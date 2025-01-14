@@ -1,0 +1,70 @@
+---
+import Layout from "@layouts/Layout.astro";
+import Container from "@components/container.astro";
+import Sectionhead from "@components/sectionhead.astro";
+import PricingCard from "@components/pricing.astro";
+import { whatsappLink } from '@utils/whatsapp';
+
+const pricing = [
+  {
+    description: "de 10 hasta 50 paquetes",
+    category: "Standar Seller",
+    prices:  [
+      { zone: "CABA", price: 2600 },
+      { zone: "GBA1", price: 3200 },
+      { zone: "GBA2", price: 4000 },
+      { zone: "GBA3", price: 5500 }
+    ],
+    button: {
+      text: "Contactarme",
+      link: whatsappLink,
+    },
+  },
+  {
+    description: "entre 50 y 100 paquetes",
+    category: "Pro Seller",
+    prices: [
+      { zone: "CABA", price: 2300 },
+      { zone: "GBA1", price: 2900 },
+      { zone: "GBA2", price: 3700 },
+      { zone: "GBA3", price: 5200 }
+    ],
+    button: {
+      text: "Contactarme",
+      link: whatsappLink,
+    },
+  },
+  {
+    description: "mas de 100 paquetes",
+    category: "Best Seller",
+    prices: [
+      { zone: "CABA", price: 2000 },
+      { zone: "GBA1", price: 2600 },
+      { zone: "GBA2", price: 3400 },
+      { zone: "GBA3", price: 4900 }
+    ],
+    button: {
+      text: "Contactarme",
+      link: whatsappLink,
+    },
+  },
+];
+---
+
+<Layout title="Precios">
+  <Container>
+    <Sectionhead>
+      <Fragment slot="title">Precios</Fragment>
+      <Fragment slot="desc">
+        Tarifas claras y competitivas. Sin costos ocultos.
+      </Fragment>
+    </Sectionhead>
+
+    <div class="grid md:grid-cols-3 gap-5 shadow-lg mx-auto max-w-screen-lg mt-8">
+      {pricing.map((item) => <PricingCard plan={item} />)}
+    </div>
+  </Container>
+  <div class="bg-primary p-10 md:px-15 md:py-15 mt-10 mx-auto max-w-5xl rounded-lg shadow-lg flex flex-col items-center text-center space-y-6">
+    <p class="text-gray-700 text-xl md:text-xl leading-relaxed">📦🤝 Si tu comercio está a menos de 5 cuadras de otro, pueden unir sus paquetes para acceder a tarifas más bajas. Por ejemplo, sumando 25 paquetes tuyos con 30 del vecino, califican para precios de +50 envíos diarios. ¡Optimiza costos uniéndote a otros comercios cercanos! 🚀💰</p>
+  </div>
+</Layout>
