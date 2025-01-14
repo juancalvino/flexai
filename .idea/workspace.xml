@@ -4,28 +4,51 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="fc2dac3e-5b81-4896-b01b-4205c394bf86" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/astroship.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/codeStyles/Project.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/codeStyles/codeStyleConfig.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.vscode/extensions.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.vscode/launch.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pnpm-lock.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/pnpm-lock.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/favicon.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/favicon.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/container.astro" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/container.astro" afterDir="false" />
+    <list default="true" id="fc2dac3e-5b81-4896-b01b-4205c394bf86" name="Changes" comment="init">
+      <change afterPath="$PROJECT_DIR$/src/pages/precios.astro" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/favicon.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/contactform.astro" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/cta.astro" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/cta.astro" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/components/features.astro" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/features.astro" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/footer.astro" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/footer.astro" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/hero.astro" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/intro.astro" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/logos.astro" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/components/navbar/navbar.astro" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/navbar/navbar.astro" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/pricing.astro" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/pricing.astro" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/ui/button.astro" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/ui/button.astro" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/ui/icons/index.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/ui/icons/tick.astro" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/ui/link.astro" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/ui/link.astro" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/content/blog/complete-guide-fullstack-development.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/content/blog/essential-data-structures-algorithms.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/content/blog/how-to-become-frontend-master.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/content/blog/kitchensink.mdx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/content/config.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/content/team/janette-lynch.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/content/team/marcell-ziemann.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/content/team/robert-palmer.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/layouts/BlogLayout.astro" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/layouts/Layout.astro" beforeDir="false" afterPath="$PROJECT_DIR$/src/layouts/Layout.astro" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/about.astro" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/nosotros.astro" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/blog/[slug].astro" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/contact.astro" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/index.astro" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/index.astro" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/pricing.astro" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Astro Component" />
+        <option value="JavaScript File" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -38,26 +61,33 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Juan/flexai_zero&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;pnpm&quot;,
-    &quot;npm.build (1).executor&quot;: &quot;Run&quot;,
-    &quot;npm.build.executor&quot;: &quot;Run&quot;,
-    &quot;npm.start.executor&quot;: &quot;Debug&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;web.inspector.settings&quot;,
-    &quot;ts.external.directory.path&quot;: &quot;C:\\Users\\juanc\\AppData\\Local\\Programs\\WebStorm\\plugins\\javascript-plugin\\jsLanguageServicesImpl\\external&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "dev",
+    "last_opened_file_path": "C:/Juan/FLEXAI/webFlexAi/astroship/src/pages",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "pnpm",
+    "npm.build (1).executor": "Run",
+    "npm.build.executor": "Run",
+    "npm.start.executor": "Debug",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "ts.external.directory.path": "C:\\Users\\juanc\\AppData\\Local\\Programs\\WebStorm\\plugins\\javascript-plugin\\jsLanguageServicesImpl\\external",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Juan\FLEXAI\webFlexAi\astroship\src\pages" />
+      <recent name="C:\Juan\FLEXAI\webFlexAi\astroship\src\assets" />
+      <recent name="C:\Juan\FLEXAI\webFlexAi\astroship\public" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Juan\FLEXAI\webFlexAi\astroship\src\assets" />
+      <recent name="C:\Juan\FLEXAI\webFlexAi\astroship\src\components\ui\icons" />
       <recent name="C:\Juan\FLEXAI\webFlexAi\astroship\public" />
     </key>
   </component>
@@ -90,7 +120,7 @@
     </recent_temporary>
   </component>
   <component name="SeleniumInternalSettingsState">
-    <option name="lastUrl" value="http://localhost:4321/pricing" />
+    <option name="lastUrl" value="http://localhost:4321/" />
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
@@ -117,12 +147,34 @@
       <workItem from="1732743428022" duration="3503000" />
       <workItem from="1733335952672" duration="189000" />
       <workItem from="1733520197061" duration="6227000" />
-      <workItem from="1733528303526" duration="320000" />
+      <workItem from="1733528303526" duration="667000" />
+      <workItem from="1733594200014" duration="9425000" />
+      <workItem from="1735341584887" duration="7620000" />
+      <workItem from="1735409963212" duration="8312000" />
+      <workItem from="1735571698609" duration="12000" />
+      <workItem from="1735922257359" duration="13131000" />
+      <workItem from="1736264489525" duration="33000" />
+      <workItem from="1736452649104" duration="8325000" />
+      <workItem from="1736534528687" duration="1191000" />
+      <workItem from="1736872043222" duration="5337000" />
     </task>
+    <task id="LOCAL-00001" summary="init">
+      <option name="closed" value="true" />
+      <created>1733528802072</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1733528802072</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="init" />
+    <option name="LAST_COMMIT_MESSAGE" value="init" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
