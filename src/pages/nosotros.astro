@@ -9,8 +9,12 @@ const { align = "center" } = Astro.props;
 <Layout title="Nosotros">
   <Container>
     <div class= "mt-16 text-center">
-      <h1 class="text-4xl lg:text-5xl font-bold lg:tracking-tight"> FlexAI </h1>
-      <h2 class="text-lg mt-4 text-slate-600">Tu Socio Logístico en Mercado Libre</h2>
+      <Sectionhead>
+        <Fragment slot="title">FlexAI</Fragment>
+        <Fragment slot="desc">
+          Tu Socio Logístico en Mercado Libre
+        </Fragment>
+      </Sectionhead>
       <img src="/assets/meliIcon.svg" alt="Mercado Libre" class="inline-block h-40 w-40" />
     </div>
     <div class="flex flex-col gap-3 mx-auto max-w-4xl ">
