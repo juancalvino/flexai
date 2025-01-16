@@ -1,0 +1,23 @@
+---
+import Layout from "@layouts/Layout.astro";
+import Container from "@components/container.astro";
+import Sectionhead from "@components/sectionhead.astro";
+
+const { align = "center" } = Astro.props;
+---
+
+<Layout title="Nosotros">
+  <Container>
+    <div class= "mt-16 text-center">
+      <h1 class="text-4xl lg:text-5xl font-bold lg:tracking-tight"> FlexAI </h1>
+      <h2 class="text-lg mt-4 text-slate-600">Tu Socio Logístico en Mercado Libre</h2>
+      <img src="../assets/meliIcon.svg" alt="Mercado Libre" class="inline-block h-40 w-40" />
+    </div>
+    <div class="flex flex-col gap-3 mx-auto max-w-4xl ">
+      <p class="text-lg leading-relaxed text-slate-500">
+      Entendemos que la logística es un componente clave para el éxito de tu negocio, y por eso, nos esforzamos por ser más que un proveedor. Somos tu aliado estratégico, garantizando la cobertura en todas las zonas habilitadas por Mercado Libre, dos recorridos diarios de lunes a sábado y un sistema innovador que te permite gestionar tus envíos con total facilidad.</p>
+
+      <p class="text-lg leading-relaxed text-slate-500"> En FlexAI, no solo transportamos paquetes; también construimos confianza. Nuestra misión es respaldar tu reputación y cuidar de tus productos como si fueran nuestros. Porque entendemos que cada entrega es una oportunidad para hacer la diferencia.</p>
+    </div>
+  </Container>
+</Layout>

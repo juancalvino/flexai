@@ -4,7 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="fc2dac3e-5b81-4896-b01b-4205c394bf86" name="Changes" comment="revert commit c5e3b70" />
+    <list default="true" id="fc2dac3e-5b81-4896-b01b-4205c394bf86" name="Changes" comment="update:astro version">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/astro.config.mjs" beforeDir="false" afterPath="$PROJECT_DIR$/astro.config.mjs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pnpm-lock.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/pnpm-lock.yaml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -32,7 +37,7 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "Merging vercel-server",
+    "git-widget-placeholder": "vercel-server",
     "last_opened_file_path": "C:/Juan/FLEXAI/webFlexAi/astroship/src/pages",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
@@ -143,7 +148,23 @@
       <option name="project" value="LOCAL" />
       <updated>1737046095439</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="fix: config">
+      <option name="closed" value="true" />
+      <created>1737046320684</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1737046320684</updated>
+    </task>
+    <task id="LOCAL-00004" summary="update:astro version">
+      <option name="closed" value="true" />
+      <created>1737046485248</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1737046485248</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -152,7 +173,9 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="init" />
     <MESSAGE value="revert commit c5e3b70" />
-    <option name="LAST_COMMIT_MESSAGE" value="revert commit c5e3b70" />
+    <MESSAGE value="fix: config" />
+    <MESSAGE value="update:astro version" />
+    <option name="LAST_COMMIT_MESSAGE" value="update:astro version" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
