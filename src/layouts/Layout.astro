@@ -14,7 +14,7 @@ export interface Props {
 const canonicalURL = new URL(Astro.url.pathname, Astro.site).toString();
 
 const resolvedImageWithDomain = new URL(
-  "/assets/logoFlexai.svg",
+  "/assets/logoFlexai.png",
   Astro.site
 ).toString();
 
@@ -34,7 +34,7 @@ const makeTitle = title
     <meta name="generator" content={Astro.generator} />
     <SEO
       title={makeTitle}
-      description="FlexAI: ¡La solución logística inteligente para tus envíos de Mercado Libre! "
+      description= "FlexAI: ¡La solución logística inteligente para tus envíos de Mercado Libre!"
       canonical={canonicalURL}
       openGraph={{
         basic: {
@@ -46,6 +46,10 @@ const makeTitle = title
         image: {
           alt: "FlexAI logo",
         },
+        optional : {
+          description: "https://www.flexai.com.ar",
+          siteName:"https://www.flexai.com.ar",
+        }
       }}
     />
   </head>
