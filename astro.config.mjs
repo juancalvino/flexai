@@ -5,6 +5,6 @@ import sitemap from "@astrojs/sitemap";
 import icon from "astro-icon";
 
 export default defineConfig({
-  site: "https://flexai.com.ar/",
+  site: "https://flexai.com.ar",
   integrations: [tailwind(), mdx(), sitemap(), icon()],
 });
