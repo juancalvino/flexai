@@ -4,51 +4,6 @@ import mapaAmba from "../assets/mapaAmba.png";
 import { whatsappLink } from "@utils/whatsapp";
 import { Picture } from "astro:assets";
 import Sectionhead from "../components/sectionhead.astro";
-
-const pricing = [
-  {
-    description: "de 10 a 50 paquetes",
-    category: "Standar Seller",
-    prices: [
-      { zone: "CABA", price: 2600 },
-      { zone: "GBA1", price: 3400 },
-      { zone: "GBA2", price: 4300 },
-      { zone: "GBA3", price: 6500 }
-    ],
-    button: {
-      text: "Contactarme",
-      link: whatsappLink
-    }
-  },
-  {
-    description: "mas de 50 paquetes",
-    category: "Pro Seller",
-    prices: [
-      { zone: "CABA", price: 2300 },
-      { zone: "GBA1", price: 3000 },
-      { zone: "GBA2", price: 3800 },
-      { zone: "GBA3", price: 5900 }
-    ],
-    button: {
-      text: "Contactarme",
-      link: whatsappLink
-    }
-  },
-  {
-    description: "clientes especiales",
-    category: "Best Seller",
-    prices: [
-      { zone: "CABA", price: 2000 },
-      { zone: "GBA1", price: 2600 },
-      { zone: "GBA2", price: 3300 },
-      { zone: "GBA3", price: 5000 }
-    ],
-    button: {
-      text: "Contactarme",
-      link: whatsappLink
-    }
-  }
-];
 ---
 
 <Layout title="Cobertura">
