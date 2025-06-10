@@ -336,21 +336,70 @@ const cssVariables = getCSSVariables();
     }
 
     .toggle-slider {
+      width: 200px;
+      height: 48px;
+      border-width: 3px;
+    }
+
+    .toggle-button {
+      width: 94px;
+      height: 40px;
+      top: 3px;
+      left: 3px;
+    }
+
+    .toggle-input:checked + .toggle-slider .toggle-button {
+      transform: translateX(94px);
+    }
+
+    .toggle-option {
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+
+    .toggle-option.left {
+      left: 24px;
+    }
+
+    .toggle-option.right {
+      right: 24px;
+    }
+
+    .button-text {
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+
+    .toggle-slider:active {
+      transform: scale(0.98);
+    }
+  }
+
+  @media (max-width: 480px) {
+    .toggle-slider {
       width: 180px;
       height: 44px;
     }
 
     .toggle-button {
-      width: 86px;
+      width: 84px;
       height: 36px;
     }
 
     .toggle-input:checked + .toggle-slider .toggle-button {
-      transform: translateX(86px);
+      transform: translateX(84px);
     }
 
     .toggle-option {
       font-size: 0.8rem;
+    }
+
+    .toggle-option.left {
+      left: 20px;
+    }
+
+    .toggle-option.right {
+      right: 20px;
     }
 
     .button-text {

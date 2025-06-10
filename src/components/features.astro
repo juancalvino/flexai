@@ -43,24 +43,24 @@ const diferenciales = [
 ---
 
 <div class="text-gray-800 mt-16 md:mt-0">
-  <h2 class="text-4xl lg:text-5xl font-bold lg:tracking-tight">
+  <h2 class="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold lg:tracking-tight">
     Todo lo que necesitas para gestionar tus envíos
   </h2>
-  <p class="text-lg mt-4 text-slate-600">
+  <p class="text-base sm:text-lg mt-4 text-slate-600 leading-relaxed">
     Con FLEXAI, tienes todo lo que necesitas. Combinamos las mejores prácticas logísticas con nuestra tecnología innovadora para simplificar y optimizar tus entregas.
   </p>
 </div>
 
-<div class="grid sm:grid-cols-2 md:grid-cols-3 mt-16 gap-16 text-gray-800">
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 mt-12 sm:mt-16 gap-8 sm:gap-12 lg:gap-16 text-gray-800">
   {
     diferenciales.map((item) => (
-      <div class="flex gap-4 items-start text-gray-800">
+      <div class="flex gap-4 items-start text-gray-800 p-4 rounded-lg hover:bg-neutral-50 transition-colors duration-200">
         <div class="mt-1 bg-brand-blue-600 rounded-full p-2 w-10 h-10 shrink-0 flex items-center justify-center shadow-lg">
           <Icon class="text-white w-5 h-5" name={item.icon} />
         </div>
-        <div>
-          <h3 class="font-semibold text-lg text-brand-blue-800">{item.title}</h3>
-          <p class="text-slate-600 mt-2 leading-relaxed">{item.description}</p>
+        <div class="flex-1 min-w-0">
+          <h3 class="font-semibold text-base sm:text-lg text-brand-blue-800 mb-2">{item.title}</h3>
+          <p class="text-slate-600 text-sm sm:text-base leading-relaxed">{item.description}</p>
         </div>
       </div>
     ))
