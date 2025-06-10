@@ -34,15 +34,14 @@ const styles = {
   href={href}
   {...rest}
   class:list={[
-    "rounded-xl text-center transition-all duration-300 focus-visible:ring-2 ring-offset-2 ring-brand-blue-500 hover:scale-105 relative group overflow-hidden",
+    "rounded-xl text-center transition-all duration-300 focus-visible:ring-2 ring-offset-2 ring-brand-blue-500 hover:scale-105 golden-shine group",
     block && "w-full",
     sizes[size],
     styles[style],
     className,
   ]}
 >
-  <!-- Efecto de brillo amarillo para todos los botones -->
-  <div class="absolute inset-0 bg-gradient-to-r from-transparent via-brand-yellow-400/70 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-800 ease-out"></div>
+  <!-- Efecto de brillo amarillo centralizado -->
   
   <span class="relative z-10 flex items-center justify-center gap-1">
     <slot />

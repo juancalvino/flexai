@@ -1,0 +1,522 @@
+---
+// Datos de zonas con sus localidades y precios
+const zones = {
+  CABA: {
+    name: "CABA",
+    description: "Todas las comunas",
+    localities: ["CABA Centro", "Palermo", "Belgrano", "Recoleta", "San Telmo", "La Boca", "Barracas"],
+    standardPrice: 3100,
+    proPrice: 2800,
+    color: "#0D395A", // brand-blue-600
+    hoverColor: "#FFCF15" // brand-yellow-500
+  },
+  GBA1: {
+    name: "GBA 1",
+    description: "Zona metropolitana cercana",
+    localities: ["Vicente López", "San Isidro", "San Fernando", "San Martín", "Tres de Febrero", "Morón", "Hurlingham", "Ituzaingó", "Matanza Norte", "Lomas de Zamora", "Lanús", "Avellaneda"],
+    standardPrice: 4000,
+    proPrice: 3700,
+    color: "#1e5b96",
+    hoverColor: "#FFCF15"
+  },
+  GBA2: {
+    name: "GBA 2", 
+    description: "Zona metropolitana intermedia",
+    localities: ["Tigre", "Malvinas Argentinas", "José C. Paz", "San Miguel", "Moreno", "Merlo", "Matanza Sur", "Ezeiza", "Esteban Echeverría", "Almirante Brown", "Quilmes", "Florencio Varela", "Berazategui"],
+    standardPrice: 5000,
+    proPrice: 4700,
+    color: "#2d7bc4",
+    hoverColor: "#FFCF15"
+  },
+  GBA3: {
+    name: "GBA 3",
+    description: "Zona metropolitana extendida", 
+    localities: ["Berisso", "Campana", "Canning", "Del Viso", "Derqui", "Ensenada", "Escobar", "Garín", "General Rodríguez", "Guernica", "Cañuelas", "Ingeniero Maschwitz", "La Plata Centro", "La Plata Norte", "La Plata Oeste", "Luján", "Marcos Paz", "Nordelta", "Pilar", "San Vicente", "Villa Rosa", "Zarate"],
+    standardPrice: 6800,
+    proPrice: 6550,
+    color: "#4a9ef1",
+    hoverColor: "#FFCF15"
+  }
+};
+---
+
+<div class="interactive-map-container">
+  <!-- Mapa SVG Interactivo -->
+  <div class="map-wrapper">
+    <svg viewBox="0 0 800 600" class="interactive-map" id="amba-map">
+      <!-- Definición de patrones y filtros -->
+      <defs>
+        <filter id="glow">
+          <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+          <feMerge> 
+            <feMergeNode in="coloredBlur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+      </defs>
+
+      <!-- GBA 3 (Tercer Cordón - forma simplificada) -->
+      <!-- Norte: Campana, Zárate, Escobar, Pilar -->
+      <path
+        id="zone-GBA3-north"
+        class="zone-path"
+        data-zone="GBA3"
+        d="M 50 50 L 750 50 L 700 150 L 600 130 L 450 120 L 300 130 L 200 150 L 100 100 Z"
+        fill={zones.GBA3.color}
+        stroke="#ffffff"
+        stroke-width="2"
+      />
+      
+      <!-- Oeste: Luján, General Rodríguez, Marcos Paz -->
+      <path
+        id="zone-GBA3-west"
+        class="zone-path"
+        data-zone="GBA3"
+        d="M 50 150 L 200 150 L 180 300 L 160 450 L 100 520 L 50 550 Z"
+        fill={zones.GBA3.color}
+        stroke="#ffffff"
+        stroke-width="2"
+      />
+      
+      <!-- Sur: La Plata, Berisso, Ensenada -->
+      <path
+        id="zone-GBA3-south"
+        class="zone-path"
+        data-zone="GBA3"
+        d="M 100 520 L 160 450 L 280 480 L 520 480 L 640 450 L 700 520 L 650 550 L 150 550 Z"
+        fill={zones.GBA3.color}
+        stroke="#ffffff"
+        stroke-width="2"
+      />
+      
+      <!-- Este: Berazategui Este -->
+      <path
+        id="zone-GBA3-east"
+        class="zone-path"
+        data-zone="GBA3"
+        d="M 600 130 L 700 150 L 720 300 L 700 420 L 640 450 L 620 350 L 600 250 Z"
+        fill={zones.GBA3.color}
+        stroke="#ffffff"
+        stroke-width="2"
+      />
+
+      <!-- GBA 2 (Segundo Cordón) -->
+      <!-- Norte: Tigre, Malvinas Argentinas, José C. Paz -->
+      <path
+        id="zone-GBA2-north"
+        class="zone-path"
+        data-zone="GBA2"
+        d="M 200 150 L 600 130 L 580 180 L 480 170 L 320 170 L 220 180 Z"
+        fill={zones.GBA2.color}
+        stroke="#ffffff"
+        stroke-width="2"
+      />
+      
+      <!-- Oeste: Moreno, Merlo -->
+      <path
+        id="zone-GBA2-west"
+        class="zone-path"
+        data-zone="GBA2"
+        d="M 160 200 L 220 180 L 200 280 L 180 380 L 160 450 L 140 400 L 140 300 Z"
+        fill={zones.GBA2.color}
+        stroke="#ffffff"
+        stroke-width="2"
+      />
+      
+      <!-- Sur: Esteban Echeverría, Almirante Brown, Quilmes -->
+      <path
+        id="zone-GBA2-south"
+        class="zone-path"
+        data-zone="GBA2"
+        d="M 180 380 L 280 400 L 520 400 L 620 380 L 640 450 L 280 480 L 160 450 Z"
+        fill={zones.GBA2.color}
+        stroke="#ffffff"
+        stroke-width="2"
+      />
+      
+      <!-- Este: Berazategui -->
+      <path
+        id="zone-GBA2-east"
+        class="zone-path"
+        data-zone="GBA2"
+        d="M 580 180 L 620 200 L 640 300 L 620 380 L 580 350 L 560 250 Z"
+        fill={zones.GBA2.color}
+        stroke="#ffffff"
+        stroke-width="2"
+      />
+
+      <!-- GBA 1 (Primer Cordón) -->
+      <!-- Norte: Vicente López, San Isidro, San Fernando -->
+      <path
+        id="zone-GBA1-north"
+        class="zone-path"
+        data-zone="GBA1"
+        d="M 250 200 L 550 190 L 530 230 L 460 220 L 340 220 L 270 230 Z"
+        fill={zones.GBA1.color}
+        stroke="#ffffff"
+        stroke-width="2"
+      />
+      
+      <!-- Oeste: San Martín, Tres de Febrero, Morón -->
+      <path
+        id="zone-GBA1-west"
+        class="zone-path"
+        data-zone="GBA1"
+        d="M 220 250 L 270 230 L 260 300 L 250 360 L 230 380 L 200 350 L 200 300 Z"
+        fill={zones.GBA1.color}
+        stroke="#ffffff"
+        stroke-width="2"
+      />
+      
+      <!-- Sur: Lomas de Zamora, Lanús, Avellaneda -->
+      <path
+        id="zone-GBA1-south"
+        class="zone-path"
+        data-zone="GBA1"
+        d="M 250 360 L 330 370 L 470 370 L 550 360 L 580 380 L 520 400 L 280 400 L 230 380 Z"
+        fill={zones.GBA1.color}
+        stroke="#ffffff"
+        stroke-width="2"
+      />
+      
+      <!-- Este: Vicente López Este -->
+      <path
+        id="zone-GBA1-east"
+        class="zone-path"
+        data-zone="GBA1"
+        d="M 530 230 L 560 250 L 580 320 L 550 360 L 520 340 L 510 280 Z"
+        fill={zones.GBA1.color}
+        stroke="#ffffff"
+        stroke-width="2"
+      />
+
+      <!-- CABA (Centro - forma más similar al real) -->
+      <path
+        id="zone-CABA"
+        class="zone-path"
+        data-zone="CABA"
+        d="M 330 250 C 340 240, 360 235, 380 240 C 420 245, 450 260, 470 280 C 480 300, 480 320, 470 340 C 450 360, 420 365, 380 360 C 360 355, 340 350, 330 340 C 320 320, 320 300, 325 280 C 327 270, 328 260, 330 250 Z"
+        fill={zones.CABA.color}
+        stroke="#ffffff"
+        stroke-width="2"
+      />
+
+      <!-- Etiquetas principales -->
+      <text x="400" y="310" text-anchor="middle" class="zone-label" fill="white" font-weight="bold">CABA</text>
+      <text x="400" y="210" text-anchor="middle" class="zone-label" fill="white" font-size="14" font-weight="bold">GBA 1</text>
+      <text x="350" y="160" text-anchor="middle" class="zone-label" fill="white" font-size="14" font-weight="bold">GBA 2</text>
+      <text x="400" y="90" text-anchor="middle" class="zone-label" fill="white" font-size="14" font-weight="bold">GBA 3</text>
+
+      <!-- Etiquetas de localidades importantes -->
+      <text x="150" y="250" text-anchor="middle" class="locality-label" fill="white" font-size="11">Luján</text>
+      <text x="400" y="520" text-anchor="middle" class="locality-label" fill="white" font-size="11">La Plata</text>
+      <text x="350" y="100" text-anchor="middle" class="locality-label" fill="white" font-size="11">Pilar</text>
+      <text x="580" y="160" text-anchor="middle" class="locality-label" fill="white" font-size="11">Tigre</text>
+      <text x="250" y="300" text-anchor="middle" class="locality-label" fill="white" font-size="11">Morón</text>
+      <text x="500" y="380" text-anchor="middle" class="locality-label" fill="white" font-size="11">Quilmes</text>
+      <text x="200" y="80" text-anchor="middle" class="locality-label" fill="white" font-size="11">Campana</text>
+      <text x="600" y="520" text-anchor="middle" class="locality-label" fill="white" font-size="11">Berisso</text>
+    </svg>
+  </div>
+
+  <!-- Panel de información -->
+  <div class="info-panel" id="zone-info">
+    <div class="info-content">
+      <h3 class="zone-title">Selecciona una zona</h3>
+      <p class="zone-description">Pasa el cursor sobre el mapa para ver información de cada zona</p>
+      <div class="price-info" style="display: none;">
+        <div class="price-item">
+          <span class="price-label">Standard Seller:</span>
+          <span class="price-value standard">$0</span>
+        </div>
+        <div class="price-item">
+          <span class="price-label">Pro Seller:</span>
+          <span class="price-value pro">$0</span>
+        </div>
+      </div>
+      <div class="localities-info" style="display: none;">
+        <h4>Localidades incluidas:</h4>
+        <div class="localities-list"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .interactive-map-container {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem;
+  }
+
+  @media (min-width: 1024px) {
+    .interactive-map-container {
+      flex-direction: row;
+    }
+  }
+
+  .map-wrapper {
+    flex: 1;
+    min-height: 400px;
+  }
+
+  .interactive-map {
+    width: 100%;
+    height: auto;
+    max-width: 800px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  }
+
+  .zone-path {
+    transition: all 0.3s ease;
+    cursor: pointer;
+    stroke-width: 2;
+  }
+
+  .zone-path:hover {
+    filter: url(#glow);
+    transform: scale(1.02);
+    transform-origin: center;
+    stroke-width: 3;
+    stroke: #FFCF15;
+  }
+
+  .zone-label {
+    font-family: 'Istok Web', sans-serif;
+    font-size: 16px;
+    pointer-events: none;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+  }
+
+  .locality-label {
+    font-family: 'Inter Variable', sans-serif;
+    pointer-events: none;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+  }
+
+  .info-panel {
+    flex: 0 0 300px;
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    border: 2px solid #e5e7eb;
+    transition: all 0.3s ease;
+  }
+
+  .info-content {
+    height: 100%;
+  }
+
+  .zone-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #0D395A;
+    margin-bottom: 0.5rem;
+    font-family: 'Istok Web', sans-serif;
+  }
+
+  .zone-description {
+    color: #6b7280;
+    margin-bottom: 1rem;
+    font-size: 1rem;
+  }
+
+  .price-info {
+    margin-bottom: 1.5rem;
+  }
+
+  .price-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .price-item:last-child {
+    border-bottom: none;
+  }
+
+  .price-label {
+    font-weight: 600;
+    color: #374151;
+  }
+
+  .price-value {
+    font-weight: bold;
+    font-size: 1.2rem;
+  }
+
+  .price-value.standard {
+    color: #059669;
+  }
+
+  .price-value.pro {
+    color: #dc2626;
+  }
+
+  .localities-info h4 {
+    font-weight: bold;
+    color: #0D395A;
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+  }
+
+  .localities-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+  }
+
+  .locality-tag {
+    background: #FFCF15;
+    color: #0D395A;
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 500;
+  }
+
+  /* Responsive */
+  @media (max-width: 1024px) {
+    .interactive-map-container {
+      flex-direction: column;
+    }
+    
+    .info-panel {
+      flex: none;
+      order: -1;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .zone-label {
+      font-size: 12px;
+    }
+    
+    .locality-label {
+      font-size: 9px;
+    }
+    
+    .info-panel {
+      padding: 1rem;
+    }
+  }
+</style>
+
+<script>
+  // Datos de zonas (repetimos aquí para JavaScript)
+  const zonesData = {
+    CABA: {
+      name: "CABA",
+      description: "Todas las comunas",
+      localities: ["CABA Centro", "Palermo", "Belgrano", "Recoleta", "San Telmo", "La Boca", "Barracas"],
+      standardPrice: 3100,
+      proPrice: 2800,
+      color: "#0D395A",
+      hoverColor: "#FFCF15"
+    },
+    GBA1: {
+      name: "GBA 1",
+      description: "Zona metropolitana cercana",
+      localities: ["Vicente López", "San Isidro", "San Fernando", "San Martín", "Tres de Febrero", "Morón", "Hurlingham", "Ituzaingó", "Matanza Norte", "Lomas de Zamora", "Lanús", "Avellaneda"],
+      standardPrice: 4000,
+      proPrice: 3700,
+      color: "#1e5b96",
+      hoverColor: "#FFCF15"
+    },
+    GBA2: {
+      name: "GBA 2", 
+      description: "Zona metropolitana intermedia",
+      localities: ["Tigre", "Malvinas Argentinas", "José C. Paz", "San Miguel", "Moreno", "Merlo", "Matanza Sur", "Ezeiza", "Esteban Echeverría", "Almirante Brown", "Quilmes", "Florencio Varela", "Berazategui"],
+      standardPrice: 5000,
+      proPrice: 4700,
+      color: "#2d7bc4",
+      hoverColor: "#FFCF15"
+    },
+    GBA3: {
+      name: "GBA 3",
+      description: "Zona metropolitana extendida", 
+      localities: ["Berisso", "Campana", "Canning", "Del Viso", "Derqui", "Ensenada", "Escobar", "Garín", "General Rodríguez", "Guernica", "Cañuelas", "Ingeniero Maschwitz", "La Plata Centro", "La Plata Norte", "La Plata Oeste", "Luján", "Marcos Paz", "Nordelta", "Pilar", "San Vicente", "Villa Rosa", "Zarate"],
+      standardPrice: 6800,
+      proPrice: 6550,
+      color: "#4a9ef1",
+      hoverColor: "#FFCF15"
+    }
+  };
+
+  document.addEventListener('DOMContentLoaded', function() {
+    const zonePaths = document.querySelectorAll('.zone-path');
+    const infoPanel = document.getElementById('zone-info');
+    const zoneTitle = infoPanel.querySelector('.zone-title');
+    const zoneDescription = infoPanel.querySelector('.zone-description');
+    const priceInfo = infoPanel.querySelector('.price-info');
+    const localitiesInfo = infoPanel.querySelector('.localities-info');
+    const localitiesList = infoPanel.querySelector('.localities-list');
+    const standardPrice = infoPanel.querySelector('.price-value.standard');
+    const proPrice = infoPanel.querySelector('.price-value.pro');
+
+    // Función para mostrar información de zona
+    function showZoneInfo(zoneId) {
+      const zone = zonesData[zoneId];
+      if (!zone) return;
+
+      zoneTitle.textContent = zone.name;
+      zoneDescription.textContent = zone.description;
+      standardPrice.textContent = `$${zone.standardPrice.toLocaleString()}`;
+      proPrice.textContent = `$${zone.proPrice.toLocaleString()}`;
+      
+      // Mostrar localidades
+      localitiesList.innerHTML = '';
+      zone.localities.forEach(locality => {
+        const tag = document.createElement('span');
+        tag.className = 'locality-tag';
+        tag.textContent = locality;
+        localitiesList.appendChild(tag);
+      });
+
+      priceInfo.style.display = 'block';
+      localitiesInfo.style.display = 'block';
+    }
+
+    // Función para ocultar información
+    function hideZoneInfo() {
+      zoneTitle.textContent = 'Selecciona una zona';
+      zoneDescription.textContent = 'Pasa el cursor sobre el mapa para ver información de cada zona';
+      priceInfo.style.display = 'none';
+      localitiesInfo.style.display = 'none';
+    }
+
+    // Event listeners para cada zona
+    zonePaths.forEach(path => {
+      const zoneId = path.getAttribute('data-zone');
+      const zone = zonesData[zoneId];
+      
+      if (zone) {
+        path.addEventListener('mouseenter', () => {
+          // Cambiar color al hover
+          path.style.fill = zone.hoverColor;
+          showZoneInfo(zoneId);
+        });
+
+        path.addEventListener('mouseleave', () => {
+          // Restaurar color original
+          path.style.fill = zone.color;
+          hideZoneInfo();
+        });
+
+        path.addEventListener('click', () => {
+          // Scroll a la sección de precios o mostrar más información
+          const whatsappUrl = `https://wa.me/5491130502881?text=Hola! Me interesa el servicio de envíos para la zona ${zone.name}. ¿Podrían darme más información?`;
+          window.open(whatsappUrl, '_blank');
+        });
+      }
+    });
+  });
+</script>

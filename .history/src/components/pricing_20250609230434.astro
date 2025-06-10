@@ -1,0 +1,41 @@
+---
+import Button from "./ui/button.astro";
+import { Icon } from "astro-icon/components";
+
+const { plan } = Astro.props;
+---
+
+<div>
+  <div
+    class="flex flex-col w-full order-first lg:order-none border-2 border-[#D8DEE9] border-opacity-50 py-5 px-6 rounded-md">
+    <div class="text-center">
+      <p
+        class="mt-1 text-5xl font-bold text-brand-blue-600 md:text-4xl">
+        { plan.category }
+      </p>
+      <p class="font-medium text-gray-500">{ plan.description }</p>
+
+    </div>
+    <ul class="grid mt-8 text-center gap-y-3 justify-center">
+      {
+        plan.prices.map((item) => (
+          <li class="flex items-center justify-center gap-3 text-gray-700">
+            <Icon class="text-brand-blue-600 w-6 h-6" name="bx:bx-package" />
+            <span>{item['zone']} -->  ${item['price']}</span>
+          </li>
+        ))
+      }
+    </ul>
+    <div class="flex mt-8">
+      <Button
+        href={plan.button.link || "#"}
+        variant="primary"
+        size="lg"
+        fullWidth
+        class="shadow-lg"
+      >
+        {plan.button.text || "Contactenos"}
+      </Button>
+    </div>
+  </div>
+</div>

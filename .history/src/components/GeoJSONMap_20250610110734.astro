@@ -1,0 +1,741 @@
+---
+// Datos de zonas con sus municipios
+const zones = {
+  CABA: {
+    name: "CABA",
+    description: "Ciudad Autónoma de Buenos Aires",
+    municipalities: ["CABA", "Buenos Aires", "Ciudad Autónoma de Buenos Aires", "Capital Federal"],
+    standardPrice: 3086, // Precio con IVA del CSV
+    proPrice: 2831, // Precio Pro con IVA del CSV
+    color: "#FFCF15", // Amarillo FLEXAI para CABA
+    hoverColor: "#0D395A" // Azul FLEXAI para hover
+  },
+  GBA1: {
+    name: "GBA 1",
+    description: "Primer cordón del conurbano",
+    municipalities: [
+      "Vicente López", "San Isidro", "San Fernando", "San Martín", 
+      "Tres de Febrero", "Morón", "Hurlingham", "Ituzaingó", 
+      "La Matanza", "Lomas de Zamora", "Lanús", "Avellaneda"
+    ],
+    standardPrice: 4114, // Precio con IVA del CSV
+    proPrice: 3703, // Precio Pro con IVA del CSV
+    color: "#0D395A", // Azul FLEXAI para GBA1
+    hoverColor: "#FFCF15" // Amarillo FLEXAI para hover
+  },
+  GBA2: {
+    name: "GBA 2", 
+    description: "Segundo cordón del conurbano",
+    municipalities: [
+      "Tigre", "Malvinas Argentinas", "José C. Paz", "San Miguel", 
+      "Moreno", "Merlo", "Ezeiza", "Esteban Echeverría", 
+      "Almirante Brown", "Quilmes", "Florencio Varela", "Berazategui"
+    ],
+    standardPrice: 5143, // Precio con IVA del CSV
+    proPrice: 4574, // Precio Pro con IVA del CSV
+    color: "#1E5A96", // Azul FLEXAI más claro para GBA2  
+    hoverColor: "#FFCF15" // Amarillo FLEXAI para hover
+  },
+  GBA3: {
+    name: "GBA 3",
+    description: "Tercer cordón del conurbano", 
+    municipalities: [
+      "Campana", "Zárate", "Escobar", "Pilar", "Luján", 
+      "General Rodríguez", "Marcos Paz", "Cañuelas", "Guernica",
+      "La Plata", "Berisso", "Ensenada"
+    ],
+    standardPrice: 6861, // Precio con IVA del CSV
+    proPrice: 6292, // Precio Pro con IVA del CSV
+    color: "#4A89DC", // Azul FLEXAI intermedio para GBA3
+    hoverColor: "#FFCF15" // Amarillo FLEXAI para hover
+  }
+};
+
+// Mapeo de municipios a zonas
+const municipalityToZone = {};
+Object.entries(zones).forEach(([zoneId, zone]) => {
+  zone.municipalities.forEach(municipality => {
+    municipalityToZone[municipality.toLowerCase()] = zoneId;
+  });
+});
+---
+
+<div class="geojson-map-container">
+  <div id="map" class="leaflet-map"></div>
+  
+  <!-- Panel de información -->
+  <div class="info-panel" id="zone-info">
+    <!-- Selector de tipo de servicio -->
+    <div class="service-selector">
+      <h4 class="selector-title">Tipo de servicio:</h4>
+      <div class="selector-options">
+        <label class="selector-option">
+          <input type="radio" name="serviceType" value="standard" checked>
+          <span class="option-text">Standard Seller</span>
+        </label>
+        <label class="selector-option">
+          <input type="radio" name="serviceType" value="pro">
+          <span class="option-text">Pro Seller</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="info-content">
+      <h3 class="zone-title">Área Metropolitana de Buenos Aires</h3>
+      <p class="zone-description">Pasa el cursor sobre el mapa para ver información de cada zona</p>
+      <div class="price-info" style="display: none;">
+        <div class="price-item">
+          <span class="price-label">Precio:</span>
+          <span class="price-value selected-price">$0</span>
+        </div>
+      </div>
+      <div class="municipalities-info" style="display: none;">
+        <h4>Municipios incluidos:</h4>
+        <div class="municipalities-list"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+  crossorigin=""/>
+
+<style>
+  .geojson-map-container {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem;
+  }
+
+  @media (min-width: 1024px) {
+    .geojson-map-container {
+      flex-direction: row;
+    }
+  }
+
+  .leaflet-map {
+    flex: 1;
+    height: 500px;
+    min-height: 400px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    border: 2px solid #e5e7eb;
+    position: relative;
+    z-index: 10;
+  }
+
+  .info-panel {
+    flex: 0 0 300px;
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    border: 2px solid #e5e7eb;
+    transition: all 0.3s ease;
+  }
+
+  .service-selector {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #e5e7eb;
+  }
+
+  .selector-title {
+    font-size: 1rem;
+    font-weight: bold;
+    color: #0D395A;
+    margin-bottom: 0.75rem;
+    font-family: 'Istok Web', sans-serif;
+  }
+
+  .selector-options {
+    display: flex;
+    gap: 1rem;
+  }
+
+  .selector-option {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    border: 2px solid transparent;
+  }
+
+  .selector-option:hover {
+    background-color: #f3f4f6;
+  }
+
+  .selector-option input[type="radio"] {
+    width: 18px;
+    height: 18px;
+    accent-color: #0D395A;
+    cursor: pointer;
+  }
+
+  .selector-option input[type="radio"]:checked + .option-text {
+    color: #0D395A;
+    font-weight: 600;
+  }
+
+  .option-text {
+    font-size: 0.9rem;
+    color: #6b7280;
+    transition: all 0.2s ease;
+    cursor: pointer;
+  }
+
+  .info-content {
+    height: 100%;
+  }
+
+  .zone-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #0D395A;
+    margin-bottom: 0.5rem;
+    font-family: 'Istok Web', sans-serif;
+  }
+
+  .zone-description {
+    color: #6b7280;
+    margin-bottom: 1rem;
+    font-size: 1rem;
+  }
+
+  .price-info {
+    margin-bottom: 1.5rem;
+  }
+
+  .price-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .price-item:last-child {
+    border-bottom: none;
+  }
+
+  .price-label {
+    font-weight: 600;
+    color: #374151;
+  }
+
+  .price-value {
+    font-weight: bold;
+    font-size: 1.2rem;
+  }
+
+  .price-value.selected-price {
+    color: #0D395A;
+  }
+
+  .municipalities-info h4 {
+    font-weight: bold;
+    color: #0D395A;
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+  }
+
+  .municipalities-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+  }
+
+  .municipality-tag {
+    background: #FFCF15;
+    color: #0D395A;
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 500;
+  }
+
+  /* Asegurar que Leaflet no interfiera con el header */
+  .leaflet-map .leaflet-control-container,
+  .leaflet-map .leaflet-popup,
+  .leaflet-map .leaflet-tooltip {
+    z-index: 15 !important;
+  }
+
+  .leaflet-map .leaflet-pane {
+    z-index: 5 !important;
+  }
+
+  /* Responsive */
+  @media (max-width: 1024px) {
+    .geojson-map-container {
+      flex-direction: column;
+    }
+    
+    .info-panel {
+      flex: none;
+      order: -1;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .info-panel {
+      padding: 1rem;
+    }
+    
+    .leaflet-map {
+      height: 400px;
+    }
+  }
+</style>
+
+<script>
+  // Debug inicial
+  console.log('Script del mapa iniciando...');
+  
+  // Importar Leaflet
+  import('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js').then(() => {
+    console.log('Leaflet cargado correctamente');
+    // Datos de zonas (repetimos aquí para JavaScript)
+    const zonesData = {
+      CABA: {
+        name: "CABA",
+        description: "Ciudad Autónoma de Buenos Aires",
+        municipalities: ["CABA", "Buenos Aires", "Ciudad Autónoma de Buenos Aires", "Capital Federal"],
+        standardPrice: 3086, // Precio con IVA del CSV
+        proPrice: 2831, // Precio Pro con IVA del CSV
+        color: "#FFCF15", // Amarillo FLEXAI para CABA
+        hoverColor: "#0D395A" // Azul FLEXAI para hover
+      },
+      GBA1: {
+        name: "GBA 1",
+        description: "Primer cordón del conurbano",
+        municipalities: [
+          "Vicente López", "San Isidro", "San Fernando", "San Martín", 
+          "Tres de Febrero", "Morón", "Hurlingham", "Ituzaingó", 
+          "La Matanza", "Lomas de Zamora", "Lanús", "Avellaneda"
+        ],
+        standardPrice: 4114, // Precio con IVA del CSV
+        proPrice: 3703, // Precio Pro con IVA del CSV
+        color: "#0D395A", // Azul FLEXAI para GBA1
+        hoverColor: "#FFCF15" // Amarillo FLEXAI para hover
+      },
+      GBA2: {
+        name: "GBA 2", 
+        description: "Segundo cordón del conurbano",
+        municipalities: [
+          "Tigre", "Malvinas Argentinas", "José C. Paz", "San Miguel", 
+          "Moreno", "Merlo", "Ezeiza", "Esteban Echeverría", 
+          "Almirante Brown", "Presidente Perón", "Quilmes", "Florencio Varela", "Berazategui"
+        ],
+        standardPrice: 5143, // Precio con IVA del CSV
+        proPrice: 4574, // Precio Pro con IVA del CSV
+        color: "#1E5A96", // Azul FLEXAI más claro para GBA2
+        hoverColor: "#FFCF15" // Amarillo FLEXAI para hover
+      },
+      GBA3: {
+        name: "GBA 3",
+        description: "Tercer cordón del conurbano", 
+        municipalities: [
+          "Campana", "Zárate", "Escobar", "Pilar", "Luján", 
+          "General Rodríguez", "Marcos Paz", "Cañuelas", "Partido de San Fernando",
+          "La Plata", "Berisso", "Ensenada"
+        ],
+        standardPrice: 6861, // Precio con IVA del CSV
+        proPrice: 6292, // Precio Pro con IVA del CSV
+        color: "#4A89DC", // Azul FLEXAI intermedio para GBA3
+        hoverColor: "#FFCF15" // Amarillo FLEXAI para hover
+      }
+    };
+
+    // Mapeo de municipios a zonas
+    const municipalityToZone = {};
+    Object.entries(zonesData).forEach(([zoneId, zone]) => {
+      zone.municipalities.forEach(municipality => {
+        municipalityToZone[municipality.toLowerCase()] = zoneId;
+      });
+    });
+
+
+    // Función para determinar la zona de un municipio
+    function getZoneForMunicipality(name) {
+      const normalizedName = name.toLowerCase().trim();
+      
+      // Mapeos exactos usando los nombres del GeoJSON (sin acentos)
+      const exactMapping = {
+        // CABA
+        'ciudad autonoma de buenos aires': 'CABA',
+        'caba': 'CABA',
+        'capital federal': 'CABA',
+        'buenos aires': 'CABA', // A veces aparece así en datos
+        
+        // GBA1 - Primer Cordón
+        'vicente lopez': 'GBA1', // sin acento
+        'san isidro': 'GBA1',
+        'san fernando': 'GBA1', // El partido que limita con San Isidro y Tigre
+        'general san martin': 'GBA1', // sin acento
+        'tres de febrero': 'GBA1',
+        'moron': 'GBA1', // sin acento
+        'hurlingham': 'GBA1',
+        'ituzaingo': 'GBA1', // sin acento
+        'la matanza': 'GBA1',
+        'lomas de zamora': 'GBA1',
+        'lanus': 'GBA1', // sin acento
+        'avellaneda': 'GBA1',
+        
+        // GBA2 - Segundo Cordón
+        'tigre': 'GBA2',
+        'malvinas argentinas': 'GBA2',
+        'jose c paz': 'GBA2', // sin acento ni punto
+        'san miguel': 'GBA2',
+        'moreno': 'GBA2',
+        'merlo': 'GBA2',
+        'ezeiza': 'GBA2',
+        'esteban echeverria': 'GBA2', // sin acento
+        'almirante brown': 'GBA2',
+        'quilmes': 'GBA2',
+        'florencio varela': 'GBA2',
+        'berazategui': 'GBA2',
+        
+        // GBA3 - Tercer Cordón
+        'berisso': 'GBA3',
+        'campana': 'GBA3',
+        'ensenada': 'GBA3',
+        'escobar': 'GBA3',
+        'general rodriguez': 'GBA3', // sin acento
+        'cañuelas': 'GBA3',
+        'presidente peron': 'GBA2', // Incluye Guernica - movido a GBA2
+        'partido de san fernando': 'GBA3', // El que limita con Tigre, Escobar y Campana
+        'la plata': 'GBA3',
+        'lujan': 'GBA3', // sin acento
+        'marcos paz': 'GBA3',
+        'pilar': 'GBA3',
+        'san vicente': 'GBA3',
+        'zarate': 'GBA3' // sin acento
+      };
+
+      // Solo devolver zona si hay mapeo exacto
+      return exactMapping[normalizedName] || null;
+    }
+
+
+    // Inicializar el mapa
+    const map = L.map('map').setView([-34.6037, -58.3816], 9);
+
+    // Agregar tiles de OpenStreetMap
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    // Referencias a elementos del DOM
+    const infoPanel = document.getElementById('zone-info');
+    const zoneTitle = infoPanel.querySelector('.zone-title');
+    const zoneDescription = infoPanel.querySelector('.zone-description');
+    const priceInfo = infoPanel.querySelector('.price-info');
+    const municipalitiesInfo = infoPanel.querySelector('.municipalities-info');
+    const municipalitiesList = infoPanel.querySelector('.municipalities-list');
+    const selectedPrice = infoPanel.querySelector('.price-value.selected-price');
+    const serviceTypeRadios = infoPanel.querySelectorAll('input[name="serviceType"]');
+
+    // Función para obtener el tipo de servicio seleccionado
+    function getSelectedServiceType() {
+      const checkedRadio = infoPanel.querySelector('input[name="serviceType"]:checked');
+      return checkedRadio ? checkedRadio.value : 'standard';
+    }
+
+    // Función para mostrar información de zona
+    function showZoneInfo(zoneId) {
+      const zone = zonesData[zoneId];
+      if (!zone) return;
+
+      const serviceType = getSelectedServiceType();
+      const price = serviceType === 'pro' ? zone.proPrice : zone.standardPrice;
+
+      zoneTitle.textContent = zone.name;
+      zoneDescription.textContent = zone.description;
+      selectedPrice.textContent = `$${price.toLocaleString()}`;
+      
+      // Mostrar municipios
+      municipalitiesList.innerHTML = '';
+      zone.municipalities.forEach(municipality => {
+        const tag = document.createElement('span');
+        tag.className = 'municipality-tag';
+        tag.textContent = municipality;
+        municipalitiesList.appendChild(tag);
+      });
+
+      priceInfo.style.display = 'block';
+      municipalitiesInfo.style.display = 'block';
+    }
+
+    // Función para ocultar información
+    function hideZoneInfo() {
+      zoneTitle.textContent = 'Área Metropolitana de Buenos Aires';
+      zoneDescription.textContent = 'Pasa el cursor sobre el mapa para ver información de cada zona';
+      priceInfo.style.display = 'none';
+      municipalitiesInfo.style.display = 'none';
+    }
+
+    // Variable para guardar la zona actualmente mostrada
+    let currentZone = null;
+
+    // Event listener para cambios en el selector de servicio
+    serviceTypeRadios.forEach(radio => {
+      radio.addEventListener('change', () => {
+        if (currentZone) {
+          showZoneInfo(currentZone);
+        }
+      });
+    });
+
+    // URLs de los GeoJSON
+    const buenosAiresGeojsonUrl = 'https://raw.githubusercontent.com/mgaitan/departamentos_argentina/master/departamentos-buenos_aires.json';
+    const cabaGeojsonUrl = 'https://cdn.buenosaires.gob.ar/datosabiertos/datasets/ministerio-de-educacion/comunas/comunas.geojson';
+    
+    console.log('Iniciando carga de GeoJSON...');
+    
+    // Primero cargar solo Buenos Aires para asegurar que funciona
+    fetch(buenosAiresGeojsonUrl)
+      .then(response => response.json())
+      .then(buenosAiresData => {
+        // Debug: mostrar información del GeoJSON
+        console.log('Municipios de Buenos Aires:', buenosAiresData.features.length);
+        console.log('Todos los nombres en GeoJSON:', buenosAiresData.features.map(f => 
+          f.properties.departamento || 'sin nombre'
+        ).sort());
+        
+        // Filtrar solo los municipios del AMBA con mapeo exacto
+        const ambaFeatures = buenosAiresData.features.filter(feature => {
+          const name = feature.properties.departamento || '';
+          const zone = getZoneForMunicipality(name);
+          
+          // Filtro especial para San Fernando: excluir el que limita con Campana
+          if (name.toLowerCase() === 'san fernando') {
+            // Obtener el centroide del polígono para determinar ubicación
+            const geometry = feature.geometry;
+            if (geometry && geometry.coordinates) {
+              // Calcular centroide aproximado
+              let totalLat = 0, totalLng = 0, pointCount = 0;
+              
+              const processCoordinates = (coords) => {
+                if (Array.isArray(coords[0])) {
+                  coords.forEach(processCoordinates);
+                } else {
+                  totalLng += coords[0];
+                  totalLat += coords[1];
+                  pointCount++;
+                }
+              };
+              
+              processCoordinates(geometry.coordinates);
+              
+              if (pointCount > 0) {
+                const centroidLat = totalLat / pointCount;
+                const centroidLng = totalLng / pointCount;
+                
+                console.log(`🔍 San Fernando encontrado: lat=${centroidLat}, lng=${centroidLng}`);
+                
+                // Por ahora, incluir ambos para ver las coordenadas exactas
+                // Luego ajustaremos el filtro
+              }
+            }
+          }
+          
+          if (zone) {
+            console.log(`Municipio AMBA encontrado: ${name} -> ${zone}`);
+          } else {
+            console.log(`Municipio NO mapeado: ${name}`);
+          }
+          return zone !== null;
+        });
+
+        // Crear el layer GeoJSON
+        const geojsonLayer = L.geoJSON(ambaFeatures, {
+          style: function(feature) {
+            const name = feature.properties.departamento || '';
+            const zone = getZoneForMunicipality(name);
+            
+            // Si no tiene zona asignada, no mostrar
+            if (!zone || !zonesData[zone]) {
+              return {
+                fillColor: '#cccccc',
+                weight: 1,
+                opacity: 0.3,
+                color: 'white',
+                fillOpacity: 0.2
+              };
+            }
+            
+            const zoneData = zonesData[zone];
+            
+            return {
+              fillColor: zoneData.color,
+              weight: 2,
+              opacity: 1,
+              color: 'white',
+              dashArray: '3',
+              fillOpacity: 0.7
+            };
+          },
+          onEachFeature: function(feature, layer) {
+            const name = feature.properties.departamento || '';
+            const zone = getZoneForMunicipality(name);
+            
+            // Solo agregar interactividad si tiene zona válida
+            if (!zone || !zonesData[zone]) {
+              return; // No agregar eventos a municipios fuera del AMBA
+            }
+            
+            const zoneData = zonesData[zone];
+            
+            // Agregar eventos
+            layer.on({
+              mouseover: function(e) {
+                const currentLayer = e.target;
+                currentLayer.setStyle({
+                  weight: 3,
+                  color: '#FFCF15',
+                  dashArray: '',
+                  fillOpacity: 0.9,
+                  fillColor: zoneData.hoverColor
+                });
+                currentLayer.bringToFront();
+                currentZone = zone;
+                showZoneInfo(zone);
+              },
+              mouseout: function(e) {
+                geojsonLayer.resetStyle(e.target);
+                currentZone = null;
+                hideZoneInfo();
+              },
+              click: function(e) {
+                const whatsappUrl = `https://wa.me/5491130502881?text=Hola! Me interesa el servicio de envíos para ${name} (${zoneData.name}). ¿Podrían darme más información?`;
+                window.open(whatsappUrl, '_blank');
+              }
+            });
+            
+            // Tooltip - Mostrar el nombre real del municipio
+            layer.bindTooltip(`${name} (${zoneData.name})`, {
+              permanent: false,
+              direction: 'center',
+              className: 'custom-tooltip'
+            });
+          }
+        }).addTo(map);
+
+        // Ajustar la vista del mapa a los datos
+        map.fitBounds(geojsonLayer.getBounds());
+        
+        console.log('Mapa cargado exitosamente con municipios del GBA');
+        
+        // Ahora intentar cargar CABA como segundo paso
+        fetch(cabaGeojsonUrl)
+          .then(response => response.json())
+          .then(cabaData => {
+            console.log('CABA GeoJSON cargado:', cabaData.features.length, 'comunas');
+            
+            // Usar todas las comunas de CABA como features individuales pero tratarlas como una zona
+            const cabaFeatures = cabaData.features.map(feature => ({
+              ...feature,
+              properties: {
+                ...feature.properties,
+                departamento: 'Ciudad Autónoma de Buenos Aires', // Nombre normalizado para mapeo
+                zona: 'CABA'
+              }
+            }));
+            
+            // Crear un layer separado para CABA
+            const cabaLayer = L.geoJSON(cabaFeatures, {
+              style: function(feature) {
+                const zone = 'CABA';
+                const zoneData = zonesData[zone];
+                
+                return {
+                  fillColor: zoneData.color,
+                  weight: 2,
+                  opacity: 1,
+                  color: 'white',
+                  dashArray: '3',
+                  fillOpacity: 0.7
+                };
+              },
+              onEachFeature: function(feature, layer) {
+                const zone = 'CABA';
+                const zoneData = zonesData[zone];
+                
+                // Agregar eventos
+                layer.on({
+                  mouseover: function(e) {
+                    const currentLayer = e.target;
+                    currentLayer.setStyle({
+                      weight: 3,
+                      color: '#FFCF15',
+                      dashArray: '',
+                      fillOpacity: 0.9,
+                      fillColor: zoneData.hoverColor
+                    });
+                    currentLayer.bringToFront();
+                    currentZone = zone;
+                    showZoneInfo(zone);
+                  },
+                  mouseout: function(e) {
+                    cabaLayer.resetStyle(e.target);
+                    currentZone = null;
+                    hideZoneInfo();
+                  },
+                  click: function(e) {
+                    const whatsappUrl = `https://wa.me/5491130502881?text=Hola! Me interesa el servicio de envíos para CABA (${zoneData.name}). ¿Podrían darme más información?`;
+                    window.open(whatsappUrl, '_blank');
+                  }
+                });
+                
+                // Tooltip
+                layer.bindTooltip(`CABA (${zoneData.name})`, {
+                  permanent: false,
+                  direction: 'center',
+                  className: 'custom-tooltip'
+                });
+              }
+            }).addTo(map);
+            
+            console.log('CABA agregado al mapa exitosamente');
+          })
+          .catch(error => {
+            console.warn('No se pudo cargar CABA, pero el mapa GBA funciona:', error);
+          });
+      })
+      .catch(error => {
+        console.error('Error cargando datos GeoJSON:', error);
+        console.error('Stack:', error.stack);
+        
+        // Fallback: mostrar un mensaje de error
+        const errorDiv = document.createElement('div');
+        errorDiv.innerHTML = `
+          <div style="padding: 2rem; text-align: center; color: #dc2626;">
+            <h3>Error cargando el mapa</h3>
+            <p>No se pudieron cargar los datos geográficos. Por favor, intenta recargar la página.</p>
+            <p style="font-size: 0.8rem; margin-top: 1rem;">Error: ${error.message}</p>
+          </div>
+        `;
+        document.getElementById('map').appendChild(errorDiv);
+      });
+  });
+</script>
+
+<style>
+  .custom-tooltip {
+    background: rgba(13, 57, 90, 0.9);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 0.5rem;
+    font-weight: 600;
+  }
+</style>
