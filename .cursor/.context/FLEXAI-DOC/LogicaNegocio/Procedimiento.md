@@ -1,0 +1,4 @@
+- Gurpo de whatsapp
+- Alta del cliente
+- Colecta y distribucion de los paquetes 
+- Las fechas 1 y 16 se enviara la liquidacion para realizar el pago

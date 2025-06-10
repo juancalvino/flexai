@@ -1,0 +1,71 @@
+---
+export interface Props {
+  variant?: "default" | "elevated" | "outline" | "glass" | "gradient";
+  padding?: "none" | "sm" | "md" | "lg" | "xl";
+  class?: string;
+  interactive?: boolean;
+  href?: string;
+  target?: string;
+}
+
+const {
+  variant = "default",
+  padding = "md",
+  class: className = "",
+  interactive = false,
+  href,
+  target,
+} = Astro.props;
+
+const baseClasses = "rounded-2xl transition-all duration-300";
+
+const variantClasses = {
+  default: "bg-white border border-neutral-200",
+  elevated: "bg-white shadow-soft hover:shadow-xl",
+  outline: "bg-transparent border-2 border-neutral-300",
+  glass: "bg-white/80 backdrop-blur-md border border-white/20 shadow-lg",
+  gradient: "bg-gradient-to-br from-brand-yellow-50 to-brand-blue-50 border border-brand-yellow-200"
+};
+
+const paddingClasses = {
+  none: "",
+  sm: "p-4",
+  md: "p-6",
+  lg: "p-8",
+  xl: "p-10"
+};
+
+const interactiveClasses = interactive || href
+  ? "cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
+  : "";
+
+const classes = [
+  baseClasses,
+  variantClasses[variant],
+  paddingClasses[padding],
+  interactiveClasses,
+  className
+].filter(Boolean).join(" ");
+
+const Tag = href ? "a" : "div";
+---
+
+<Tag
+  class={classes}
+  href={href}
+  target={target}
+>
+  <slot />
+</Tag>
+
+<style>
+  /* Additional hover effects for elevated variant */
+  .bg-white.shadow-soft:hover {
+    transform: translateY(-2px);
+  }
+  
+  /* Glow effect on hover for gradient variant */
+  .bg-gradient-to-br:hover {
+    box-shadow: 0 0 30px rgba(255, 207, 21, 0.3);
+  }
+</style>

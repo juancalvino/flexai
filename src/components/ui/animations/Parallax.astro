@@ -1,0 +1,173 @@
+---
+export interface Props {
+  speed?: number;
+  class?: string;
+  direction?: 'vertical' | 'horizontal';
+  offset?: number;
+}
+
+const {
+  speed = 0.5,
+  class: className = '',
+  direction = 'vertical',
+  offset = 0,
+} = Astro.props;
+
+const parallaxId = `parallax-${Math.random().toString(36).substr(2, 9)}`;
+---
+
+<div 
+  class={`parallax-element ${className}`}
+  data-parallax-id={parallaxId}
+  data-speed={speed}
+  data-direction={direction}
+  data-offset={offset}
+  style="will-change: transform;"
+>
+  <slot />
+</div>
+
+<script>
+  class ParallaxController {
+    private elements: NodeListOf<Element> | null = null;
+    private rafId: number | null = null;
+    private isScrolling = false;
+
+    constructor() {
+      this.init();
+    }
+
+    init() {
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => this.setupParallax());
+      } else {
+        this.setupParallax();
+      }
+
+      document.addEventListener('astro:page-load', () => this.setupParallax());
+    }
+
+    setupParallax() {
+      this.elements = document.querySelectorAll('.parallax-element');
+      
+      if (!this.elements.length) return;
+
+      // Check for reduced motion preference
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        return;
+      }
+
+      this.bindEvents();
+      this.updateParallax(); // Initial calculation
+    }
+
+    bindEvents() {
+      let ticking = false;
+
+      const handleScroll = () => {
+        if (!ticking) {
+          requestAnimationFrame(() => {
+            this.updateParallax();
+            ticking = false;
+          });
+          ticking = true;
+        }
+      };
+
+      // Throttled scroll event
+      window.addEventListener('scroll', handleScroll, { passive: true });
+      window.addEventListener('resize', handleScroll, { passive: true });
+    }
+
+    updateParallax() {
+      if (!this.elements) return;
+
+      const scrollTop = window.pageYOffset;
+      const scrollLeft = window.pageXOffset;
+      const windowHeight = window.innerHeight;
+      const windowWidth = window.innerWidth;
+
+      this.elements.forEach(element => {
+        const htmlElement = element as HTMLElement;
+        const rect = element.getBoundingClientRect();
+        const speed = parseFloat(htmlElement.getAttribute('data-speed') || '0.5');
+        const direction = htmlElement.getAttribute('data-direction') || 'vertical';
+        const offset = parseFloat(htmlElement.getAttribute('data-offset') || '0');
+
+        // Check if element is in viewport
+        const isInViewport = rect.bottom >= 0 && rect.top <= windowHeight;
+        
+        if (!isInViewport) return;
+
+        let translateValue = 0;
+        
+        if (direction === 'vertical') {
+          // Calculate vertical parallax
+          const elementTop = rect.top + scrollTop;
+          const elementCenter = elementTop + rect.height / 2;
+          const viewportCenter = scrollTop + windowHeight / 2;
+          const distance = elementCenter - viewportCenter;
+          translateValue = distance * speed + offset;
+          
+          htmlElement.style.transform = `translate3d(0, ${translateValue}px, 0)`;
+        } else {
+          // Calculate horizontal parallax
+          const elementLeft = rect.left + scrollLeft;
+          const elementCenter = elementLeft + rect.width / 2;
+          const viewportCenter = scrollLeft + windowWidth / 2;
+          const distance = elementCenter - viewportCenter;
+          translateValue = distance * speed + offset;
+          
+          htmlElement.style.transform = `translate3d(${translateValue}px, 0, 0)`;
+        }
+      });
+    }
+
+    destroy() {
+      if (this.rafId) {
+        cancelAnimationFrame(this.rafId);
+        this.rafId = null;
+      }
+    }
+  }
+
+  // Initialize parallax system
+  let parallaxInstance: ParallaxController | null = null;
+
+  function initParallax() {
+    if (parallaxInstance) {
+      parallaxInstance.destroy();
+    }
+    parallaxInstance = new ParallaxController();
+  }
+
+  // Initialize on first load
+  initParallax();
+
+  // Cleanup on page unload
+  window.addEventListener('beforeunload', () => {
+    if (parallaxInstance) {
+      parallaxInstance.destroy();
+    }
+  });
+</script>
+
+<style>
+  .parallax-element {
+    will-change: transform;
+  }
+  
+  /* Disable parallax on reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    .parallax-element {
+      transform: none !important;
+    }
+  }
+  
+  /* Disable parallax on mobile for performance */
+  @media (max-width: 768px) {
+    .parallax-element {
+      transform: none !important;
+    }
+  }
+</style>

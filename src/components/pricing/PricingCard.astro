@@ -1,0 +1,121 @@
+---
+import Button from "../ui/button.astro";
+import Badge from "../ui/Badge.astro";
+import { Icon } from "astro-icon/components";
+
+export interface Props {
+  name: string;
+  description: string;
+  featured?: boolean;
+  badge?: string;
+  priceRange?: string;
+  features: string[];
+  zones: {
+    name: string;
+    price: string;
+  }[];
+  ctaText?: string;
+  ctaHref?: string;
+}
+
+const {
+  name,
+  description,
+  featured = false,
+  badge,
+  priceRange,
+  features,
+  zones,
+  ctaText = "Comenzar ahora",
+  ctaHref = "#contacto"
+} = Astro.props;
+---
+
+<div class={`
+  relative flex flex-col h-full rounded-3xl p-8 transition-all duration-300
+  ${featured 
+    ? 'bg-gradient-to-br from-brand-blue-500 to-brand-blue-600 text-white shadow-2xl scale-105 lg:scale-110' 
+    : 'bg-white border border-neutral-200 hover:border-brand-yellow-300 hover:shadow-xl'
+  }
+`}>
+  {badge && (
+    <div class="absolute -top-4 left-1/2 -translate-x-1/2">
+      <Badge variant="primary" size="md" rounded>
+        {badge}
+      </Badge>
+    </div>
+  )}
+  
+  {/* Header */}
+  <div class="mb-6">
+    <h3 class={`text-2xl font-bold mb-2 ${featured ? 'text-white' : 'text-neutral-900'}`}>
+      {name}
+    </h3>
+    <p class={`text-sm ${featured ? 'text-brand-blue-100' : 'text-neutral-600'}`}>
+      {description}
+    </p>
+    {priceRange && (
+      <p class={`mt-2 text-lg font-medium ${featured ? 'text-brand-yellow-300' : 'text-brand-blue-600'}`}>
+        {priceRange} envíos diarios
+      </p>
+    )}
+  </div>
+  
+  {/* Price zones */}
+  <div class="mb-6 space-y-3">
+    <p class={`text-sm font-medium ${featured ? 'text-brand-blue-100' : 'text-neutral-500'}`}>
+      Precios por zona:
+    </p>
+    {zones.map((zone) => (
+      <div class={`
+        flex items-center justify-between p-3 rounded-xl
+        ${featured ? 'bg-brand-blue-400/20' : 'bg-neutral-50'}
+      `}>
+        <span class={`font-medium ${featured ? 'text-white' : 'text-neutral-700'}`}>
+          {zone.name}
+        </span>
+        <span class={`
+          text-lg font-bold
+          ${featured ? 'text-brand-yellow-300' : 'text-brand-blue-600'}
+        `}>
+          ${zone.price}
+        </span>
+      </div>
+    ))}
+    <p class={`text-xs ${featured ? 'text-brand-blue-100' : 'text-neutral-500'}`}>
+      *Precios + IVA si requiere factura
+    </p>
+  </div>
+  
+  {/* Features */}
+  <div class="flex-grow mb-8">
+    <ul class="space-y-3">
+      {features.map((feature) => (
+        <li class="flex items-start gap-3">
+          <Icon 
+            name="bx:check-circle" 
+            class={`
+              w-5 h-5 flex-shrink-0 mt-0.5
+              ${featured ? 'text-brand-yellow-300' : 'text-success-500'}
+            `}
+          />
+          <span class={`text-sm ${featured ? 'text-white' : 'text-neutral-600'}`}>
+            {feature}
+          </span>
+        </li>
+      ))}
+    </ul>
+  </div>
+  
+  {/* CTA */}
+  <Button
+    href={ctaHref}
+    variant={featured ? "primary" : "outline"}
+    size="lg"
+    fullWidth
+    class={featured ? "hover:shadow-lg" : ""}
+  >
+    {ctaText}
+    <Icon name="bx:right-arrow-alt" class="w-5 h-5 ml-2" />
+  </Button>
+</div>

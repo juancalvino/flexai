@@ -1,0 +1,54 @@
+---
+import { Picture } from "astro:assets";
+import motoPedido from "../assets/motoPedido.svg";
+import Link from "./ui/link.astro";
+import { Icon } from "astro-icon/components";
+---
+
+<main
+  class="grid lg:grid-cols-2 place-items-center pt-16 pb-8 md:pt-12 md:pb-24">
+  <div class="py-6 md:order-1 hidden md:block">
+    <Picture
+      src={motoPedido}
+      alt="GPS y moto de FLEXAI"
+      widths={[200, 400, 600]}
+      sizes="(max-width: 800px) 100vw, 620px"
+      loading="eager"
+      format="avif"
+    />
+  </div>
+  <div>
+    <h1
+      class="text-5xl lg:text-6xl xl:text-7xl text-gray-800 font-bold lg:tracking-tight xl:tracking-tighter">
+      La forma flex de realizar envios inteligentes
+    </h1>
+    <p class="text-lg mt-4 text-slate-600 max-w-xl">
+      ¡Impulsa tus ventas con envíos Flex sin complicaciones!🚀 <br>
+      Nos encargamos de tu logística de forma rápida y eficiente,
+      para que te concentres en lo que realmente importa: hacer crecer tu negocio.📈
+      Olvídate de las demoras y la complejidad, ¡nosotros te simplificamos el proceso!
+    </p>
+    <div class="mt-6 flex flex-col sm:flex-row gap-3">
+      <Link
+        href="https://wa.me/5491130502881"
+        target="_self"
+        style="primary"
+        size="lg"
+        class="flex gap-1 items-center justify-center shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
+        rel="noopener">
+        <Icon class="text-white w-5 h-5 transition-colors duration-300" name="bx:bxs-rocket" />
+        Comenzar con FLEXAI
+      </Link>
+      <Link
+        size="lg"
+        style="outline"
+        rel="noopener"
+        href="/precios"
+        class="flex gap-1 items-center justify-center shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
+        target="_self">
+        <Icon class="text-brand-blue-600 group-hover:text-white w-4 h-4 transition-colors duration-300" name="bx:bx-bar-chart-alt-2" />
+         Ver precios
+      </Link>
+    </div>
+  </div>
+</main>

@@ -1,0 +1,56 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Container from "../components/container.astro";
+import Sectionhead from "../components/sectionhead.astro";
+import PricingCard from "../components/pricing.astro";
+
+const pricing = [
+  {
+    description: "10 a 50 paquetes por día",
+    category: "Standar Seller",
+    prices:  [
+      { zone: "CABA", price: 3100 },
+      { zone: "GBA1", price: 4000 },
+      { zone: "GBA2", price: 5000 },
+      { zone: "GBA3", price: 6800 }
+    ],
+    button: {
+      text: "Contactarme",
+      link: "https://wa.me/5491130502881",
+    },
+  },
+  {
+    description: "Más de 50 paquetes por día",
+    category: "Pro Seller",
+    prices: [
+      { zone: "CABA", price: 2800 },
+      { zone: "GBA1", price: 3700 },
+      { zone: "GBA2", price: 4700 },
+      { zone: "GBA3", price: 6550 }
+    ],
+    button: {
+      text: "Contactarme",
+      link: "https://wa.me/5491130502881",
+    },
+  },
+];
+---
+
+<Layout title="Precios">
+  <Container>
+    <Sectionhead>
+      <Fragment slot="title">Precios</Fragment>
+      <Fragment slot="desc">
+        Tarifas claras y competitivas. Sin costos ocultos.
+      </Fragment>
+    </Sectionhead>
+
+    <div class="grid md:grid-cols-3 gap-5 shadow-lg mx-auto max-w-screen-lg mt-8">
+      {pricing.map((item) => <PricingCard plan={item} />)}
+    </div>
+    <p class="text-gray-400 text-center pt-2"> * IVA no incluido</p>
+  </Container>
+  <div class="bg-brand-yellow-100 border-l-4 border-brand-yellow-500 p-10 md:px-15 md:py-15 mt-10 mx-auto max-w-5xl rounded-lg shadow-lg flex flex-col items-center text-center space-y-6">
+    <p class="text-brand-blue-800 text-xl md:text-xl leading-relaxed font-medium">📦🤝 ¡Ahorra más combinando envíos con otro comercio! Si al sumar tus envíos con los de uno o varios comercios cercanos alcanzan un volumen mayor, pueden calificar a un plan superior y disfrutar de tarifas aún más bajas. 💸💰 ¡Optimiza tus costos colaborando con negocios cercanos! 🚀</p>
+  </div>
+</Layout>

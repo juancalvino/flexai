@@ -1,0 +1,3 @@
+- [ ] Crear grupo de whatsapp
+- [ ] Dar de alta al sistema ligthdata, link
+- [ ] 

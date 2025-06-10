@@ -1,0 +1,162 @@
+### **Pedido 1**
+
+- **Número de Venta:** 2000007241304741
+- **Destinatario:** Sabrina Gianasso (SGIANASSO)
+- **Código Postal:** 1670
+- **Ciudad:** Nordelta
+- **Dirección:** Barrio El Golf SN
+- **Referencia:** Lote 408, Casa Blanca y Marrón
+
+---
+
+### **Pedido 2**
+
+- **Número de Venta:** 2000010818455488
+- **Destinatario:** Evelin Noemí Maldonado (EVELINNOEMIMALDONADO)
+- **Código Postal:** 1864
+- **Ciudad:** San Vicente, Alejandro Korn
+- **Dirección:** Calle José Hernández 960
+- **Referencia:** Puerta negra, casa amarilla, dos macetas en la puerta. Entre: Ameguino y Lavalle
+
+---
+
+### **Pedido 3**
+
+- **Número de Venta:** 2000007239970841
+- **Destinatario:** Maricel Morichetti (MARICELMIRICHETTI)
+- **Código Postal:** 1629
+- **Ciudad:** Pilar, La Lonja
+- **Dirección:** Ramos Mejía 2821
+- **Referencia:** Portón negro de metal sobre la izquierda. Entre: El Cardenal y El Chingolo
+
+---
+
+### **Pedido 4**
+
+- **Número de Venta:** 2000010824611066
+- **Destinatario:** José Ruiz (RUJO5632156)
+- **Código Postal:** 1925
+- **Ciudad:** Ensenada
+- **Dirección:** Bernardo de Irigoyen 31
+- **Referencia:** Rejas Blancas. Entre: Gerez y Mitre
+
+---
+
+### **Pedido 5**
+
+- **Número de Venta:** 2000007239797373
+- **Destinatario:** Cintia Jesica de Brasi (CINTIAJESICADEBRASI)
+- **Código Postal:** 1625
+- **Ciudad:** Escobar, Belén de Escobar
+- **Dirección:** Rafael Obligado 1051
+- **Referencia:** Casa con portón negro
+
+---
+
+### **Pedido 6**
+
+- **Número de Venta:** 2000010825445844
+- **Destinatario:** Noemí Tassi (TANO7344565)
+- **Código Postal:** 1722
+- **Ciudad:** Merlo
+- **Dirección:** Pitágoras 1036
+- **Referencia:** Portones negros. Entre: Alem y Aristóbulo del Valle
+
+---
+
+### **Pedido 7**
+
+- **Número de Venta:** 2000007241760219
+- **Destinatario:** Yelisberth Rodríguez (YELISRO)
+- **Código Postal:** 1645
+- **Ciudad:** San Fernando, Virreyes
+- **Dirección:** Calle Quintana 1674
+- **Referencia:** Piso 1 Dpto 4. A una cuadra de la estación de Virreyes. Paralelo a Avellaneda. Timbre 4. Entre: Besares y Pellegrini
+
+---
+
+### **Pedido 8**
+
+- **Número de Venta:** 2000010818843390
+- **Destinatario:** Elena Aguirre (AGEL9608726)
+- **Código Postal:** 1870
+- **Ciudad:** Avellaneda
+- **Dirección:** Sarmiento 1994
+- **Referencia:** Casa. Entre: Campichuelo y Cangallo
+
+---
+
+### **Pedido 9**
+
+- **Número de Venta:** 2000010817293648
+- **Destinatario:** Carolina Mallmann (CAROMALLMANN)
+- **Código Postal:** 1016
+- **Ciudad:** CABA, Recoleta
+- **Dirección:** Uruguay 1017
+- **Referencia:** 5to Piso. Entre: Avenida Santa Fe y Marcelo T. de Alvear
+
+---
+
+### **Pedido 10**
+
+- **Número de Venta:** 2000010823119746
+- **Destinatario:** Paola Elizabeth Solaligue (PAOLASOLALIGUE)
+- **Código Postal:** 1712
+- **Ciudad:** Morón, Castelar
+- **Dirección:** Calle Turín 385
+- **Referencia:** Es una casa de 3 pisos. Llamar antes de entregar. Entregar después de las 13 horas.
+
+---
+
+### **Pedido 11**
+
+- **Número de Venta:** 2000010816808472
+- **Destinatario:** Tamara Botté (TAMYBOTTE)
+- **Código Postal:** 1414
+- **Ciudad:** CABA, Chacarita
+- **Dirección:** Calle Vera 1402
+- **Referencia:** No especificada
+
+---
+
+### **Pedido 12**
+
+- **Número de Venta:** 2000010824613774
+- **Destinatario:** Gonzalo Sebastián Robledo (ROBLEDOGON)
+- **Código Postal:** 1293
+- **Ciudad:** CABA, Buenos Aires
+- **Dirección:** Osvaldo Cruz 2102
+- **Referencia:** Oficina
+
+---
+
+### **Pedido 13**
+
+- **Número de Venta:** 2000010817933284
+- **Destinatario:** Rosa Barrios (ROSAGABRIELABARRIOSCACERES)
+- **Código Postal:** 1439
+- **Ciudad:** CABA, Lugano
+- **Dirección:** Av. Piedra Buena 3401
+- **Referencia:** Entre Argentina y Echeandia
+
+---
+
+### **Pedido 14**
+
+- **Número de Venta:** 2000010819506270
+- **Destinatario:** Gladys Andrea Lopez (ANDRU_LOPEZ1881)
+- **Código Postal:** 1406
+- **Ciudad:** CABA, Flores
+- **Dirección:** Condarco 355
+- **Referencia:** 7B
+
+---
+
+### **Pedido 15**
+
+- **Número de Venta:** 2000010825808830
+- **Destinatario:** Mirta Daniela Britos Núñez (BRDA3993595)
+- **Código Postal:** 1607
+- **Ciudad:** San Isidro, Villa Adelina
+- **Dirección:** Perito Moreno 2453
+- **Referencia:** Timbre que dice arriba. Avisar por teléfono al llegar. Contacto alternativo: Alejandro 1168878705. Entre: Guayaquil y Castillos

@@ -1,0 +1,200 @@
+---
+export interface Props {
+  value: number;
+  duration?: number;
+  prefix?: string;
+  suffix?: string;
+  decimals?: number;
+  class?: string;
+  separator?: string;
+}
+
+const {
+  value,
+  duration = 2000,
+  prefix = '',
+  suffix = '',
+  decimals = 0,
+  class: className = '',
+  separator = ',',
+} = Astro.props;
+
+const counterId = `counter-${Math.random().toString(36).substr(2, 9)}`;
+---
+
+<span 
+  class={`count-up ${className}`}
+  data-counter-id={counterId}
+  data-value={value}
+  data-duration={duration}
+  data-prefix={prefix}
+  data-suffix={suffix}
+  data-decimals={decimals}
+  data-separator={separator}
+>
+  {prefix}0{suffix}
+</span>
+
+<script>
+  class CountUpAnimation {
+    private observer: IntersectionObserver | null = null;
+    private elements: NodeListOf<Element> | null = null;
+
+    constructor() {
+      this.init();
+    }
+
+    init() {
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => this.setupObserver());
+      } else {
+        this.setupObserver();
+      }
+
+      document.addEventListener('astro:page-load', () => this.setupObserver());
+    }
+
+    setupObserver() {
+      this.elements = document.querySelectorAll('.count-up');
+      
+      if (!this.elements.length) return;
+
+      if (!('IntersectionObserver' in window)) {
+        this.fallbackAnimation();
+        return;
+      }
+
+      if (this.observer) {
+        this.observer.disconnect();
+      }
+
+      this.observer = new IntersectionObserver(
+        (entries) => this.handleIntersection(entries),
+        {
+          root: null,
+          rootMargin: '0px',
+          threshold: 0.5
+        }
+      );
+
+      this.elements.forEach(element => {
+        if (this.observer) {
+          this.observer.observe(element);
+        }
+      });
+    }
+
+    handleIntersection(entries: IntersectionObserverEntry[]) {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          this.animateCounter(entry.target as HTMLElement);
+          if (this.observer) {
+            this.observer.unobserve(entry.target);
+          }
+        }
+      });
+    }
+
+    animateCounter(element: HTMLElement) {
+      const value = parseFloat(element.getAttribute('data-value') || '0');
+      const duration = parseInt(element.getAttribute('data-duration') || '2000');
+      const prefix = element.getAttribute('data-prefix') || '';
+      const suffix = element.getAttribute('data-suffix') || '';
+      const decimals = parseInt(element.getAttribute('data-decimals') || '0');
+      const separator = element.getAttribute('data-separator') || ',';
+
+      let startTime: number | null = null;
+      const startValue = 0;
+
+      const easeOutQuart = (t: number): number => {
+        return 1 - Math.pow(1 - t, 4);
+      };
+
+      const formatNumber = (num: number): string => {
+        let formatted = num.toFixed(decimals);
+        
+        if (separator && Math.abs(num) >= 1000) {
+          const parts = formatted.split('.');
+          parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, separator);
+          formatted = parts.join('.');
+        }
+        
+        return formatted;
+      };
+
+      const animate = (currentTime: number) => {
+        if (startTime === null) startTime = currentTime;
+        
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const easedProgress = easeOutQuart(progress);
+        
+        const currentValue = startValue + (value - startValue) * easedProgress;
+        
+        element.textContent = `${prefix}${formatNumber(currentValue)}${suffix}`;
+        
+        if (progress < 1) {
+          requestAnimationFrame(animate);
+        } else {
+          element.textContent = `${prefix}${formatNumber(value)}${suffix}`;
+        }
+      };
+
+      requestAnimationFrame(animate);
+    }
+
+    fallbackAnimation() {
+      if (this.elements) {
+        this.elements.forEach(element => {
+          const value = parseFloat(element.getAttribute('data-value') || '0');
+          const prefix = element.getAttribute('data-prefix') || '';
+          const suffix = element.getAttribute('data-suffix') || '';
+          const decimals = parseInt(element.getAttribute('data-decimals') || '0');
+          
+          element.textContent = `${prefix}${value.toFixed(decimals)}${suffix}`;
+        });
+      }
+    }
+
+    destroy() {
+      if (this.observer) {
+        this.observer.disconnect();
+        this.observer = null;
+      }
+    }
+  }
+
+  // Initialize counter system
+  let counterInstance: CountUpAnimation | null = null;
+
+  function initCountUp() {
+    if (counterInstance) {
+      counterInstance.destroy();
+    }
+    counterInstance = new CountUpAnimation();
+  }
+
+  // Initialize on first load
+  initCountUp();
+
+  // Cleanup on page unload
+  window.addEventListener('beforeunload', () => {
+    if (counterInstance) {
+      counterInstance.destroy();
+    }
+  });
+</script>
+
+<style>
+  .count-up {
+    display: inline-block;
+    font-variant-numeric: tabular-nums;
+  }
+  
+  /* Disable animation on reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    .count-up {
+      /* Show final value immediately */
+    }
+  }
+</style>

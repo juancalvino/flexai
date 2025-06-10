@@ -1,0 +1,1 @@
+- [ ]  Completar [FLEXAI | Instagram | Linktree](https://linktr.ee/logisticaflexai)

@@ -1,0 +1,187 @@
+---
+import { Picture, Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
+export interface Props {
+  src: string | ImageMetadata;
+  alt: string;
+  width?: number;
+  height?: number;
+  sizes?: string;
+  class?: string;
+  loading?: 'lazy' | 'eager';
+  quality?: number;
+  format?: 'webp' | 'avif' | 'png' | 'jpg';
+  priority?: boolean;
+  aspectRatio?: string;
+  placeholder?: 'blur' | 'empty';
+  fallback?: string;
+}
+
+const {
+  src,
+  alt,
+  width,
+  height,
+  sizes = '(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw',
+  class: className = '',
+  loading = 'lazy',
+  quality = 80,
+  format = 'webp',
+  priority = false,
+  aspectRatio,
+  placeholder = 'empty',
+  fallback = 'jpg',
+  ...props
+} = Astro.props;
+
+const formats = ['avif', 'webp', fallback];
+const isLocalImage = typeof src !== 'string';
+
+// Generate responsive widths
+const breakpoints = [320, 640, 768, 1024, 1280, 1536];
+const responsiveWidths = width 
+  ? breakpoints.filter(bp => bp <= width * 2)
+  : breakpoints;
+
+// Build classes
+const imageClasses = [
+  'object-cover w-full h-full transition-opacity duration-300',
+  aspectRatio && `aspect-[${aspectRatio}]`,
+  placeholder === 'blur' && 'blur-sm',
+  className
+].filter(Boolean).join(' ');
+
+const containerClasses = [
+  'relative overflow-hidden',
+  aspectRatio && `aspect-[${aspectRatio}]`,
+].filter(Boolean).join(' ');
+
+// Preload hint for priority images
+const shouldPreload = priority && loading === 'eager';
+---
+
+{shouldPreload && (
+  <link
+    rel="preload"
+    as="image"
+    href={typeof src === 'string' ? src : src.src}
+    imagesizes={sizes}
+  />
+)}
+
+<div class={containerClasses}>
+  {isLocalImage ? (
+    <Picture
+      src={src}
+      alt={alt}
+      widths={responsiveWidths}
+      sizes={sizes}
+      formats={formats}
+      quality={quality}
+      loading={loading}
+      class={imageClasses}
+      {...props}
+    />
+  ) : (
+    <img
+      src={src}
+      alt={alt}
+      width={width}
+      height={height}
+      sizes={sizes}
+      loading={loading}
+      class={imageClasses}
+      {...props}
+    />
+  )}
+  
+  {/* Loading skeleton */}
+  {placeholder === 'blur' && (
+    <div class="absolute inset-0 bg-gradient-to-r from-neutral-200 via-neutral-300 to-neutral-200 animate-pulse opacity-50" />
+  )}
+</div>
+
+<style>
+  /* Progressive enhancement for intersection observer */
+  @supports (content-visibility: auto) {
+    img[loading="lazy"] {
+      content-visibility: auto;
+    }
+  }
+  
+  /* Fade in animation */
+  img {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  
+  img.loaded {
+    opacity: 1;
+  }
+  
+  /* Blur placeholder animation */
+  .blur-placeholder {
+    filter: blur(5px);
+    transition: filter 0.3s ease;
+  }
+  
+  .blur-placeholder.loaded {
+    filter: blur(0);
+  }
+</style>
+
+<script>
+  // Progressive image loading with intersection observer
+  function initImageLoading() {
+    const images = document.querySelectorAll('img[loading="lazy"]');
+    
+    if ('IntersectionObserver' in window) {
+      const imageObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const img = entry.target as HTMLImageElement;
+            
+            // Load the image
+            if (img.dataset.src) {
+              img.src = img.dataset.src;
+              img.removeAttribute('data-src');
+            }
+            
+            // Add loaded class when image loads
+            img.addEventListener('load', () => {
+              img.classList.add('loaded');
+              img.style.opacity = '1';
+            });
+            
+            observer.unobserve(img);
+          }
+        });
+      }, {
+        rootMargin: '50px 0px',
+        threshold: 0.1
+      });
+      
+      images.forEach(img => imageObserver.observe(img));
+    } else {
+      // Fallback for browsers without IntersectionObserver
+      images.forEach((img: HTMLImageElement) => {
+        if (img.dataset.src) {
+          img.src = img.dataset.src;
+          img.removeAttribute('data-src');
+        }
+        img.style.opacity = '1';
+      });
+    }
+  }
+  
+  // Initialize on DOM content loaded
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initImageLoading);
+  } else {
+    initImageLoading();
+  }
+  
+  // Reinitialize for dynamic content
+  document.addEventListener('astro:page-load', initImageLoading);
+</script>

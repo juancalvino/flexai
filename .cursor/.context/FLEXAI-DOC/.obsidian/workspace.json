@@ -1,0 +1,200 @@
+{
+  "main": {
+    "id": "82e8d1d6483efbcc",
+    "type": "split",
+    "children": [
+      {
+        "id": "83823e9c3095ff4a",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "9e25de8f1f316c5d",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "LogicaNegocio/Preguntas frecuentes.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Preguntas frecuentes"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "c041c73cbdc5da4b",
+    "type": "split",
+    "children": [
+      {
+        "id": "efa099b966f5ebce",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "301c39adb76b64c7",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "a1108024302acbe4",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "b1473db10088727f",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "90908ffcb6578cc2",
+    "type": "split",
+    "children": [
+      {
+        "id": "9544dc47deff05bb",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "80cb472d83f0d0be",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks"
+            }
+          },
+          {
+            "id": "c158ab07c718172f",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links"
+            }
+          },
+          {
+            "id": "01c2c1c05a56828a",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "092f1fb7b492b024",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Outline"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false
+    }
+  },
+  "active": "9e25de8f1f316c5d",
+  "lastOpenFiles": [
+    "LogicaNegocio/Procedimiento.md",
+    "LogicaNegocio/Propuesta.md",
+    "Busqueda/Posibles Clientes.md",
+    "Cosas para hacer.md",
+    "Competencia.md",
+    "Consultorias/Estudio Contable LT/consultoria_estudio_contable.md",
+    "Consultorias/Estudio Contable LT/Transcription - Copy.md",
+    "Consultorias/Estudio Contable LT/Transcription.md",
+    "Consultorias/Estudio Contable LT",
+    "Consultorias",
+    "LogicaNegocio/Preguntas frecuentes.md",
+    "LogicaNegocio/Precios.md",
+    "LogicaNegocio/Logica de negocio.md",
+    "LogicaNegocio/Info de la empresa.md",
+    "02-FaseCliente/AltaEnLigthData/AltaLigthData.md",
+    "02-FaseCliente/CrearGrupoWhatsapp/01-Crear grupo en whatsapp.md",
+    "02-FaseCliente/Proceso de alta.md",
+    "02-FaseCliente/Proceso.md",
+    "LigthData.md",
+    "Utils.md",
+    "Reuniones/Clientes.md",
+    "Libros robados.md",
+    "Libros robados.txt",
+    "Reuniones/Chofer.md",
+    "Mensajes/Presentacion por Email.md",
+    "01-FaseVenta/Mensajes/Texto promocional.md",
+    "LogicaNegocio/Preguntas al cliente.md",
+    "`",
+    "Reuniones"
+  ]
+}

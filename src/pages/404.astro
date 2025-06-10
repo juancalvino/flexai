@@ -1,0 +1,95 @@
+---
+import Container from "../components/container.astro";
+import Layout from "../layouts/Layout.astro";
+import Button from "../components/ui/button.astro";
+import { Icon } from "astro-icon/components";
+---
+
+<Layout title="404 - Página no encontrada">
+  <Container>
+    <div class="min-h-[calc(100vh-16rem)] flex items-center justify-center">
+      <div class="text-center max-w-2xl mx-auto py-16">
+        <!-- 404 Icon -->
+        <div class="mb-8">
+          <div class="relative inline-block">
+            <div class="absolute inset-0 bg-brand-yellow-300 rounded-full blur-3xl opacity-30 animate-pulse"></div>
+            <div class="relative bg-brand-yellow-100 w-32 h-32 rounded-full flex items-center justify-center mx-auto">
+              <Icon name="bx:error" class="w-16 h-16 text-brand-yellow-600" />
+            </div>
+          </div>
+        </div>
+        
+        <!-- Error message -->
+        <h1 class="text-6xl lg:text-8xl font-display font-bold text-neutral-900 mb-4">
+          404
+        </h1>
+        <h2 class="text-2xl lg:text-3xl font-semibold text-neutral-800 mb-4">
+          ¡Ups! Página no encontrada
+        </h2>
+        <p class="text-lg text-neutral-600 mb-8 max-w-lg mx-auto">
+          Parece que el paquete que buscas se perdió en el camino. 
+          No te preocupes, te ayudamos a encontrar tu destino.
+        </p>
+        
+        <!-- Actions -->
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <Button
+            href="/"
+            size="lg"
+            variant="primary"
+            class="group"
+          >
+            <Icon name="bx:home" class="w-5 h-5 mr-2" />
+            Volver al inicio
+          </Button>
+          
+          <Button
+            href="/contacto"
+            size="lg"
+            variant="outline"
+          >
+            <Icon name="bx:support" class="w-5 h-5 mr-2" />
+            Contactar soporte
+          </Button>
+        </div>
+        
+        <!-- Quick links -->
+        <div class="mt-12 pt-12 border-t border-neutral-200">
+          <p class="text-sm text-neutral-500 mb-4">O tal vez querías visitar:</p>
+          <div class="flex flex-wrap gap-2 justify-center">
+            <a href="/precios" class="text-brand-blue-500 hover:text-brand-blue-600 hover:underline">
+              Precios
+            </a>
+            <span class="text-neutral-300">•</span>
+            <a href="/cobertura" class="text-brand-blue-500 hover:text-brand-blue-600 hover:underline">
+              Cobertura
+            </a>
+            <span class="text-neutral-300">•</span>
+            <a href="/nosotros" class="text-brand-blue-500 hover:text-brand-blue-600 hover:underline">
+              Nosotros
+            </a>
+            <span class="text-neutral-300">•</span>
+            <a href="https://lightdata.flexai.com.ar" target="_blank" class="text-brand-blue-500 hover:text-brand-blue-600 hover:underline">
+              Sistema LightData
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </Container>
+</Layout>
+
+<style>
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+  
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+</style>

@@ -1,0 +1,109 @@
+---
+export interface Props {
+  variant?: "primary" | "secondary" | "outline" | "ghost" | "danger";
+  size?: "sm" | "md" | "lg" | "xl";
+  href?: string;
+  class?: string;
+  disabled?: boolean;
+  loading?: boolean;
+  icon?: string;
+  iconPosition?: "left" | "right";
+  fullWidth?: boolean;
+  type?: "button" | "submit" | "reset";
+  block?: boolean; // Backwards compatibility
+  style?: "outline" | "primary" | "inverted"; // Backwards compatibility
+  [key: string]: any;
+}
+
+const {
+  variant = "primary",
+  size = "md",
+  href,
+  class: className = "",
+  disabled = false,
+  loading = false,
+  icon,
+  iconPosition = "left",
+  fullWidth = false,
+  type = "button",
+  block, // Backwards compatibility
+  style, // Backwards compatibility
+  ...rest
+} = Astro.props;
+
+// Handle backwards compatibility
+const finalVariant = style === "outline" ? "outline" : variant;
+const finalFullWidth = block || fullWidth;
+
+const baseClasses = "inline-flex items-center justify-center font-semibold transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed relative overflow-hidden group";
+
+const variantClasses = {
+  primary: "bg-gradient-to-r from-brand-yellow-500 to-brand-yellow-400 text-brand-blue-900 hover:from-brand-yellow-600 hover:to-brand-yellow-500 focus-visible:ring-brand-yellow-500 shadow-lg shadow-brand-yellow-500/25 hover:shadow-xl hover:shadow-brand-yellow-500/40 active:scale-[0.98] hover:-translate-y-0.5",
+  secondary: "bg-gradient-to-r from-brand-blue-600 to-brand-blue-500 text-white hover:from-brand-blue-700 hover:to-brand-blue-600 focus-visible:ring-brand-blue-500 shadow-lg shadow-brand-blue-500/25 hover:shadow-xl hover:shadow-brand-blue-500/40 active:scale-[0.98] hover:-translate-y-0.5",
+  outline: "border-2 border-brand-blue-500 text-brand-blue-600 hover:bg-brand-blue-500 hover:text-white focus-visible:ring-brand-blue-500 hover:shadow-lg hover:shadow-brand-blue-500/25 active:scale-[0.98]",
+  ghost: "text-brand-blue-600 hover:bg-brand-blue-100 hover:text-brand-blue-700 focus-visible:ring-brand-blue-500 active:scale-[0.98]",
+  danger: "bg-gradient-to-r from-error-500 to-error-600 text-white hover:from-error-600 hover:to-error-700 focus-visible:ring-error-500 shadow-lg shadow-error-500/25 hover:shadow-xl hover:shadow-error-500/40 active:scale-[0.98] hover:-translate-y-0.5"
+};
+
+const sizeClasses = {
+  sm: "px-4 py-2 text-sm rounded-xl gap-2",
+  md: "px-6 py-2.5 text-base rounded-xl gap-2",
+  lg: "px-8 py-3 text-lg rounded-2xl gap-2.5",
+  xl: "px-10 py-4 text-xl rounded-2xl gap-3"
+};
+
+const classes = [
+  baseClasses,
+  variantClasses[finalVariant],
+  sizeClasses[size],
+  finalFullWidth && "w-full",
+  className
+].filter(Boolean).join(" ");
+
+const Tag = href ? "a" : "button";
+---
+
+<Tag
+  class={classes}
+  href={href}
+  disabled={disabled || loading}
+  type={!href ? type : undefined}
+  {...rest}
+>
+  <!-- Shine effect for primary buttons -->
+  {finalVariant === "primary" && (
+    <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-out"></div>
+  )}
+  
+  {loading && (
+    <svg
+      class="animate-spin h-5 w-5"
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+    >
+      <circle
+        class="opacity-25"
+        cx="12"
+        cy="12"
+        r="10"
+        stroke="currentColor"
+        stroke-width="4"
+      ></circle>
+      <path
+        class="opacity-75"
+        fill="currentColor"
+        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+      ></path>
+    </svg>
+  )}
+  {icon && !loading && iconPosition === "left" && (
+    <span class="flex-shrink-0 transition-transform group-hover:scale-110">{icon}</span>
+  )}
+  <span class="relative z-10">
+    <slot />
+  </span>
+  {icon && !loading && iconPosition === "right" && (
+    <span class="flex-shrink-0 transition-transform group-hover:scale-110">{icon}</span>
+  )}
+</Tag>

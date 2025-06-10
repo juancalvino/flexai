@@ -1,0 +1,197 @@
+---
+import Container from "../container.astro";
+import Button from "../ui/button.astro";
+import { Picture } from "astro:assets";
+import logoFlexai from "../../assets/imagotipoFlexai.svg";
+import { Astronav, MenuItems, MenuIcon, OpenIcon, CloseIcon } from "astro-navbar";
+import { Icon } from "astro-icon/components";
+
+const menuitems = [
+  {
+    title: "Inicio",
+    path: "/"
+  },
+  {
+    title: "Precios",
+    path: "/precios"
+  },
+  {
+    title: "Cobertura",
+    path: "/cobertura"
+  },
+  {
+    title: "Nosotros",
+    path: "/nosotros"
+  },
+];
+
+const currentPath = Astro.url.pathname;
+---
+
+<header class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-neutral-100">
+  <Container>
+    <div class="py-4">
+      <Astronav>
+        <div class="flex items-center justify-between">
+          <!-- Logo -->
+          <div>
+            <a href="/" class="inline-block">
+              <Picture
+                src={logoFlexai}
+                alt="FLEXAI Logística"
+                loading="eager"
+                class="h-12 w-auto"
+              />
+            </a>
+          </div>
+
+          <!-- Mobile menu button -->
+          <div class="block lg:hidden">
+            <MenuIcon class="w-6 h-6 text-neutral-800">
+              <OpenIcon class="h-6 w-6">
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <line x1="3" y1="6" x2="21" y2="6"></line>
+                  <line x1="3" y1="12" x2="21" y2="12"></line>
+                  <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+              </OpenIcon>
+              <CloseIcon class="h-6 w-6">
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </CloseIcon>
+            </MenuIcon>
+          </div>
+
+          <!-- Desktop navigation -->
+          <MenuItems class="hidden lg:flex">
+            <nav class="flex items-center gap-2">
+              {menuitems.map((item) => {
+                const isActive = currentPath === item.path || 
+                  (item.path !== '/' && currentPath.startsWith(item.path));
+                
+                return (
+                  <a
+                    href={item.path}
+                    class={`
+                      px-4 py-2 rounded-xl font-medium transition-all duration-200
+                      ${isActive 
+                        ? 'bg-brand-yellow-100 text-brand-blue-900' 
+                        : 'text-neutral-700 hover:bg-neutral-100 hover:text-neutral-900'
+                      }
+                    `}
+                  >
+                    {item.title}
+                  </a>
+                );
+              })}
+              
+              <!-- CTA Buttons -->
+              <div class="flex items-center gap-3 ml-4">
+                <a
+                  href="https://lightdata.flexai.com.ar"
+                  target="_blank"
+                  class="text-brand-blue-500 hover:text-brand-blue-600 font-medium flex items-center gap-1.5"
+                >
+                  <Icon name="bx:log-in" class="w-5 h-5" />
+                  <span>LightData</span>
+                </a>
+                
+                <Button
+                  href="#contacto"
+                  size="md"
+                  variant="primary"
+                  class="shadow-sm"
+                >
+                  <Icon name="bx:phone" class="w-5 h-5 mr-2" />
+                  Contactar
+                </Button>
+              </div>
+            </nav>
+          </MenuItems>
+        </div>
+
+        <!-- Mobile navigation -->
+        <MenuItems class="lg:hidden">
+          <div class="mt-4 bg-white rounded-2xl shadow-lg border border-neutral-100 p-4">
+            <nav class="flex flex-col gap-2">
+              {menuitems.map((item) => {
+                const isActive = currentPath === item.path || 
+                  (item.path !== '/' && currentPath.startsWith(item.path));
+                
+                return (
+                  <a
+                    href={item.path}
+                    class={`
+                      px-4 py-3 rounded-xl font-medium transition-all duration-200
+                      ${isActive 
+                        ? 'bg-brand-yellow-100 text-brand-blue-900' 
+                        : 'text-neutral-700 hover:bg-neutral-100'
+                      }
+                    `}
+                  >
+                    {item.title}
+                  </a>
+                );
+              })}
+              
+              <hr class="my-2 border-neutral-200" />
+              
+              <a
+                href="https://lightdata.flexai.com.ar"
+                target="_blank"
+                class="px-4 py-3 text-brand-blue-500 font-medium flex items-center gap-2"
+              >
+                <Icon name="bx:log-in" class="w-5 h-5" />
+                Acceder a LightData
+              </a>
+              
+              <Button
+                href="#contacto"
+                size="md"
+                variant="primary"
+                fullWidth
+                class="mt-2"
+              >
+                <Icon name="bx:phone" class="w-5 h-5 mr-2" />
+                Contactar ahora
+              </Button>
+            </nav>
+          </div>
+        </MenuItems>
+      </Astronav>
+    </div>
+  </Container>
+</header>
+
+<style>
+  /* Custom animations for mobile menu */
+  @media (max-width: 1023px) {
+    [astro-nav-toggle] {
+      transition: transform 0.2s ease;
+    }
+    
+    [astro-nav-toggle].active {
+      transform: rotate(90deg);
+    }
+  }
+</style>

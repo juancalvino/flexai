@@ -1,0 +1,200 @@
+---
+export interface Props {
+  text: string;
+  delay?: number;
+  duration?: number;
+  class?: string;
+  stagger?: number;
+  mode?: 'words' | 'letters' | 'lines';
+}
+
+const {
+  text,
+  delay = 0,
+  duration = 800,
+  class: className = '',
+  stagger = 50,
+  mode = 'words',
+} = Astro.props;
+
+const textId = `text-reveal-${Math.random().toString(36).substr(2, 9)}`;
+
+// Split text based on mode
+let splitText: string[] = [];
+if (mode === 'words') {
+  splitText = text.split(' ');
+} else if (mode === 'letters') {
+  splitText = text.split('');
+} else {
+  splitText = text.split('\n');
+}
+---
+
+<div 
+  class={`text-reveal ${className}`}
+  data-text-id={textId}
+  data-delay={delay}
+  data-duration={duration}
+  data-stagger={stagger}
+  data-mode={mode}
+>
+  {splitText.map((segment, index) => (
+    <span 
+      class="text-reveal-segment"
+      data-index={index}
+      style={`
+        opacity: 0;
+        transform: translateY(20px);
+        transition: opacity ${duration}ms ease, transform ${duration}ms ease;
+        transition-delay: ${delay + (index * stagger)}ms;
+        display: ${mode === 'letters' ? 'inline' : 'inline-block'};
+        ${mode === 'words' || mode === 'lines' ? 'margin-right: 0.25em;' : ''}
+      `}
+    >
+      {segment === ' ' ? '\u00A0' : segment}
+      {mode === 'lines' && <br />}
+    </span>
+  ))}
+</div>
+
+<script>
+  class TextRevealAnimation {
+    private observer: IntersectionObserver | null = null;
+    private elements: NodeListOf<Element> | null = null;
+
+    constructor() {
+      this.init();
+    }
+
+    init() {
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => this.setupObserver());
+      } else {
+        this.setupObserver();
+      }
+
+      document.addEventListener('astro:page-load', () => this.setupObserver());
+    }
+
+    setupObserver() {
+      this.elements = document.querySelectorAll('.text-reveal');
+      
+      if (!this.elements.length) return;
+
+      if (!('IntersectionObserver' in window)) {
+        this.fallbackAnimation();
+        return;
+      }
+
+      if (this.observer) {
+        this.observer.disconnect();
+      }
+
+      this.observer = new IntersectionObserver(
+        (entries) => this.handleIntersection(entries),
+        {
+          root: null,
+          rootMargin: '0px 0px -10% 0px',
+          threshold: 0.1
+        }
+      );
+
+      this.elements.forEach(element => {
+        if (this.observer) {
+          this.observer.observe(element);
+        }
+      });
+    }
+
+    handleIntersection(entries: IntersectionObserverEntry[]) {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          this.animateText(entry.target as HTMLElement);
+          if (this.observer) {
+            this.observer.unobserve(entry.target);
+          }
+        }
+      });
+    }
+
+    animateText(element: HTMLElement) {
+      const segments = element.querySelectorAll('.text-reveal-segment') as NodeListOf<HTMLElement>;
+      const baseDelay = parseInt(element.getAttribute('data-delay') || '0');
+      const duration = parseInt(element.getAttribute('data-duration') || '800');
+      const stagger = parseInt(element.getAttribute('data-stagger') || '50');
+
+      segments.forEach((segment, index) => {
+        const totalDelay = baseDelay + (index * stagger);
+        
+        setTimeout(() => {
+          segment.style.opacity = '1';
+          segment.style.transform = 'translateY(0)';
+          segment.classList.add('text-reveal-visible');
+        }, totalDelay);
+      });
+    }
+
+    fallbackAnimation() {
+      if (this.elements) {
+        this.elements.forEach(element => {
+          const segments = element.querySelectorAll('.text-reveal-segment') as NodeListOf<HTMLElement>;
+          segments.forEach(segment => {
+            segment.style.opacity = '1';
+            segment.style.transform = 'translateY(0)';
+          });
+        });
+      }
+    }
+
+    destroy() {
+      if (this.observer) {
+        this.observer.disconnect();
+        this.observer = null;
+      }
+    }
+  }
+
+  // Initialize text reveal system
+  let textRevealInstance: TextRevealAnimation | null = null;
+
+  function initTextReveal() {
+    if (textRevealInstance) {
+      textRevealInstance.destroy();
+    }
+    textRevealInstance = new TextRevealAnimation();
+  }
+
+  // Initialize on first load
+  initTextReveal();
+
+  // Cleanup on page unload
+  window.addEventListener('beforeunload', () => {
+    if (textRevealInstance) {
+      textRevealInstance.destroy();
+    }
+  });
+</script>
+
+<style>
+  .text-reveal {
+    overflow: hidden;
+  }
+  
+  .text-reveal-segment {
+    will-change: opacity, transform;
+  }
+  
+  .text-reveal-visible {
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+  }
+  
+  /* Disable animations on reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    .text-reveal-segment {
+      opacity: 1 !important;
+      transform: none !important;
+      transition: none !important;
+    }
+  }
+</style>

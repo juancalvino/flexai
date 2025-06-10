@@ -1,0 +1,179 @@
+---
+import Container from "./container.astro";
+import { Icon } from "astro-icon/components";
+
+const navigation = {
+  servicios: [
+    { name: "Distribución Express", href: "#" },
+    { name: "Cobertura AMBA", href: "/cobertura" },
+    { name: "Sistema LightData", href: "#" },
+    { name: "Precios", href: "/precios" },
+  ],
+  empresa: [
+    { name: "Nosotros", href: "/nosotros" },
+    { name: "Cómo funciona", href: "#" },
+    { name: "Testimonios", href: "#" },
+    { name: "Blog", href: "#" },
+  ],
+  soporte: [
+    { name: "Centro de ayuda", href: "#" },
+    { name: "Términos y condiciones", href: "#" },
+    { name: "Política de privacidad", href: "#" },
+    { name: "Contacto", href: "#contacto" },
+  ],
+};
+
+const socialLinks = [
+  {
+    name: "Instagram",
+    href: "https://instagram.com/flexai.logistica",
+    icon: "simple-icons:instagram",
+  },
+  {
+    name: "WhatsApp",
+    href: "https://wa.me/5491130502881",
+    icon: "simple-icons:whatsapp",
+  },
+  {
+    name: "LinkedIn",
+    href: "#",
+    icon: "simple-icons:linkedin",
+  },
+];
+---
+
+<footer class="bg-neutral-900 text-neutral-300 mt-20">
+  <Container>
+    <div class="py-12 md:py-16">
+      <!-- Top section -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-12">
+        <!-- Brand column -->
+        <div class="lg:col-span-2">
+          <a href="/" class="inline-block mb-4">
+            <span class="text-2xl font-bold text-brand-yellow-500">FLEXAI</span>
+          </a>
+          <p class="text-neutral-400 mb-6 max-w-sm">
+            Tu socio confiable en logística para Mercado Libre. Entregas rápidas y seguras en todo AMBA.
+          </p>
+          
+          <!-- Social links -->
+          <div class="flex gap-4">
+            {socialLinks.map((social) => (
+              <a
+                href={social.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="w-10 h-10 rounded-lg bg-neutral-800 flex items-center justify-center hover:bg-neutral-700 transition-all duration-200 no-underline"
+                aria-label={social.name}
+              >
+                <Icon name={social.icon} class="w-5 h-5 text-neutral-300 hover:text-brand-yellow-500 transition-colors duration-200" />
+              </a>
+            ))}
+          </div>
+        </div>
+        
+        <!-- Navigation columns -->
+        <div>
+          <h3 class="font-semibold text-white mb-4">Servicios</h3>
+          <ul class="space-y-3">
+            {navigation.servicios.map((item) => (
+              <li>
+                <a
+                  href={item.href}
+                  class="text-neutral-300 hover:text-brand-yellow-500 transition-colors duration-200"
+                >
+                  {item.name}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+        
+        <div>
+          <h3 class="font-semibold text-white mb-4">Empresa</h3>
+          <ul class="space-y-3">
+            {navigation.empresa.map((item) => (
+              <li>
+                <a
+                  href={item.href}
+                  class="text-neutral-300 hover:text-brand-yellow-500 transition-colors duration-200"
+                >
+                  {item.name}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+        
+        <div>
+          <h3 class="font-semibold text-white mb-4">Soporte</h3>
+          <ul class="space-y-3">
+            {navigation.soporte.map((item) => (
+              <li>
+                <a
+                  href={item.href}
+                  class="text-neutral-300 hover:text-brand-yellow-500 transition-colors duration-200"
+                >
+                  {item.name}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+      
+      <!-- Contact info -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 py-8 border-t border-neutral-800 mb-8">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-lg bg-brand-yellow-500 flex items-center justify-center">
+            <Icon name="bx:phone" class="w-5 h-5 text-brand-blue-900" />
+          </div>
+          <div>
+            <p class="text-sm text-neutral-400">Teléfono</p>
+            <a href="tel:+5491130502881" class="text-white hover:text-brand-yellow-500 transition-colors">
+              11 3050-2881
+            </a>
+          </div>
+        </div>
+        
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-lg bg-brand-yellow-500 flex items-center justify-center">
+            <Icon name="bx:envelope" class="w-5 h-5 text-brand-blue-900" />
+          </div>
+          <div>
+            <p class="text-sm text-neutral-400">Email</p>
+            <a href="mailto:flexai.logistica@gmail.com" class="text-white hover:text-brand-yellow-500 transition-colors">
+              flexai.logistica@gmail.com
+            </a>
+          </div>
+        </div>
+        
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-lg bg-brand-yellow-500 flex items-center justify-center">
+            <Icon name="bx:time" class="w-5 h-5 text-brand-blue-900" />
+          </div>
+          <div>
+            <p class="text-sm text-neutral-400">Horario</p>
+            <p class="text-white">Lun - Sáb: 9:00 - 22:00</p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Bottom section -->
+      <div class="flex flex-col md:flex-row justify-between items-center gap-4 pt-8 border-t border-neutral-800">
+        <p class="text-sm text-neutral-400 text-center md:text-left">
+          Copyright © {new Date().getFullYear()} FLEXAI. Todos los derechos reservados.
+        </p>
+        
+        <div class="flex items-center gap-6 text-sm">
+          <a href="#" class="text-neutral-400 hover:text-brand-yellow-500 transition-colors">
+            Política de privacidad
+          </a>
+          <a href="#" class="text-neutral-400 hover:text-brand-yellow-500 transition-colors">
+            Términos de servicio
+          </a>
+        </div>
+      </div>
+    </div>
+  </Container>
+</footer>

@@ -1,0 +1,200 @@
+---
+export interface Props {
+  delay?: number;
+  duration?: number;
+  direction?: 'up' | 'down' | 'left' | 'right' | 'none';
+  distance?: number;
+  class?: string;
+  once?: boolean;
+}
+
+const {
+  delay = 0,
+  duration = 600,
+  direction = 'up',
+  distance = 20,
+  class: className = '',
+  once = true,
+} = Astro.props;
+
+const fadeId = `fade-${Math.random().toString(36).substr(2, 9)}`;
+
+const directionTransforms = {
+  up: `translateY(${distance}px)`,
+  down: `translateY(-${distance}px)`,
+  left: `translateX(${distance}px)`,
+  right: `translateX(-${distance}px)`,
+  none: 'none'
+};
+
+const initialTransform = directionTransforms[direction];
+---
+
+<div 
+  class={`fade-in-element ${className}`} 
+  data-fade-id={fadeId}
+  data-delay={delay}
+  data-duration={duration}
+  data-transform={initialTransform}
+  data-once={once}
+  style={`
+    opacity: 0;
+    transform: ${initialTransform};
+    transition: opacity ${duration}ms ease-out, transform ${duration}ms ease-out;
+    transition-delay: ${delay}ms;
+  `}
+>
+  <slot />
+</div>
+
+<script>
+  class FadeInAnimation {
+    private observer: IntersectionObserver | null = null;
+    private elements: NodeListOf<Element> | null = null;
+
+    constructor() {
+      this.init();
+    }
+
+    init() {
+      // Wait for DOM to be ready
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => this.setupObserver());
+      } else {
+        this.setupObserver();
+      }
+
+      // Reinitialize on page navigation (for SPAs)
+      document.addEventListener('astro:page-load', () => this.setupObserver());
+    }
+
+    setupObserver() {
+      this.elements = document.querySelectorAll('.fade-in-element');
+      
+      if (!this.elements.length) return;
+
+      // Check if IntersectionObserver is supported
+      if (!('IntersectionObserver' in window)) {
+        this.fallbackAnimation();
+        return;
+      }
+
+      // Clean up existing observer
+      if (this.observer) {
+        this.observer.disconnect();
+      }
+
+      // Create new observer
+      this.observer = new IntersectionObserver(
+        (entries) => this.handleIntersection(entries),
+        {
+          root: null,
+          rootMargin: '0px 0px -10% 0px',
+          threshold: 0.1
+        }
+      );
+
+      // Observe all elements
+      this.elements.forEach(element => {
+        if (this.observer) {
+          this.observer.observe(element);
+        }
+      });
+    }
+
+    handleIntersection(entries: IntersectionObserverEntry[]) {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          this.animateElement(entry.target as HTMLElement);
+          
+          // Unobserve if once=true
+          const once = entry.target.getAttribute('data-once') === 'true';
+          if (once && this.observer) {
+            this.observer.unobserve(entry.target);
+          }
+        } else {
+          // Reset animation if once=false
+          const once = entry.target.getAttribute('data-once') === 'true';
+          if (!once) {
+            this.resetElement(entry.target as HTMLElement);
+          }
+        }
+      });
+    }
+
+    animateElement(element: HTMLElement) {
+      const delay = parseInt(element.getAttribute('data-delay') || '0');
+      const duration = parseInt(element.getAttribute('data-duration') || '600');
+      
+      // Apply animation
+      setTimeout(() => {
+        element.style.opacity = '1';
+        element.style.transform = 'none';
+        element.classList.add('fade-in-visible');
+      }, delay);
+    }
+
+    resetElement(element: HTMLElement) {
+      const initialTransform = element.getAttribute('data-transform') || 'none';
+      element.style.opacity = '0';
+      element.style.transform = initialTransform;
+      element.classList.remove('fade-in-visible');
+    }
+
+    fallbackAnimation() {
+      // Fallback for browsers without IntersectionObserver
+      if (this.elements) {
+        this.elements.forEach(element => {
+          this.animateElement(element as HTMLElement);
+        });
+      }
+    }
+
+    destroy() {
+      if (this.observer) {
+        this.observer.disconnect();
+        this.observer = null;
+      }
+    }
+  }
+
+  // Initialize animation system
+  let fadeInInstance: FadeInAnimation | null = null;
+
+  function initFadeIn() {
+    if (fadeInInstance) {
+      fadeInInstance.destroy();
+    }
+    fadeInInstance = new FadeInAnimation();
+  }
+
+  // Initialize on first load
+  initFadeIn();
+
+  // Cleanup on page unload
+  window.addEventListener('beforeunload', () => {
+    if (fadeInInstance) {
+      fadeInInstance.destroy();
+    }
+  });
+</script>
+
+<style>
+  .fade-in-element {
+    will-change: opacity, transform;
+  }
+  
+  .fade-in-visible {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  
+  /* Reduced motion support */
+  @media (prefers-reduced-motion: reduce) {
+    .fade-in-element {
+      opacity: 1 !important;
+      transform: none !important;
+      transition: none !important;
+    }
+  }
+</style>

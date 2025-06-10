@@ -1,0 +1,58 @@
+---
+export interface Props {
+  variant?: "default" | "primary" | "secondary" | "success" | "warning" | "error" | "info";
+  size?: "sm" | "md" | "lg";
+  class?: string;
+  dot?: boolean;
+  rounded?: boolean;
+}
+
+const {
+  variant = "default",
+  size = "md",
+  class: className = "",
+  dot = false,
+  rounded = false
+} = Astro.props;
+
+const baseClasses = "inline-flex items-center font-medium transition-colors";
+
+const variantClasses = {
+  default: "bg-neutral-100 text-neutral-700",
+  primary: "bg-brand-yellow-100 text-brand-yellow-800",
+  secondary: "bg-brand-blue-100 text-brand-blue-800",
+  success: "bg-success-100 text-success-700",
+  warning: "bg-warning-100 text-warning-700",
+  error: "bg-error-100 text-error-700",
+  info: "bg-brand-blue-100 text-brand-blue-700"
+};
+
+const sizeClasses = {
+  sm: "px-2 py-0.5 text-xs gap-1",
+  md: "px-2.5 py-1 text-sm gap-1.5",
+  lg: "px-3 py-1.5 text-base gap-2"
+};
+
+const roundedClass = rounded ? "rounded-full" : "rounded-md";
+
+const classes = [
+  baseClasses,
+  variantClasses[variant],
+  sizeClasses[size],
+  roundedClass,
+  className
+].filter(Boolean).join(" ");
+
+const dotSizeClasses = {
+  sm: "w-1.5 h-1.5",
+  md: "w-2 h-2",
+  lg: "w-2.5 h-2.5"
+};
+---
+
+<span class={classes}>
+  {dot && (
+    <span class={`${dotSizeClasses[size]} rounded-full bg-current opacity-60`}></span>
+  )}
+  <slot />
+</span>

@@ -1,0 +1,55 @@
+---
+import Layout from "../layouts/Layout.astro";
+import mapaAmba from "../assets/mapaAmba.png";
+import { Picture } from "astro:assets";
+import Sectionhead from "../components/sectionhead.astro";
+---
+
+<Layout title="Cobertura">
+  <Sectionhead>
+    <Fragment slot="title">Cobertura</Fragment>
+    <Fragment slot="desc"></Fragment>
+  </Sectionhead>
+  <div class="flex justify-center px-5 lg:px-20 flex-col lg:flex-row ">
+    <div class="content_map">
+    <div class="map">
+      <Picture
+        src={mapaAmba}
+        alt="Mapa AMBA"
+        widths={[200, 400, 600]}
+        sizes="(max-width: 600px) 100vw, 620px"
+        loading="eager"
+        format="avif"
+      />
+    </div>
+  </div>
+  <div
+    class="bg-brand-blue-600 p-8 md:px-20 md:py-10 mt-10 mx-auto max-w-5xl shadow-lg rounded-lg flex flex-col items-center text-center">
+    <h2 class="text-white text-4xl md:text-6xl tracking-tight"> Zonas Cubiertas </h2>
+    <div><h3 class="text-white font-bold mt-5 text-lg md:text-2xl">📍 CABA </h3>
+      <p class="text-white text-lg md:text-xl"> Todas las comunas </p>
+    </div>
+    <div><h3 class="text-white font-bold mt-5 text-lg md:text-2xl">📍 GBA 1 </h3>
+      <p class="text-white text-lg md:text-xl"> Vicente López, San Isidro, San Fernando, San Martín, Tres de Febrero,
+        Morón, Hurlingham, Ituzaingó, Matanza Norte, Lomas de Zamora, Lanús, Avellaneda. </p>
+    </div>
+    <div><h3 class="text-white font-bold mt-5 text-lg md:text-2xl">📍 GBA 2 </h3>
+      <p class="text-white text-lg md:text-xl"> Tigre, Malvinas Argentinas, José C. Paz, San Miguel, Moreno, Merlo,
+        Matanza Sur, Ezeiza, Esteban Echeverría, Almirante Brown, Quilmes, Florencio Varela, Berazategui. </p>
+    </div>
+    <div><h3 class="text-white font-bold mt-5 text-lg md:text-2xl">📍 GBA 3 </h3>
+      <p class="text-white text-lg md:text-xl">Berisso, Campana, Canning, Del Viso, Derqui, Ensenada, Escobar, Garín, General Rodríguez,
+        Guernica, Cañuelas, Ingeniero Maschwitz, La Plata Centro, La Plata Norte, La Plata Oeste, Luján, Marcos Paz,
+        Nordelta, Pilar, San Vicente, Villa Rosa, Zarate. </p>
+    </div>
+  </div>
+  </div>
+
+</Layout>
+
+<style>
+    .content_map {
+        display: flex;
+        justify-content: center;
+    }
+</style>

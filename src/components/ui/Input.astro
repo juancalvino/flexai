@@ -1,0 +1,129 @@
+---
+export interface Props {
+  type?: string;
+  name: string;
+  id?: string;
+  label?: string;
+  placeholder?: string;
+  value?: string;
+  error?: string;
+  hint?: string;
+  required?: boolean;
+  disabled?: boolean;
+  readonly?: boolean;
+  class?: string;
+  inputClass?: string;
+  icon?: string;
+  iconPosition?: "left" | "right";
+  size?: "sm" | "md" | "lg";
+  [key: string]: any;
+}
+
+const {
+  type = "text",
+  name,
+  id,
+  label,
+  placeholder,
+  value,
+  error,
+  hint,
+  required = false,
+  disabled = false,
+  readonly = false,
+  class: className = "",
+  inputClass = "",
+  icon,
+  iconPosition = "left",
+  size = "md",
+  ...rest
+} = Astro.props;
+
+const inputId = id || name;
+
+const sizeClasses = {
+  sm: "px-3 py-1.5 text-sm",
+  md: "px-4 py-2.5 text-base",
+  lg: "px-5 py-3 text-lg"
+};
+
+const iconPaddingClasses = {
+  left: {
+    sm: "pl-8",
+    md: "pl-10",
+    lg: "pl-12"
+  },
+  right: {
+    sm: "pr-8",
+    md: "pr-10",
+    lg: "pr-12"
+  }
+};
+
+const baseInputClasses = "w-full rounded-xl border bg-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:bg-neutral-50 disabled:cursor-not-allowed";
+
+const stateClasses = error
+  ? "border-error-300 focus:border-error-500 focus:ring-error-500"
+  : "border-neutral-300 focus:border-brand-blue-500 focus:ring-brand-blue-500";
+
+const inputClasses = [
+  baseInputClasses,
+  sizeClasses[size],
+  icon && iconPaddingClasses[iconPosition][size],
+  stateClasses,
+  inputClass
+].filter(Boolean).join(" ");
+---
+
+<div class={`${className}`}>
+  {label && (
+    <label
+      for={inputId}
+      class="block text-sm font-medium text-neutral-700 mb-1.5"
+    >
+      {label}
+      {required && <span class="text-error-500 ml-0.5">*</span>}
+    </label>
+  )}
+  
+  <div class="relative">
+    {icon && iconPosition === "left" && (
+      <div class="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 pointer-events-none">
+        <Fragment set:html={icon} />
+      </div>
+    )}
+    
+    <input
+      type={type}
+      name={name}
+      id={inputId}
+      placeholder={placeholder}
+      value={value}
+      required={required}
+      disabled={disabled}
+      readonly={readonly}
+      class={inputClasses}
+      aria-invalid={error ? "true" : undefined}
+      aria-describedby={error ? `${inputId}-error` : hint ? `${inputId}-hint` : undefined}
+      {...rest}
+    />
+    
+    {icon && iconPosition === "right" && (
+      <div class="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 pointer-events-none">
+        <Fragment set:html={icon} />
+      </div>
+    )}
+  </div>
+  
+  {error && (
+    <p id={`${inputId}-error`} class="mt-1.5 text-sm text-error-600">
+      {error}
+    </p>
+  )}
+  
+  {hint && !error && (
+    <p id={`${inputId}-hint`} class="mt-1.5 text-sm text-neutral-500">
+      {hint}
+    </p>
+  )}
+</div>

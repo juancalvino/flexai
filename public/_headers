@@ -1,0 +1,56 @@
+# Global headers for all routes
+/*
+  # Security headers
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  X-XSS-Protection: 1; mode=block
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+  
+  # Content Security Policy
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://va.vercel-scripts.com https://vitals.vercel-insights.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://va.vercel-scripts.com https://vitals.vercel-insights.com https://lightdata.flexai.com.ar; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self';
+  
+  # Performance headers
+  Cache-Control: public, max-age=31536000, immutable
+
+# Static assets - long cache
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+  
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Images - medium cache
+/images/*
+  Cache-Control: public, max-age=2592000
+  
+# Fonts - long cache
+*.woff2
+  Cache-Control: public, max-age=31536000, immutable
+  
+*.woff
+  Cache-Control: public, max-age=31536000, immutable
+
+# HTML pages - short cache
+/*.html
+  Cache-Control: public, max-age=3600
+  
+# API routes - no cache
+/api/*
+  Cache-Control: no-cache, no-store, must-revalidate
+
+# Service worker - no cache
+/sw.js
+  Cache-Control: no-cache, no-store, must-revalidate
+
+# Manifest - medium cache
+/manifest.json
+  Cache-Control: public, max-age=86400
+
+# Sitemap - daily cache
+/sitemap*.xml
+  Cache-Control: public, max-age=86400
+
+# Robots.txt - weekly cache
+/robots.txt
+  Cache-Control: public, max-age=604800
