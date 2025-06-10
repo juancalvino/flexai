@@ -1,0 +1,236 @@
+---
+import Container from "../container.astro";
+import { Picture } from "astro:assets";
+import logoFlexai from "../../assets/imagotipoFlexai.svg";
+import { Astronav, MenuItems, MenuIcon, OpenIcon, CloseIcon } from "astro-navbar";
+import { Icon } from "astro-icon/components";
+
+const menuitems = [
+  {
+    title: "Inicio",
+    path: "/"
+  },
+  {
+    title: "Precios",
+    path: "/precios"
+  },
+  {
+    title: "Cobertura",
+    path: "/cobertura"
+  },
+  {
+    title: "Nosotros",
+    path: "/nosotros"
+  },
+];
+
+const currentPath = Astro.url.pathname;
+---
+
+<header class="sticky top-0 z-50 bg-brand-yellow-500 border-b border-brand-yellow-600 shadow-lg">
+  <Container>
+    <div class="py-3">
+      <Astronav>
+        <div class="flex items-center justify-between">
+          <!-- Logo -->
+          <div>
+            <a href="/" class="inline-block group relative overflow-hidden rounded-lg logo-link">
+              <Picture
+                src={logoFlexai}
+                alt="FLEXAI Logística"
+                loading="eager"
+                class="h-14 w-auto relative z-10 transform-none"
+              />
+              <!-- Efecto de brillo amarillo -->
+              <div class="absolute inset-0 bg-gradient-to-r from-transparent via-brand-yellow-400/70 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1200 ease-out"></div>
+            </a>
+          </div>
+
+          <!-- Mobile menu button -->
+          <div class="block lg:hidden">
+            <MenuIcon class="w-8 h-8 p-1 rounded-lg bg-brand-blue-600 text-white hover:bg-brand-blue-700 transition-colors">
+              <OpenIcon class="h-6 w-6">
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <line x1="3" y1="6" x2="21" y2="6"></line>
+                  <line x1="3" y1="12" x2="21" y2="12"></line>
+                  <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+              </OpenIcon>
+              <CloseIcon class="h-6 w-6">
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </CloseIcon>
+            </MenuIcon>
+          </div>
+
+          <!-- Desktop navigation -->
+          <MenuItems class="hidden lg:flex">
+            <nav class="flex items-center gap-1">
+              {menuitems.map((item) => {
+                const isActive = currentPath === item.path || 
+                  (item.path !== '/' && currentPath.startsWith(item.path));
+                
+                return (
+                  <a
+                    href={item.path}
+                    class={`
+                      relative px-5 py-2.5 rounded-full font-semibold text-sm transition-all duration-300 group
+                      ${isActive 
+                        ? 'bg-brand-blue-600 text-white hover:text-white shadow-lg shadow-brand-blue-600/25 hover:shadow-xl hover:shadow-brand-blue-600/40 overflow-hidden' 
+                        : 'text-brand-blue-800 hover:bg-brand-blue-600 hover:text-white'
+                      }
+                    `}
+                  >
+                    <span class={`relative z-10 ${isActive ? 'text-white' : ''}`}>{item.title}</span>
+                    {isActive && (
+                      <div class="absolute inset-0 bg-gradient-to-r from-transparent via-brand-yellow-400/70 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1200 ease-out"></div>
+                    )}
+                    {!isActive && (
+                      <div class="absolute inset-0 bg-brand-blue-600 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300"></div>
+                    )}
+                  </a>
+                );
+              })}
+              
+              <!-- CTA Buttons -->
+              <div class="flex items-center gap-3 ml-6 pl-6 border-l border-brand-yellow-600">
+                <a
+                  href="https://lightdata.flexai.com.ar"
+                  target="_blank"
+                  class="group flex items-center gap-2 px-4 py-2.5 text-brand-blue-800 hover:text-white font-semibold text-sm rounded-full hover:bg-brand-blue-600 transition-all duration-200"
+                >
+                  <Icon name="bx:log-in" class="w-5 h-5 text-brand-blue-800 group-hover:text-white transition-all duration-200" />
+                  <span>LightData</span>
+                </a>
+                
+                <a
+                  href="https://wa.me/5491130502881"
+                  class="group relative inline-flex items-center gap-2 px-6 py-2.5 bg-brand-blue-600 text-white hover:text-white font-semibold text-base rounded-xl shadow-lg shadow-brand-blue-600/25 hover:shadow-xl hover:shadow-brand-blue-600/40 transition-all duration-300 overflow-hidden"
+                >
+                  <!-- Efecto de brillo amarillo -->
+                  <div class="absolute inset-0 bg-gradient-to-r from-transparent via-brand-yellow-400/70 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-800 ease-out"></div>
+                  <Icon name="bx:phone" class="w-4 h-4 relative z-10 text-white" />
+                  <span class="relative z-10 text-white">Contactar</span>
+                </a>
+              </div>
+            </nav>
+          </MenuItems>
+        </div>
+
+        <!-- Mobile navigation -->
+        <MenuItems class="lg:hidden">
+          <div class="mt-4 bg-white rounded-2xl shadow-2xl border border-neutral-200 p-6">
+            <nav class="flex flex-col gap-2">
+              {menuitems.map((item) => {
+                const isActive = currentPath === item.path || 
+                  (item.path !== '/' && currentPath.startsWith(item.path));
+                
+                return (
+                  <a
+                    href={item.path}
+                    class={`
+                      px-5 py-4 rounded-xl font-semibold transition-all duration-300
+                      ${isActive 
+                        ? 'bg-brand-blue-600 text-white shadow-lg' 
+                        : 'text-brand-blue-700 hover:bg-brand-blue-50 hover:text-brand-blue-900'
+                      }
+                    `}
+                  >
+                    {item.title}
+                  </a>
+                );
+              })}
+              
+              <hr class="my-4 border-neutral-200" />
+              
+              <a
+                href="https://lightdata.flexai.com.ar"
+                target="_blank"
+                class="px-5 py-4 text-brand-blue-700 font-semibold flex items-center gap-3 rounded-xl hover:bg-brand-blue-50 transition-all duration-200"
+              >
+                <Icon name="bx:log-in" class="w-6 h-6 text-brand-blue-700" />
+                Acceder a LightData
+              </a>
+              
+              <a
+                href="https://wa.me/5491130502881"
+                class="w-full mt-3 inline-flex items-center justify-center gap-2 px-8 py-3 bg-brand-yellow-500 text-brand-blue-900 hover:bg-brand-yellow-600 font-semibold text-lg rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300"
+              >
+                <Icon name="bx:phone" class="w-5 h-5 text-brand-blue-900" />
+                <span>Contactar ahora</span>
+              </a>
+            </nav>
+          </div>
+        </MenuItems>
+      </Astronav>
+    </div>
+  </Container>
+</header>
+
+<style>
+  /* Custom animations for mobile menu */
+  @media (max-width: 1023px) {
+    [astro-nav-toggle] {
+      transition: all 0.3s ease;
+    }
+    
+    [astro-nav-toggle].active {
+      transform: rotate(180deg);
+      background-color: theme('colors.brand.blue.700');
+      color: white;
+    }
+  }
+  
+  /* Logo específico - sin transformaciones */
+  .logo-link {
+    position: relative;
+  }
+  
+  .logo-link:hover {
+    transform: none !important;
+  }
+  
+  .logo-link img,
+  .logo-link picture {
+    transform: none !important;
+    transition: none !important;
+  }
+  
+  /* Smooth hover effects */
+  header a:not(.logo-link) {
+    position: relative;
+  }
+  
+  /* Active link indicator */
+  .active-link::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 6px;
+    height: 6px;
+    background-color: theme('colors.brand.yellow.500');
+    border-radius: 50%;
+  }
+</style>

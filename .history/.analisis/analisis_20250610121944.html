@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Análisis Interactivo FlexAI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Custom Brand Colors -->
+    <!-- Application Structure Plan: Se ha diseñado una aplicación tipo dashboard interactivo. La estructura sigue un flujo lógico para el usuario: 1) Un resumen del modelo de negocio. 2) Resumen de KPIs clave en la parte superior para una visión general instantánea. 3) Un simulador interactivo como sección principal. 4) Una sección de desglose con pestañas para explorar datos más granulares. 5) Una sección informativa sobre la empresa. 6) Una sección sobre el valor tecnológico. Esta estructura transforma un informe pasivo en una herramienta de exploración activa. -->
+    <!-- Visualization & Content Choices: 1. KPIs: Tarjetas HTML para mostrar métricas clave. 2. Simulador de Margen por Zona: Gráfico de barras (Chart.js) que se actualiza en tiempo real. 3. Margen por Paquete y Nivel: Gráfico de barras agrupado (Chart.js) para comparar todas las zonas. 4. Tablas de datos: HTML simple para referencia. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        :root {
+            --brand-yellow: #FFCF15;
+            --brand-blue: #0D395A;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FFFFFF;
+            color: var(--brand-blue);
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 320px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+        .slider-thumb::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: var(--slider-color, var(--brand-yellow));
+            cursor: pointer;
+            border-radius: 50%;
+        }
+        .slider-thumb::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: var(--slider-color, var(--brand-yellow));
+            cursor: pointer;
+            border-radius: 50%;
+        }
+        .scenario-btn.active {
+            background-color: var(--brand-yellow);
+            color: var(--brand-blue);
+            font-weight: 600;
+        }
+        .zone-filter.active {
+            background-color: var(--brand-yellow);
+            color: var(--brand-blue);
+            font-weight: 600;
+            border-color: var(--brand-yellow);
+        }
+        .tab-button.active {
+            color: var(--brand-blue);
+            border-color: var(--brand-yellow);
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <div class="container mx-auto p-4 md:p-8 max-w-7xl">
+        
+        <header class="text-center mb-8 md:mb-12">
+            <h1 class="text-3xl md:text-4xl font-bold text-[--brand-blue]">Análisis Interactivo del Negocio: FlexAI</h1>
+            <p class="mt-2 text-lg text-[--brand-blue] opacity-80">Una herramienta para explorar la rentabilidad del modelo logístico de MercadoFlex.</p>
+        </header>
+
+        <main>
+            <!-- Business Summary Section -->
+            <section id="business-summary" class="bg-white p-4 md:p-6 rounded-xl shadow-md border border-stone-200 mb-8 md:mb-12">
+                <div class="mb-4">
+                    <h2 class="text-2xl font-bold text-[--brand-blue]">¿Cómo funciona FlexAI?</h2>
+                    <p class="mt-1 text-[--brand-blue] opacity-80">
+                        FlexAI es una empresa de logística especializada en los envíos de <strong>MercadoFlex</strong>. Los vendedores de Mercado Libre nos contratan para realizar sus entregas. Nuestro modelo de negocio es simple: cobramos una tarifa por cada paquete entregado, que es <strong>menor al valor que Mercado Libre le paga al vendedor</strong>. Esta diferencia genera un ahorro o ganancia directa para nuestros clientes.
+                    </p>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-[--brand-blue] mb-3">Comparativa de Precios por Paquete <span class="text-sm font-normal opacity-60">(IVA incluido)</span></h3>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-stone-200">
+                            <thead class="bg-stone-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-[--brand-blue] opacity-70 uppercase tracking-wider">Zona</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-[--brand-blue] opacity-70 uppercase tracking-wider">Tarifa MercadoLibre</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-[--brand-blue] opacity-70 uppercase tracking-wider">Nuestro Precio (Standar)</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-[--brand-blue] opacity-70 uppercase tracking-wider">Nuestro Precio (Pro)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="summary-prices-body" class="bg-white divide-y divide-stone-200">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Unified Interactive Simulator Section -->
+            <section id="simulator" class="bg-white p-4 md:p-6 rounded-xl shadow-md border border-stone-200 mb-8 md:mb-12">
+                <div class="mb-4">
+                    <h2 class="text-2xl font-bold text-[--brand-blue]">Simulador de Rentabilidad Avanzado</h2>
+                    <p class="mt-1 text-[--brand-blue] opacity-80">Selecciona un escenario y ajusta los paquetes por zona para analizar la rentabilidad.</p>
+                </div>
+
+                <!-- Scenario Tabs -->
+                <div class="mb-6">
+                    <div id="scenario-tabs" class="flex flex-wrap gap-2 p-1 bg-stone-100 rounded-lg">
+                        <button data-scenario="Equitativo" class="scenario-btn flex-1 py-2 px-4 rounded-md text-sm font-semibold transition-colors duration-200 active">Equitativo</button>
+                        <button data-scenario="Standar" class="scenario-btn flex-1 py-2 px-4 rounded-md text-sm font-semibold transition-colors duration-200">Solo Standar</button>
+                        <button data-scenario="Pro" class="scenario-btn flex-1 py-2 px-4 rounded-md text-sm font-semibold transition-colors duration-200">Solo Pro</button>
+                    </div>
+                </div>
+                
+                <!-- KPIs Section -->
+                 <div id="kpis" class="mb-8 grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6">
+                    <div class="bg-stone-50 p-4 rounded-xl border border-stone-200 text-center">
+                        <h3 class="text-sm md:text-base font-semibold text-[--brand-blue] opacity-70">Margen Diario Total</h3>
+                        <p id="kpi-daily-margin" class="text-2xl md:text-3xl font-bold text-[--brand-blue] mt-1">$0</p>
+                    </div>
+                    <div class="bg-stone-50 p-4 rounded-xl border border-stone-200 text-center">
+                        <h3 class="text-sm md:text-base font-semibold text-[--brand-blue] opacity-70">Margen Mensual Bruto</h3>
+                        <p id="kpi-monthly-margin" class="text-2xl md:text-3xl font-bold text-[--brand-blue] mt-1">$0</p>
+                    </div>
+                    <div class="bg-stone-50 p-4 rounded-xl border border-stone-200 text-center">
+                        <h3 class="text-sm md:text-base font-semibold text-[--brand-blue] opacity-70">Paquetes Totales</h3>
+                        <p id="kpi-total-packages" class="text-2xl md:text-3xl font-bold text-[--brand-blue] mt-1">0</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
+                    <div class="lg:col-span-1 space-y-4">
+                        <h3 class="text-lg font-semibold text-[--brand-blue]">Controles de Paquetes Diarios</h3>
+                        <!-- Zone Controllers -->
+                        <div id="zone-controllers"></div>
+                    </div>
+                    <div class="lg:col-span-2">
+                        <h3 id="chart-title" class="text-lg font-semibold mb-4 text-center text-[--brand-blue]">Margen Bruto Diario por Zona (Equitativo)</h3>
+                        <div class="chart-container">
+                            <canvas id="marginByZoneChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Detailed Breakdown Section -->
+            <section id="details" class="bg-white p-4 md:p-6 rounded-xl shadow-md border border-stone-200 mb-8 md:mb-12">
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold text-[--brand-blue]">Análisis Detallado</h2>
+                    <p class="mt-1 text-[--brand-blue] opacity-80">Explora los datos granulares de márgenes y costos.</p>
+                </div>
+                <div>
+                    <div class="border-b border-stone-200">
+                        <nav id="tabs" class="flex space-x-4" aria-label="Tabs">
+                           <button data-tab="costs-tariffs" class="tab-button text-[--brand-blue] opacity-70 whitespace-nowrap py-3 px-1 border-b-2 border-transparent font-medium text-sm active">Costos y Tarifas</button>
+                           <button data-tab="margin-per-package" class="tab-button text-[--brand-blue] opacity-70 whitespace-nowrap py-3 px-1 border-b-2 border-transparent font-medium text-sm">Margen por Paquete</button>
+                        </nav>
+                    </div>
+                    <div id="tab-content" class="mt-6">
+                        <div id="costs-tariffs-content" class="tab-panel">
+                            <h3 class="text-lg font-semibold text-[--brand-blue] mb-4">Tabla de Tarifas, Costos y Precios Finales por Zona</h3>
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full divide-y divide-stone-200">
+                                    <thead class="bg-stone-50">
+                                        <tr>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-[--brand-blue] opacity-70 uppercase tracking-wider">Zona</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-[--brand-blue] opacity-70 uppercase tracking-wider">Tarifa ML</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-[--brand-blue] opacity-70 uppercase tracking-wider">Costo Vehículo</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-[--brand-blue] opacity-70 uppercase tracking-wider">Final Standar</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-[--brand-blue] opacity-70 uppercase tracking-wider">Final Pro</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="costs-table-body" class="bg-white divide-y divide-stone-200">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div id="margin-per-package-content" class="tab-panel hidden">
+                            <div>
+                                <h3 id="margin-detail-title" class="text-lg font-semibold mb-4 text-center text-[--brand-blue]">Comparativa de Margen por Nivel y Zona</h3>
+                                <div class="chart-container mx-auto" style="max-width: 800px;">
+                                    <canvas id="marginByLevelChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Company Info Section -->
+            <section id="company-info" class="bg-white p-4 md:p-6 rounded-xl shadow-md border border-stone-200 mb-8 md:mb-12">
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold text-[--brand-blue]">Nuestra Propuesta de Valor</h2>
+                    <p class="mt-1 text-[--brand-blue] opacity-80">Conoce cómo FlexAI optimiza tu logística en MercadoFlex.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="text-xl font-semibold text-[--brand-blue] mb-4">Diferenciales Clave</h3>
+                        <ul class="space-y-4">
+                            <li class="flex items-start"><span class="mr-3 text-xl">🗺️</span><span><strong class="font-semibold">Cobertura total en CABA y GBA:</strong> Llegamos a todas las zonas, incluyendo las nuevas localidades habilitadas por Mercado Libre.</span></li>
+                            <li class="flex items-start"><span class="mr-3 text-xl">⚡️</span><span><strong class="font-semibold">Entregas rápidas y eficientes:</strong> Dos recorridos diarios, de lunes a sábado, para que tus productos lleguen a tiempo.</span></li>
+                            <li class="flex items-start"><span class="mr-3 text-xl">💻</span><span><strong class="font-semibold">Flexibilidad y control:</strong> Sistema integrado "lighdata" para gestionar tus envíos y acceder a información detallada.</span></li>
+                            <li class="flex items-start"><span class="mr-3 text-xl">💪</span><span><strong class="font-semibold">Máxima seguridad y responsabilidad:</strong> Garantizamos el 100% de las entregas y nos hacemos cargo del costo del producto y envío en caso de roturas o pérdidas.</span></li>
+                            <li class="flex items-start"><span class="mr-3 text-xl">🔄</span><span><strong class="font-semibold">Intentos de entrega ilimitados:</strong> Sin costo adicional por visita, maximizando las posibilidades de entrega exitosa.</span></li>
+                             <li class="flex items-start"><span class="mr-3 text-xl">📦</span><span><strong class="font-semibold">Devoluciones ágiles:</strong> Gestionamos las devoluciones en 48hs, para que tu stock esté siempre disponible.</span></li>
+                        </ul>
+                    </div>
+                     <div>
+                        <h3 class="text-xl font-semibold text-[--brand-blue] mb-4">Áreas de Cobertura</h3>
+                        <div class="space-y-3 text-sm">
+                            <p><strong class="font-semibold text-[--brand-blue]">GBA 1:</strong> Vicente López, San Isidro, San Fernando, San Martín, Tres de Febrero, Morón, Hurlingham, Ituzaingó, Matanza Norte, Lomas de Zamora, Lanús, Avellaneda.</p>
+                            <p><strong class="font-semibold text-[--brand-blue]">GBA 2:</strong> Tigre, Malvinas Argentinas, José C. Paz, San Miguel, Moreno, Merlo, Matanza Sur, Ezeiza, Esteban Echeverría, Almirante Brown, Quilmes, Florencio Varela, Berazategui.</p>
+                            <p><strong class="font-semibold text-[--brand-blue]">GBA 3:</strong> Berisso, Del Viso, Derqui, Ensenada, Escobar, General Rodríguez, Guernica, Cañuelas, Ingeniero Maschwitz, La Plata Centro, La Plata Norte, La Plata Oeste, Luján, Marcos Paz, Nordelta, Pilar, San Vicente, Villa Rosa, Garín.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tech Value Section -->
+            <section id="tech-value" class="bg-white p-4 md:p-6 rounded-xl shadow-md border border-stone-200 mb-8 md:mb-12">
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold text-[--brand-blue]">Logística Flexible — Valor Tecnológico</h2>
+                    <p class="mt-1 text-[--brand-blue] opacity-80">
+                        Plataforma logística sin depósitos ni flota propia. Conecta comercios, depósitos y conductores mediante una app que asigna vehículos, optimiza rutas y gestiona entregas en tiempo real. Se integra con e-commerce y aplica reglas automáticas para penalizaciones, seguros y preferencia de choferes.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="text-xl font-semibold text-[--brand-blue] mb-4">Tecnología Clave:</h3>
+                        <ul class="space-y-3">
+                            <li class="flex items-start"><span class="mr-3 text-xl">⚙️</span><span>Motor de asignación dinámica y rutas optimizadas.</span></li>
+                            <li class="flex items-start"><span class="mr-3 text-xl">📍</span><span>Seguimiento en tiempo real y score de conductores.</span></li>
+                            <li class="flex items-start"><span class="mr-3 text-xl">🌐</span><span>Gestión distribuida sin infraestructura física.</span></li>
+                            <li class="flex items-start"><span class="mr-3 text-xl">🧠</span><span>IA proyectada para predicción de demanda y soporte inteligente.</span></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-semibold text-[--brand-blue] mb-4">¿Cómo funciona la app?</h3>
+                        <div class="space-y-3">
+                            <p><strong class="font-semibold">Comercios:</strong> Registran paquetes, eligen horarios y hacen seguimiento.</p>
+                            <p><strong class="font-semibold">Conductores:</strong> Aceptan viajes según zona y vehículo, reportan entregas.</p>
+                            <p><strong class="font-semibold">Depósitos:</strong> Gestionan recepción y despacho desde un panel web.</p>
+                            <p class="mt-4 text-[--brand-blue] opacity-90">Todo sincronizado en la nube para operar con eficiencia y sin fricción.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            const businessData = {
+                zones: {
+                    "CABA": {
+                        margins: { "Standar": 750, "Pro": 540 },
+                        costs: { "Standar": 3086, "Pro": 2831 },
+                        fullCosts: { "Tarifa ML": 4250, "Costo Vehículo": 1700, "Final Standar": 3086, "Final Pro": 2831 }
+                    },
+                    "GBA 1": {
+                        margins: { "Standar": 1150, "Pro": 810 },
+                        costs: { "Standar": 4114, "Pro": 3703 },
+                        fullCosts: { "Tarifa ML": 6792, "Costo Vehículo": 2173, "Final Standar": 4114, "Final Pro": 3703 }
+                    },
+                    "GBA 2": {
+                        margins: { "Standar": 1500, "Pro": 1030 },
+                        costs: { "Standar": 5143, "Pro": 4574 },
+                        fullCosts: { "Tarifa ML": 9443, "Costo Vehículo": 3777, "Final Standar": 5143, "Final Pro": 4574 }
+                    },
+                    "GBA 3": {
+                        margins: { "Standar": 970, "Pro": 500 },
+                        costs: { "Standar": 6861, "Pro": 6292 },
+                        fullCosts: { "Tarifa ML": 9443, "Costo Vehículo": 4721, "Final Standar": 6861, "Final Pro": 6292 }
+                    }
+                },
+                activeDays: 26
+            };
+            
+            for (const zoneKey in businessData.zones) {
+                const zone = businessData.zones[zoneKey];
+                zone.avgMargin = (zone.margins.Standar + zone.margins.Pro) / 2;
+                zone.costs.Equitativo = (zone.costs.Standar + zone.costs.Pro) / 2;
+            }
+
+            let activeScenario = 'Equitativo';
+            let marginByZoneChart, marginByLevelChart;
+
+            const BRAND_BLUE = '#0D395A';
+            const BRAND_YELLOW = '#FFCF15';
+            const DISTINCT_COLORS = ['#FFCF15', '#0D395A', '#14b8a6', '#f97316'];
+
+            const formatCurrency = (value) => new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', minimumFractionDigits: 0 }).format(value);
+
+            const kpis = {
+                dailyMargin: document.getElementById('kpi-daily-margin'),
+                monthlyMargin: document.getElementById('kpi-monthly-margin'),
+                totalPackages: document.getElementById('kpi-total-packages'),
+            };
+
+            function createZoneControllers() {
+                const container = document.getElementById('zone-controllers');
+                container.innerHTML = '';
+                Object.keys(businessData.zones).forEach((zoneKey, index) => {
+                    const zoneName = zoneKey.replace(/\s/g, '-').toLowerCase();
+                    const color = DISTINCT_COLORS[index];
+                    const controllerHTML = `
+                        <div class="p-4 bg-stone-50 rounded-lg border border-stone-200" style="--slider-color: ${color}">
+                            <div class="mb-3">
+                                <label for="${zoneName}-slider" class="flex justify-between font-medium">
+                                    <span>${zoneKey}</span>
+                                    <span id="${zoneName}-value">250</span>
+                                </label>
+                                <input id="${zoneName}-slider" type="range" min="0" max="500" value="250" class="zone-slider w-full h-2 bg-stone-200 rounded-lg appearance-none cursor-pointer slider-thumb" data-zone="${zoneKey}">
+                            </div>
+                            <div class="text-xs space-y-1">
+                                <div class="flex justify-between"><span>Margen/Paq:</span><span id="${zoneName}-margin" class="font-semibold"></span></div>
+                                <div class="flex justify-between"><span>Costo/Paq:</span><span id="${zoneName}-cost" class="font-semibold"></span></div>
+                                <div class="flex justify-between"><span>Rentab. Zona:</span><span id="${zoneName}-profit" class="font-semibold text-[--brand-blue]"></span></div>
+                            </div>
+                        </div>
+                    `;
+                    container.innerHTML += controllerHTML;
+                });
+            }
+
+            function updateSimulation() {
+                let totalDailyMargin = 0;
+                let totalPackages = 0;
+                const marginsByZone = {};
+                
+                document.querySelectorAll('.zone-slider').forEach(slider => {
+                    const zoneKey = slider.dataset.zone;
+                    const packageCount = parseInt(slider.value);
+                    const zoneName = zoneKey.replace(/\s/g, '-').toLowerCase();
+                    
+                    document.getElementById(`${zoneName}-value`).textContent = packageCount;
+
+                    let marginPerPackage = 0;
+                    let costPerPackage = 0;
+
+                    if (activeScenario === 'Equitativo') {
+                        marginPerPackage = businessData.zones[zoneKey].avgMargin;
+                        costPerPackage = businessData.zones[zoneKey].costs.Equitativo;
+                    } else {
+                        marginPerPackage = businessData.zones[zoneKey].margins[activeScenario];
+                        costPerPackage = businessData.zones[zoneKey].costs[activeScenario];
+                    }
+                    
+                    const zoneProfit = packageCount * marginPerPackage;
+                    marginsByZone[zoneKey] = zoneProfit;
+                    totalDailyMargin += zoneProfit;
+                    totalPackages += packageCount;
+                    
+                    document.getElementById(`${zoneName}-margin`).textContent = formatCurrency(marginPerPackage);
+                    document.getElementById(`${zoneName}-cost`).textContent = formatCurrency(costPerPackage);
+                    document.getElementById(`${zoneName}-profit`).textContent = formatCurrency(zoneProfit);
+                });
+                
+                kpis.dailyMargin.textContent = formatCurrency(totalDailyMargin);
+                kpis.monthlyMargin.textContent = formatCurrency(totalDailyMargin * businessData.activeDays);
+                kpis.totalPackages.textContent = totalPackages;
+                
+                document.getElementById('chart-title').textContent = `Margen Bruto Diario por Zona (${activeScenario})`;
+                updateMarginByZoneChart(Object.keys(marginsByZone), Object.values(marginsByZone));
+            }
+            
+            function populateSummaryPrices() {
+                const tableBody = document.getElementById('summary-prices-body');
+                tableBody.innerHTML = '';
+                Object.keys(businessData.zones).forEach(zone => {
+                    const data = businessData.zones[zone];
+                    const row = `
+                        <tr class="hover:bg-stone-50">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">${zone}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm opacity-80">${formatCurrency(data.fullCosts['Tarifa ML'])}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-yellow-600">${formatCurrency(data.costs['Standar'])}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-yellow-600">${formatCurrency(data.costs['Pro'])}</td>
+                        </tr>
+                    `;
+                    tableBody.innerHTML += row;
+                });
+            }
+
+            function createMarginByZoneChart() {
+                const ctx = document.getElementById('marginByZoneChart').getContext('2d');
+                marginByZoneChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: [],
+                        datasets: [{
+                            label: 'Margen Bruto Diario',
+                            data: [],
+                            backgroundColor: DISTINCT_COLORS,
+                            borderColor: DISTINCT_COLORS,
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => `Margen: ${formatCurrency(c.raw)}` } } },
+                        scales: { 
+                            y: { beginAtZero: true, ticks: { color: BRAND_BLUE, callback: (v) => formatCurrency(v) } },
+                            x: { ticks: { color: BRAND_BLUE } }
+                        }
+                    }
+                });
+            }
+
+            function updateMarginByZoneChart(labels, data) {
+                marginByZoneChart.data.labels = labels;
+                marginByZoneChart.data.datasets[0].data = data;
+                marginByZoneChart.update();
+            }
+            
+            function createMarginByLevelChart() {
+                const ctx = document.getElementById('marginByLevelChart').getContext('2d');
+
+                const datasets = Object.keys(businessData.zones).map((zoneKey, index) => {
+                    const zoneData = businessData.zones[zoneKey];
+                    return {
+                        label: zoneKey,
+                        data: [zoneData.margins.Standar, zoneData.margins.Pro],
+                        backgroundColor: DISTINCT_COLORS[index],
+                        borderColor: DISTINCT_COLORS[index],
+                        borderWidth: 1
+                    };
+                });
+
+                marginByLevelChart = new Chart(ctx, {
+                    type: 'bar', 
+                    data: { 
+                        labels: ['Standar', 'Pro'], 
+                        datasets: datasets 
+                    },
+                    options: { 
+                        responsive: true, maintainAspectRatio: false, 
+                        plugins: { 
+                            legend: { 
+                                display: true,
+                                position: 'top',
+                                labels: {
+                                    color: BRAND_BLUE
+                                }
+                             }, 
+                            tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${formatCurrency(c.raw)}` } } 
+                        }, 
+                        scales: { 
+                            y: { beginAtZero: true, ticks: { color: BRAND_BLUE, callback: (v) => formatCurrency(v) } },
+                            x: { ticks: { color: BRAND_BLUE } }
+                        } 
+                    }
+                });
+            }
+            
+            function populateCostsTable() {
+                const tableBody = document.getElementById('costs-table-body');
+                tableBody.innerHTML = '';
+                Object.keys(businessData.zones).forEach(zone => {
+                    const costs = businessData.zones[zone].fullCosts;
+                    const row = `<tr class="hover:bg-stone-50"><td class="px-6 py-4 whitespace-nowrap text-sm font-medium">${zone}</td><td class="px-6 py-4 whitespace-nowrap text-sm opacity-80">${formatCurrency(costs['Tarifa ML'])}</td><td class="px-6 py-4 whitespace-nowrap text-sm opacity-80">${formatCurrency(costs['Costo Vehículo'])}</td><td class="px-6 py-4 whitespace-nowrap text-sm opacity-80">${formatCurrency(costs['Final Standar'])}</td><td class="px-6 py-4 whitespace-nowrap text-sm opacity-80">${formatCurrency(costs['Final Pro'])}</td></tr>`;
+                    tableBody.innerHTML += row;
+                });
+            }
+            
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.addEventListener('click', () => {
+                    const tabId = button.dataset.tab;
+                    document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.add('hidden'));
+                    document.getElementById(`${tabId}-content`).classList.remove('hidden');
+                });
+            });
+            
+            document.getElementById('scenario-tabs').addEventListener('click', (e) => {
+                if(e.target.classList.contains('scenario-btn')) {
+                    activeScenario = e.target.dataset.scenario;
+                    document.querySelectorAll('.scenario-btn').forEach(btn => btn.classList.remove('active'));
+                    e.target.classList.add('active');
+                    updateSimulation();
+                }
+            });
+
+            function addSliderEventListeners() {
+                document.getElementById('zone-controllers').addEventListener('input', (e) => {
+                    if (e.target.classList.contains('zone-slider')) {
+                        updateSimulation();
+                    }
+                });
+            }
+
+            function init() {
+                populateSummaryPrices();
+                createZoneControllers();
+                createMarginByZoneChart();
+                createMarginByLevelChart();
+                addSliderEventListeners();
+                updateSimulation();
+                populateCostsTable();
+            }
+
+            init();
+        });
+    </script>
+</body>
+</html>
