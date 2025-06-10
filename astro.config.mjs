@@ -3,9 +3,14 @@ import tailwind from "@astrojs/tailwind";
 import mdx from "@astrojs/mdx";
 import sitemap from "@astrojs/sitemap";
 import icon from "astro-icon";
+import { securityConfig } from "./astro.config.security.mjs";
 
 export default defineConfig({
   site: "https://flexai.com.ar",
+  // Apply server security configuration for development
+  ...(process.env.NODE_ENV === 'development' && securityConfig.server ? { 
+    server: securityConfig.server 
+  } : {}),
   integrations: [
     tailwind({
       // Apply base styles
@@ -79,16 +84,20 @@ export default defineConfig({
       // Source maps for production debugging
       sourcemap: false,
     },
-    // Development server
+    // Development server with security configuration
     server: {
-      host: true,
-      port: 3000,
+      ...(process.env.NODE_ENV === 'development' ? securityConfig.server : {
+        host: true,
+        port: 3000,
+      }),
     },
     // Plugin optimizations
     esbuild: {
       // Drop console logs in production
       drop: process.env.NODE_ENV === 'production' ? ['console', 'debugger'] : [],
     },
+    // Apply additional security config for development
+    ...(process.env.NODE_ENV === 'development' ? securityConfig.vite : {}),
   },
   markdown: {
     // Markdown processing optimizations
