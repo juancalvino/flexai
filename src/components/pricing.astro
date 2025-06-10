@@ -5,23 +5,23 @@ import { Icon } from "astro-icon/components";
 const { plan } = Astro.props;
 ---
 
-<div>
+<div class="w-full max-w-sm">
   <div
-    class="flex flex-col w-full order-first lg:order-none border-2 border-[#D8DEE9] border-opacity-50 py-5 px-6 rounded-md">
+    class="flex flex-col w-full h-full border-2 border-[#D8DEE9] border-opacity-50 py-6 px-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 bg-white">
     <div class="text-center">
       <p
-        class="mt-1 text-5xl font-bold text-brand-blue-600 md:text-4xl">
+        class="mt-1 text-4xl font-bold text-brand-blue-600 md:text-3xl">
         { plan.category }
       </p>
-      <p class="font-medium text-gray-500">{ plan.description }</p>
+      <p class="font-medium text-gray-500 mt-2">{ plan.description }</p>
 
     </div>
-    <ul class="grid mt-8 text-center gap-y-3 justify-center">
+    <ul class="grid mt-8 text-center gap-y-4 justify-center flex-grow">
       {
-        plan.prices.map((item) => (
+        plan.prices.map((item: any) => (
           <li class="flex items-center justify-center gap-3 text-gray-700">
             <Icon class="text-brand-blue-600 w-6 h-6" name="bx:bx-package" />
-            <span>{item['zone']} -->  ${item['price']}</span>
+            <span class="font-medium">{item['zone']} -->  ${item['price']}</span>
           </li>
         ))
       }
@@ -32,7 +32,7 @@ const { plan } = Astro.props;
         variant="primary"
         size="lg"
         fullWidth
-        class="shadow-lg"
+        class="shadow-md hover:shadow-lg transition-shadow duration-200"
       >
         {plan.button.text || "Contactenos"}
       </Button>

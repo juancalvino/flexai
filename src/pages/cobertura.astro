@@ -3,6 +3,7 @@ import Layout from "../layouts/Layout.astro";
 import mapaAmba from "../assets/mapaAmba.png";
 import { Picture } from "astro:assets";
 import Sectionhead from "../components/sectionhead.astro";
+import GeoJSONMap from "../components/GeoJSONMap.astro";
 ---
 
 <Layout title="Cobertura">
@@ -10,18 +11,9 @@ import Sectionhead from "../components/sectionhead.astro";
     <Fragment slot="title">Cobertura</Fragment>
     <Fragment slot="desc"></Fragment>
   </Sectionhead>
-  <div class="flex justify-center px-5 lg:px-20 flex-col lg:flex-row ">
-    <div class="content_map">
-    <div class="map">
-      <Picture
-        src={mapaAmba}
-        alt="Mapa AMBA"
-        widths={[200, 400, 600]}
-        sizes="(max-width: 600px) 100vw, 620px"
-        loading="eager"
-        format="avif"
-      />
-    </div>
+  <!-- Mapa GeoJSON Real -->
+  <div class="px-5 lg:px-20 mb-10">
+    <GeoJSONMap />
   </div>
   <div
     class="bg-brand-blue-600 p-8 md:px-20 md:py-10 mt-10 mx-auto max-w-5xl shadow-lg rounded-lg flex flex-col items-center text-center">

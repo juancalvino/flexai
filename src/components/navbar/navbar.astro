@@ -34,13 +34,15 @@ const currentPath = Astro.url.pathname;
         <div class="flex items-center justify-between">
           <!-- Logo -->
           <div>
-            <a href="/" class="inline-block group">
+            <a href="/" class="inline-block group relative overflow-hidden rounded-lg logo-link">
               <Picture
                 src={logoFlexai}
                 alt="FLEXAI Logística"
                 loading="eager"
-                class="h-14 w-auto transition-transform duration-200 group-hover:scale-105"
+                class="h-14 w-auto relative z-10 transform-none"
               />
+              <!-- Efecto de brillo amarillo -->
+              <div class="absolute inset-0 bg-gradient-to-r from-transparent via-brand-yellow-400/70 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-800 ease-out"></div>
             </a>
           </div>
 
@@ -199,8 +201,23 @@ const currentPath = Astro.url.pathname;
     }
   }
   
+  /* Logo específico - sin transformaciones */
+  .logo-link {
+    position: relative;
+  }
+  
+  .logo-link:hover {
+    transform: none !important;
+  }
+  
+  .logo-link img,
+  .logo-link picture {
+    transform: none !important;
+    transition: none !important;
+  }
+  
   /* Smooth hover effects */
-  header a {
+  header a:not(.logo-link) {
     position: relative;
   }
   

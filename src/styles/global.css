@@ -111,6 +111,18 @@ a {
   position: relative;
 }
 
+/* Asegurar que el header siempre esté por encima de mapas */
+header {
+  z-index: 50 !important;
+}
+
+/* Limitar z-index de mapas para que no interfieran con el header */
+.leaflet-container,
+.leaflet-map-pane,
+.leaflet-control-container {
+  z-index: 10 !important;
+}
+
 a:hover {
   color: theme('colors.brand.blue.700');
 }
