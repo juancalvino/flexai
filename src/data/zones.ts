@@ -31,7 +31,7 @@ export const ZONES: Record<ZoneId, Zone> = {
       "La Matanza Norte", "Lomas de Zamora", "Lanús", "Avellaneda",
     ],
     prices: { standard: 4000, pro: 3700 },
-    color: "#F2994A",
+    color: "#D9C590",
   },
   GBA2: {
     id: "GBA2",
