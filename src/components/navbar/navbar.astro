@@ -1,7 +1,8 @@
 ---
+import { Icon } from "astro-icon/components";
 import Container from "../container.astro";
 import Logo from "../ui/Logo.astro";
-import { NAVIGATION, SITE, whatsappUrl, DEFAULT_WHATSAPP_MESSAGE } from "../../data/site";
+import { NAVIGATION, SITE, SOCIAL_LINKS, whatsappUrl, DEFAULT_WHATSAPP_MESSAGE } from "../../data/site";
 
 const currentPath = Astro.url.pathname.replace(/\/$/, "") || "/";
 const isActive = (path: string) => (path === "/" ? currentPath === "/" : currentPath.startsWith(path));
@@ -57,41 +58,90 @@ const isActive = (path: string) => (path === "/" ? currentPath === "/" : current
 
   <div
     id="mobile-menu"
-    class="fixed inset-0 z-50 flex flex-col bg-ink px-5 pb-10 pt-28 opacity-0 transition-opacity duration-500 [visibility:hidden] data-[open]:opacity-100 data-[open]:[visibility:visible] lg:hidden"
+    class="fixed inset-0 z-50 overflow-y-auto overscroll-contain bg-ink opacity-0 transition-opacity duration-500 [visibility:hidden] data-[open]:opacity-100 data-[open]:[visibility:visible] lg:hidden"
     role="dialog"
     aria-modal="true"
     aria-label="Menú"
+    data-lenis-prevent
   >
-    <nav aria-label="Móvil" class="flex-1">
-      <ul class="flex flex-col gap-2">
-        {
-          NAVIGATION.map((item, index) => (
-            <li class="overflow-hidden">
-              <a
-                href={item.path}
-                aria-current={isActive(item.path) ? "page" : undefined}
-                class:list={[
-                  "mobile-link flex items-baseline gap-4 font-display text-5xl uppercase",
-                  isActive(item.path) ? "text-accent" : "text-cream",
-                ]}
-                style={`--i:${index}`}
-              >
-                <span class="font-sans text-xs text-cream/40">0{index + 1}</span>
-                {item.title}
-              </a>
-            </li>
-          ))
-        }
-      </ul>
-    </nav>
-    <div class="flex flex-col gap-3">
-      <a href={whatsappUrl(DEFAULT_WHATSAPP_MESSAGE)} target="_blank" rel="noopener noreferrer" class="btn-primary w-full">
-        Hablanos por WhatsApp
-      </a>
-      <a href={SITE.lightDataUrl} target="_blank" rel="noopener noreferrer" class="btn-ghost w-full text-cream">
-        Ingresar a LightData
-      </a>
-    </div>
+    <div class="menu-glow pointer-events-none absolute inset-0" aria-hidden="true"></div>
+
+    <Container class="relative flex min-h-full flex-col gap-10 pb-[calc(2rem+env(safe-area-inset-bottom))] pt-24">
+      <nav aria-label="Móvil">
+        <ul class="border-t border-cream/10">
+          {
+            NAVIGATION.map((item, index) => (
+              <li class="menu-item overflow-hidden border-b border-cream/10" style={`--i:${index}`}>
+                <a
+                  href={item.path}
+                  aria-current={isActive(item.path) ? "page" : undefined}
+                  class:list={[
+                    "group flex items-center justify-between gap-4 py-4 font-display text-[clamp(1.75rem,min(9vw,6.5svh),3rem)] uppercase leading-none transition-colors",
+                    isActive(item.path) ? "text-accent" : "text-cream hover:text-accent",
+                  ]}
+                >
+                  <span class="flex items-baseline gap-4">
+                    <span class="w-6 font-sans text-xs tabular-nums text-cream/35">0{index + 1}</span>
+                    {item.title}
+                  </span>
+                  {
+                    isActive(item.path) ? (
+                      <span class="eyebrow text-[10px] text-accent">Estás acá</span>
+                    ) : (
+                      <Icon name="bx:right-arrow-alt" class="h-6 w-6 shrink-0 text-cream/30 transition-transform duration-300 group-hover:translate-x-1 group-hover:text-accent" />
+                    )
+                  }
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+
+      <div class="menu-footer mt-auto flex flex-col gap-8">
+        <div class="grid gap-3 sm:grid-cols-2">
+          <a href={whatsappUrl(DEFAULT_WHATSAPP_MESSAGE)} target="_blank" rel="noopener noreferrer" class="btn-primary w-full">
+            <Icon name="simple-icons:whatsapp" class="h-4 w-4" />
+            Hablanos por WhatsApp
+          </a>
+          <a href={SITE.lightDataUrl} target="_blank" rel="noopener noreferrer" class="btn-ghost w-full text-cream">
+            Ingresar a LightData
+          </a>
+        </div>
+
+        <div class="flex flex-wrap items-end justify-between gap-6 border-t border-cream/10 pt-6 text-sm">
+          <dl class="grid gap-3">
+            <div>
+              <dt class="eyebrow text-[10px] text-cream/40">Teléfono</dt>
+              <dd><a href={SITE.phoneHref} class="inline-block py-1 text-cream/80 hover:text-accent">{SITE.phoneDisplay}</a></dd>
+            </div>
+            <div>
+              <dt class="eyebrow text-[10px] text-cream/40">Email</dt>
+              <dd><a href={`mailto:${SITE.email}`} class="inline-block break-all py-1 text-cream/80 hover:text-accent">{SITE.email}</a></dd>
+            </div>
+            <div>
+              <dt class="eyebrow text-[10px] text-cream/40">Horario</dt>
+              <dd class="py-1 text-cream/80">Lunes a sábado · AMBA</dd>
+            </div>
+          </dl>
+          <div class="flex gap-3">
+            {
+              SOCIAL_LINKS.map((social) => (
+                <a
+                  href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={social.name}
+                  class="flex h-11 w-11 items-center justify-center rounded-full border border-cream/20 text-cream transition-colors hover:border-accent hover:bg-accent hover:text-accent-contrast"
+                >
+                  <Icon name={social.icon} class="h-5 w-5" />
+                </a>
+              ))
+            }
+          </div>
+        </div>
+      </div>
+    </Container>
   </div>
 </header>
 
@@ -129,13 +179,30 @@ const isActive = (path: string) => (path === "/" ? currentPath === "/" : current
     transform: translateY(-6px) rotate(-90deg);
   }
 
-  .mobile-link {
-    transform: translateY(100%);
-    transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
-    transition-delay: calc(var(--i) * 60ms + 100ms);
+  .menu-glow {
+    background: radial-gradient(60% 40% at 100% 100%, rgb(var(--color-accent) / 0.12), transparent 70%);
   }
 
-  #mobile-menu[data-open] .mobile-link {
+  .menu-item > a {
+    transform: translateY(100%);
+    transition:
+      transform 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+      color 0.3s ease;
+    transition-delay: calc(var(--i) * 50ms + 80ms), 0s;
+  }
+
+  .menu-footer {
+    opacity: 0;
+    transform: translateY(16px);
+    transition:
+      opacity 0.6s ease,
+      transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    transition-delay: 0.35s;
+  }
+
+  #mobile-menu[data-open] .menu-item > a,
+  #mobile-menu[data-open] .menu-footer {
+    opacity: 1;
     transform: translateY(0);
   }
 </style>
@@ -156,10 +223,20 @@ const isActive = (path: string) => (path === "/" ? currentPath === "/" : current
     toggle.setAttribute("aria-expanded", String(open));
     toggle.setAttribute("aria-label", open ? "Cerrar menú" : "Abrir menú");
     document.documentElement.style.overflow = open ? "hidden" : "";
+    // Pause the smooth-scroll engine (scripts/motion.ts) so the page behind doesn't move.
+    document.dispatchEvent(new CustomEvent(open ? "scroll:lock" : "scroll:unlock"));
     if (open) menu.querySelector<HTMLElement>("a")?.focus();
   }
 
   toggle.addEventListener("click", () => setOpen(!menu.hasAttribute("data-open")));
+
+  // Links to the current page don't navigate, so close the menu instead.
+  menu.querySelectorAll<HTMLAnchorElement>('a[aria-current="page"]').forEach((link) =>
+    link.addEventListener("click", (event) => {
+      event.preventDefault();
+      setOpen(false);
+    }),
+  );
 
   document.addEventListener("keydown", (event) => {
     if (!menu.hasAttribute("data-open")) return;
