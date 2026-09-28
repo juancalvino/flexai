@@ -36,10 +36,10 @@ const planIds: PlanId[] = ["standard", "pro"];
               >
                 <div class="flex items-start justify-between gap-4">
                   <div>
-                    <p class:list={["eyebrow", featured ? "text-brand-yellow-500" : "text-ink/50"]}>{plan.volume}</p>
+                    <p class:list={["eyebrow", featured ? "text-accent" : "text-ink/50"]}>{plan.volume}</p>
                     <h2 class="mt-4 font-display text-5xl uppercase leading-none">{plan.name}</h2>
                   </div>
-                  {featured && <span class="eyebrow rounded-full bg-brand-yellow-500 px-3 py-1.5 text-ink">Mejor tarifa</span>}
+                  {featured && <span class="eyebrow rounded-full bg-accent px-3 py-1.5 text-accent-contrast">Mejor tarifa</span>}
                 </div>
                 <p class:list={["mt-4", featured ? "text-cream/60" : "text-ink/60"]}>{plan.highlight}</p>
 
@@ -67,11 +67,11 @@ const planIds: PlanId[] = ["standard", "pro"];
       </div>
       <p class="mt-6 text-sm text-ink/50">* Precios por paquete. IVA no incluido.</p>
 
-      <aside class="mt-16 flex flex-col gap-6 rounded-3xl bg-brand-yellow-500 p-8 md:flex-row md:items-center md:p-12" data-reveal="up">
+      <aside class="mt-16 flex flex-col gap-6 rounded-3xl bg-accent p-8 text-accent-contrast md:flex-row md:items-center md:p-12" data-reveal="up">
         <Icon name="bx:group" class="h-12 w-12 shrink-0" />
         <div>
           <h2 class="font-display text-2xl uppercase">Sumá envíos con otros comercios</h2>
-          <p class="mt-2 max-w-3xl text-ink/75">
+          <p class="mt-2 max-w-3xl text-accent-contrast/75">
             Si combinás tus envíos con los de comercios cercanos y juntos alcanzan un mayor volumen, pueden acceder a un plan superior con tarifas más bajas.
           </p>
         </div>
@@ -88,7 +88,7 @@ const planIds: PlanId[] = ["standard", "pro"];
         {
           DIFFERENTIATORS.map((item, index) => (
             <li class="rounded-3xl bg-cream-light p-8 ring-1 ring-ink/10" data-reveal="up" data-delay={index * 0.1}>
-              <Icon name={item.icon} class="h-10 w-10 text-brand-blue-500" />
+              <Icon name={item.icon} class="h-10 w-10 text-secondary" />
               <h3 class="mt-8 font-display text-2xl uppercase">{item.title}</h3>
               <p class="mt-3 text-ink/65">{item.description}</p>
             </li>

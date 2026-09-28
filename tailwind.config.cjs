@@ -1,35 +1,29 @@
 /** @type {import('tailwindcss').Config} */
 const defaultTheme = require("tailwindcss/defaultTheme");
 
+const themeColor = (name) => `rgb(var(--color-${name}) / <alpha-value>)`;
+
 module.exports = {
   content: ["./src/**/*.{astro,html,js,ts}"],
   theme: {
     extend: {
+      // Colors come from CSS variables in src/styles/theme.css.
       colors: {
         ink: {
-          DEFAULT: "#1F1E1D",
-          soft: "#292727",
-          muted: "#3A3836",
+          DEFAULT: themeColor("ink"),
+          soft: themeColor("ink-soft"),
+          muted: themeColor("ink-muted"),
         },
         cream: {
-          DEFAULT: "#F3F1EB",
-          light: "#FEFCF3",
-          dark: "#E4E0D5",
+          DEFAULT: themeColor("cream"),
+          light: themeColor("cream-light"),
+          dark: themeColor("cream-dark"),
         },
-        brand: {
-          yellow: {
-            100: "#FFF6CF",
-            300: "#FFE27A",
-            500: "#FFCF15",
-            600: "#E6B800",
-            700: "#B38F00",
-          },
-          blue: {
-            300: "#8FA9BF",
-            500: "#0D395A",
-            700: "#082236",
-          },
+        accent: {
+          DEFAULT: themeColor("accent"),
+          contrast: themeColor("on-accent"),
         },
+        secondary: themeColor("secondary"),
       },
       fontFamily: {
         sans: ["Inter Variable", ...defaultTheme.fontFamily.sans],

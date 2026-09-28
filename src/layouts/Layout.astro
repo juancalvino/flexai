@@ -50,7 +50,7 @@ const structuredData = {
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
-    <meta name="theme-color" content="#1F1E1D" />
+    <meta name="theme-color" content={SITE.browserThemeColor} />
     <link rel="manifest" href="/manifest.json" />
     {noIndex && <meta name="robots" content="noindex, nofollow" />}
 
@@ -75,7 +75,7 @@ const structuredData = {
   </head>
 
   <body class="flex min-h-screen flex-col">
-    <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-full focus:bg-brand-yellow-500 focus:px-4 focus:py-2 focus:text-ink">
+    <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-full focus:bg-accent focus:px-4 focus:py-2 focus:text-accent-contrast">
       Saltar al contenido
     </a>
     <Navbar />

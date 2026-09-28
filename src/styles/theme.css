@@ -1,0 +1,34 @@
+/*
+ * Brand theme. Every color on the site comes from these variables, so a new brand
+ * only needs to change this file (plus logo, fonts and src/data/site.ts).
+ *
+ * Values are RGB channels ("R G B") so Tailwind opacity modifiers work, e.g. bg-ink/80.
+ * In plain CSS use them as rgb(var(--color-accent)) or rgb(var(--color-accent) / 0.5).
+ */
+:root {
+  /* Dark base: page backgrounds, dark sections, text on light surfaces. */
+  --color-ink: 31 30 29;
+  --color-ink-soft: 41 39 39;
+  --color-ink-muted: 58 56 54;
+
+  /* Light base: page background and text on dark surfaces. */
+  --color-cream: 243 241 235;
+  --color-cream-light: 254 252 243;
+  --color-cream-dark: 228 224 213;
+
+  /* Brand accent (buttons, highlights) and the text color used on top of it. */
+  --color-accent: 255 207 21;
+  --color-on-accent: 31 30 29;
+
+  /* Secondary brand color, used sparingly for details. */
+  --color-secondary: 13 57 90;
+
+  /* Outline of the selected zone on the coverage map. */
+  --color-highlight: 255 255 255;
+
+  /* Coverage zones, from the city center outwards (CABA, GBA 1, GBA 2, GBA 3). */
+  --color-zone-1: 255 207 21;
+  --color-zone-2: 217 197 144;
+  --color-zone-3: 157 184 207;
+  --color-zone-4: 74 123 167;
+}

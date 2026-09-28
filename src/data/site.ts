@@ -16,6 +16,8 @@ export const SITE = {
   lightDataUrl: "https://lightdata.flexai.com.ar",
   instagram: "https://instagram.com/flexai.logistica",
   ogImage: "/assets/og-image.jpg",
+  // Browser UI color (mobile address bar). Meta tags can't read CSS variables: keep in sync with --color-ink.
+  browserThemeColor: "#1F1E1D",
 } as const;
 
 export function whatsappUrl(message?: string): string {

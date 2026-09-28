@@ -15,7 +15,7 @@ const { lines, tag: Tag = "h2", class: className, delay = 0, accent } = Astro.pr
   {
     lines.map((line, index) => (
       <span class="line block overflow-hidden pb-[0.08em]">
-        <span class:list={["block", index === accent && "text-brand-yellow-500"]}>{line}</span>
+        <span class:list={["block", index === accent && "text-accent"]}>{line}</span>
       </span>
     ))
   }

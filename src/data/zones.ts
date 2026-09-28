@@ -9,8 +9,13 @@ export interface Zone {
   description: string;
   localities: string[];
   prices: Record<PlanId, number>;
+  /** Theme token in src/styles/theme.css (--color-<token>). */
+  colorToken: string;
+  /** CSS color for inline styles. */
   color: string;
 }
+
+const themeColor = (token: string) => `rgb(var(--color-${token}))`;
 
 export const ZONES: Record<ZoneId, Zone> = {
   CABA: {
@@ -19,7 +24,8 @@ export const ZONES: Record<ZoneId, Zone> = {
     description: "Todas las comunas de la Ciudad",
     localities: ["Todas las comunas"],
     prices: { standard: 3100, pro: 2800 },
-    color: "#FFCF15",
+    colorToken: "zone-1",
+    color: themeColor("zone-1"),
   },
   GBA1: {
     id: "GBA1",
@@ -31,7 +37,8 @@ export const ZONES: Record<ZoneId, Zone> = {
       "La Matanza Norte", "Lomas de Zamora", "Lanús", "Avellaneda",
     ],
     prices: { standard: 4000, pro: 3700 },
-    color: "#D9C590",
+    colorToken: "zone-2",
+    color: themeColor("zone-2"),
   },
   GBA2: {
     id: "GBA2",
@@ -44,7 +51,8 @@ export const ZONES: Record<ZoneId, Zone> = {
       "Berazategui",
     ],
     prices: { standard: 5000, pro: 4700 },
-    color: "#9DB8CF",
+    colorToken: "zone-3",
+    color: themeColor("zone-3"),
   },
   GBA3: {
     id: "GBA3",
@@ -57,7 +65,8 @@ export const ZONES: Record<ZoneId, Zone> = {
       "Pilar", "San Vicente", "Villa Rosa", "Zárate",
     ],
     prices: { standard: 6800, pro: 6550 },
-    color: "#4A7BA7",
+    colorToken: "zone-4",
+    color: themeColor("zone-4"),
   },
 };
 

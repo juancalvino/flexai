@@ -14,7 +14,7 @@ const { eyebrow, title, accent } = Astro.props;
 
 <section class="relative overflow-hidden bg-ink pb-20 pt-40 text-cream md:pb-28 md:pt-52">
   <Container>
-    <p class="eyebrow mb-8 text-brand-yellow-500" data-reveal="fade">{eyebrow}</p>
+    <p class="eyebrow mb-8 text-accent" data-reveal="fade">{eyebrow}</p>
     <Lines tag="h1" lines={title} accent={accent} class="text-display-md uppercase" />
     {
       Astro.slots.has("default") && (

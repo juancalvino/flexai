@@ -10,7 +10,7 @@ const isActive = (path: string) => (path === "/" ? currentPath === "/" : current
 <header id="site-header" class="fixed inset-x-0 top-0 z-50 text-cream transition-[background-color,backdrop-filter] duration-500">
   <Container class="flex h-20 items-center justify-between gap-6">
     <a href="/" class="relative z-[60] block w-28 py-3 md:w-32" aria-label="FLEXAI, ir al inicio">
-      <Logo class="h-auto w-full text-cream" accent="#FFCF15" />
+      <Logo class="h-auto w-full text-cream" accent="rgb(var(--color-accent))" />
     </a>
 
     <nav aria-label="Principal" class="hidden lg:block">
@@ -23,7 +23,7 @@ const isActive = (path: string) => (path === "/" ? currentPath === "/" : current
                 aria-current={isActive(item.path) ? "page" : undefined}
                 class:list={[
                   "block rounded-full px-4 py-2 font-display text-sm uppercase tracking-wider transition-colors duration-300",
-                  isActive(item.path) ? "bg-cream text-ink" : "text-cream/80 hover:text-brand-yellow-500",
+                  isActive(item.path) ? "bg-cream text-ink" : "text-cream/80 hover:text-accent",
                 ]}
               >
                 {item.title}
@@ -72,7 +72,7 @@ const isActive = (path: string) => (path === "/" ? currentPath === "/" : current
                 aria-current={isActive(item.path) ? "page" : undefined}
                 class:list={[
                   "mobile-link flex items-baseline gap-4 font-display text-5xl uppercase",
-                  isActive(item.path) ? "text-brand-yellow-500" : "text-cream",
+                  isActive(item.path) ? "text-accent" : "text-cream",
                 ]}
                 style={`--i:${index}`}
               >
@@ -97,7 +97,7 @@ const isActive = (path: string) => (path === "/" ? currentPath === "/" : current
 
 <style>
   #site-header[data-scrolled] {
-    background-color: rgb(31 30 29 / 0.85);
+    background-color: rgb(var(--color-ink) / 0.85);
     backdrop-filter: blur(12px);
   }
 

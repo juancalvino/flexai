@@ -4,13 +4,13 @@ import { ZONE_LIST } from "../../data/zones";
 const localities = ZONE_LIST.flatMap((zone) => (zone.id === "CABA" ? ["CABA"] : zone.localities));
 ---
 
-<div class="overflow-hidden border-y border-ink/10 bg-brand-yellow-500 py-5 text-ink" aria-hidden="true">
+<div class="overflow-hidden border-y border-accent-contrast/10 bg-accent py-5 text-accent-contrast" aria-hidden="true">
   <div class="flex w-max animate-marquee gap-10 whitespace-nowrap font-display text-2xl uppercase md:text-3xl">
     {
       [...localities, ...localities].map((name) => (
         <span class="flex items-center gap-10">
           {name}
-          <span class="h-2 w-2 rounded-full bg-ink" />
+          <span class="h-2 w-2 rounded-full bg-accent-contrast" />
         </span>
       ))
     }
