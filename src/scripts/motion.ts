@@ -30,6 +30,9 @@ function initSmoothScroll(): Lenis {
     });
   });
 
+  document.addEventListener("scroll:lock", () => lenis.stop());
+  document.addEventListener("scroll:unlock", () => lenis.start());
+
   return lenis;
 }
 
