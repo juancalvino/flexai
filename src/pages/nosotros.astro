@@ -2,26 +2,60 @@
 import Layout from "../layouts/Layout.astro";
 import Container from "../components/container.astro";
 import Sectionhead from "../components/sectionhead.astro";
+import PageHero from "../components/sections/PageHero.astro";
+import StepsSection from "../components/sections/StepsSection.astro";
+import ContactCta from "../components/sections/ContactCta.astro";
+import ImageSlot from "../components/ui/ImageSlot.astro";
 
-const { align = "center" } = Astro.props;
+const values = [
+  { title: "Compromiso", description: "Cuidamos cada paquete como si fuera nuestro." },
+  { title: "Puntualidad", description: "Dos recorridos diarios para que nada quede esperando." },
+  { title: "Transparencia", description: "Tarifas claras y seguimiento en tiempo real." },
+  { title: "Cercanía", description: "Un equipo que responde, sin bots ni vueltas." },
+];
 ---
 
-<Layout title="Nosotros">
-  <Container>
-    <div class= "mt-16 text-center">
-      <Sectionhead>
-        <Fragment slot="title">FlexAI</Fragment>
-        <Fragment slot="desc">
-          Tu Socio Logístico en Mercado Libre
-        </Fragment>
-      </Sectionhead>
-      <img src="/assets/meliIcon.svg" alt="Mercado Libre" class="inline-block h-40 w-40" />
-    </div>
-    <div class="flex flex-col gap-3 mx-auto max-w-4xl ">
-      <p class="text-lg leading-relaxed text-slate-500">
-      Entendemos que la logística es un componente clave para el éxito de tu negocio, y por eso, nos esforzamos por ser más que un proveedor. Somos tu aliado estratégico, garantizando la cobertura en todas las zonas habilitadas por Mercado Libre, dos recorridos diarios de lunes a sábado y un sistema innovador que te permite gestionar tus envíos con total facilidad.</p>
+<Layout title="Nosotros" description="Conocé FLEXAI, tu socio logístico para Mercado Libre en AMBA.">
+  <PageHero eyebrow="Nosotros" title={["Tu socio", "logístico en", "Mercado Libre."]} accent={2} />
 
-      <p class="text-lg leading-relaxed text-slate-500"> En FlexAI, no solo transportamos paquetes; también construimos confianza. Nuestra misión es respaldar tu reputación y cuidar de tus productos como si fueran nuestros. Porque entendemos que cada entrega es una oportunidad para hacer la diferencia.</p>
-    </div>
-  </Container>
+  <section class="section bg-cream">
+    <Container class="grid gap-16 lg:grid-cols-2 lg:gap-24">
+      <div class="overflow-hidden rounded-3xl" data-reveal="clip">
+        <ImageSlot
+          prompt="equipo de FLEXAI en su depósito preparando paquetes, luz cálida, ambiente de trabajo real, fotografía vertical 4:5"
+          alt="Equipo de FLEXAI preparando envíos"
+          class="aspect-[4/5] w-full"
+        />
+      </div>
+      <div class="flex flex-col justify-center gap-6 text-lg leading-relaxed text-ink/70">
+        <Sectionhead eyebrow="Nuestra historia" title={["Más que", "transportar", "paquetes."]} accent={1} class="mb-4" />
+        <p data-reveal="up">
+          Entendemos que la logística es un componente clave para el éxito de tu negocio, y por eso buscamos ser más que un proveedor: somos tu aliado estratégico. Cubrimos todas las zonas habilitadas por Mercado Libre, con dos recorridos diarios de lunes a sábado y un sistema que te permite gestionar tus envíos con total facilidad.
+        </p>
+        <p data-reveal="up" data-delay="0.1">
+          En FLEXAI no solo transportamos paquetes: construimos confianza. Nuestra misión es respaldar tu reputación y cuidar tus productos, porque cada entrega es una oportunidad para hacer la diferencia.
+        </p>
+      </div>
+    </Container>
+  </section>
+
+  <section class="section bg-ink text-cream">
+    <Container>
+      <Sectionhead eyebrow="Valores" title={["Lo que nos", "mueve."]} tone="dark" accent={1} class="mb-16" />
+      <ul class="grid gap-px overflow-hidden rounded-3xl bg-cream/10 sm:grid-cols-2 lg:grid-cols-4">
+        {
+          values.map((value, index) => (
+            <li class="bg-ink p-8" data-reveal="up" data-delay={index * 0.1}>
+              <span class="font-display text-sm text-accent">0{index + 1}</span>
+              <h3 class="mt-10 font-display text-3xl uppercase">{value.title}</h3>
+              <p class="mt-3 text-cream/60">{value.description}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </Container>
+  </section>
+
+  <StepsSection />
+  <ContactCta />
 </Layout>

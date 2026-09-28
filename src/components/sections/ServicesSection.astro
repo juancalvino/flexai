@@ -1,0 +1,41 @@
+---
+import { Icon } from "astro-icon/components";
+import Container from "../container.astro";
+import Sectionhead from "../sectionhead.astro";
+import ImageSlot from "../ui/ImageSlot.astro";
+import { SERVICES } from "../../data/services";
+---
+
+<section class="section bg-ink text-cream" id="servicios">
+  <Container>
+    <div class="mb-20 flex flex-col gap-10 md:flex-row md:items-end md:justify-between">
+      <Sectionhead eyebrow="Servicios" title={["Todo lo que tu", "tienda necesita", "para vender más."]} tone="dark" accent={1} />
+      <a href="/servicios" class="btn-ghost shrink-0 self-start md:self-auto" data-reveal="fade">Ver planes y tarifas</a>
+    </div>
+
+    <ol class="flex flex-col gap-6 md:gap-10">
+      {
+        SERVICES.map((service, index) => (
+          <li
+            class="grid min-w-0 origin-top grid-cols-1 overflow-hidden rounded-3xl bg-ink-soft ring-1 ring-cream/10 md:sticky md:top-28 md:min-h-[60vh] md:grid-cols-2"
+            data-stack-card
+          >
+            <div class="flex min-w-0 flex-col justify-between gap-8 p-6 sm:p-8 md:gap-10 md:p-12">
+              <div class="flex items-center justify-between">
+                <span class="font-display text-sm text-cream/40">0{index + 1} / 0{SERVICES.length}</span>
+                <span class="flex h-12 w-12 items-center justify-center rounded-full bg-accent text-accent-contrast">
+                  <Icon name={service.icon} class="h-6 w-6" />
+                </span>
+              </div>
+              <div>
+                <h3 class="font-display text-[clamp(1.5rem,7.5vw,2.25rem)] uppercase leading-none sm:text-4xl md:text-5xl">{service.title}</h3>
+                <p class="mt-6 max-w-md text-lg leading-relaxed text-cream/70">{service.description}</p>
+              </div>
+            </div>
+            <ImageSlot prompt={service.imagePrompt} alt={service.title} class="aspect-[16/10] md:aspect-auto md:min-h-full" />
+          </li>
+        ))
+      }
+    </ol>
+  </Container>
+</section>

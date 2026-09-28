@@ -1,193 +1,86 @@
 ---
-import Container from "./container.astro";
 import { Icon } from "astro-icon/components";
+import Container from "./container.astro";
+import Logo from "./ui/Logo.astro";
+import { NAVIGATION, SITE, SOCIAL_LINKS, whatsappUrl, DEFAULT_WHATSAPP_MESSAGE } from "../data/site";
 
-const socialLinks = [
-  {
-    name: "Instagram",
-    href: "https://instagram.com/flexai.logistica",
-    icon: "simple-icons:instagram",
-  },
-  {
-    name: "WhatsApp",
-    href: "https://wa.me/5491130502881",
-    icon: "simple-icons:whatsapp",
-  },
-];
+const year = new Date().getFullYear();
 ---
 
-<!-- Footer optimizado con información de contacto integrada -->
-<footer class="bg-neutral-900 text-neutral-300 mt-20">
+<footer class="relative overflow-hidden bg-ink pt-24 text-cream">
   <Container>
-    <div class="py-8 md:py-16 px-4 md:px-8">
-      <!-- Top section - Optimizado para desktop y móvil -->
-      <div class="mb-8 md:mb-12">
-        <!-- Layout móvil: Solo brand + redes -->
-        <div class="block md:hidden text-center">
-          <a href="/" class="inline-block mb-4">
-            <span class="text-2xl font-bold text-brand-yellow-500">FLEXAI</span>
-          </a>
-          <p class="text-neutral-400 mb-6 max-w-sm mx-auto text-base leading-relaxed">
-            Tu socio confiable en logística para Mercado Libre. Entregas rápidas y seguras en todo AMBA.
-          </p>
-          
-          <!-- Social links - Centrados en móvil -->
-          <div class="flex gap-4 justify-center">
-            {socialLinks.map((social) => (
+    <div class="grid gap-16 lg:grid-cols-[1.4fr_1fr_1fr]">
+      <div>
+        <p class="eyebrow mb-6 text-accent">¿Arrancamos?</p>
+        <a
+          href={whatsappUrl(DEFAULT_WHATSAPP_MESSAGE)}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="group inline-flex items-center gap-4 font-display text-4xl uppercase leading-none md:text-6xl"
+        >
+          Hablanos
+          <span class="flex h-12 w-12 items-center justify-center rounded-full bg-accent text-accent-contrast transition-transform duration-500 ease-out-expo group-hover:rotate-45 md:h-16 md:w-16">
+            <Icon name="bx:up-arrow-alt" class="h-6 w-6 rotate-45 md:h-8 md:w-8" />
+          </span>
+        </a>
+      </div>
+
+      <nav aria-label="Pie de página">
+        <p class="eyebrow mb-6 text-cream/40">Navegación</p>
+        <ul class="space-y-1">
+          {
+            NAVIGATION.map((item) => (
+              <li>
+                <a href={item.path} class="inline-block py-2 text-cream/80 transition-colors hover:text-accent">
+                  {item.title}
+                </a>
+              </li>
+            ))
+          }
+          <li>
+            <a href={SITE.lightDataUrl} target="_blank" rel="noopener noreferrer" class="inline-block py-2 text-cream/80 transition-colors hover:text-accent">
+              Sistema LightData
+            </a>
+          </li>
+        </ul>
+      </nav>
+
+      <div>
+        <p class="eyebrow mb-6 text-cream/40">Contacto</p>
+        <ul class="space-y-1 text-cream/80">
+          <li>
+            <a href={SITE.phoneHref} class="inline-block py-2 transition-colors hover:text-accent">{SITE.phoneDisplay}</a>
+          </li>
+          <li>
+            <a href={`mailto:${SITE.email}`} class="inline-block break-all py-2 transition-colors hover:text-accent">{SITE.email}</a>
+          </li>
+          <li class="py-2">Lunes a sábado · AMBA, Argentina</li>
+        </ul>
+        <div class="mt-8 flex gap-3">
+          {
+            SOCIAL_LINKS.map((social) => (
               <a
                 href={social.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                class="w-12 h-12 rounded-xl bg-neutral-800 flex items-center justify-center hover:bg-neutral-700 hover:scale-105 transition-all duration-300 no-underline touch-manipulation"
                 aria-label={social.name}
+                class="flex h-11 w-11 items-center justify-center rounded-full border border-cream/20 transition-colors hover:border-accent hover:bg-accent hover:text-accent-contrast"
               >
-                <Icon name={social.icon} class="w-6 h-6 text-neutral-300 hover:text-brand-yellow-500 transition-colors duration-200" />
+                <Icon name={social.icon} class="h-5 w-5" />
               </a>
-            ))}
-          </div>
-        </div>
-        
-        <!-- Layout desktop: Grid compacto -->
-        <div class="hidden md:grid md:grid-cols-2 gap-16 mb-8">
-          <!-- Brand column -->
-          <div>
-            <a href="/" class="inline-block mb-4">
-              <span class="text-3xl font-bold text-brand-yellow-500">FLEXAI</span>
-            </a>
-            <p class="text-neutral-400 mb-6 max-w-md text-base leading-relaxed">
-              Tu socio confiable en logística para Mercado Libre. Entregas rápidas y seguras en todo AMBA.
-            </p>
-            
-            <!-- Social links -->
-            <div class="flex gap-4">
-              {socialLinks.map((social) => (
-                <a
-                  href={social.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="w-12 h-12 rounded-xl bg-neutral-800 flex items-center justify-center hover:bg-neutral-700 hover:scale-105 transition-all duration-300 no-underline touch-manipulation"
-                  aria-label={social.name}
-                >
-                  <Icon name={social.icon} class="w-6 h-6 text-neutral-300 hover:text-brand-yellow-500 transition-colors duration-200" />
-                </a>
-              ))}
-            </div>
-          </div>
-          
-          <!-- Información de Contacto -->
-          <div>
-            <h3 class="font-semibold text-white mb-4 text-lg">Información de Contacto</h3>
-            <div class="space-y-4">
-              <!-- Teléfono -->
-              <div class="flex items-center gap-4 p-4 rounded-xl bg-neutral-800/50 hover:bg-neutral-800 transition-colors duration-200">
-                <div class="w-12 h-12 rounded-xl bg-brand-yellow-500 flex items-center justify-center shrink-0">
-                  <Icon name="bx:phone" class="w-6 h-6 text-brand-blue-900" />
-                </div>
-                <div class="min-w-0">
-                  <p class="text-sm text-neutral-400 mb-1">Teléfono</p>
-                  <a href="tel:+5491130502881" class="text-white hover:text-brand-yellow-500 transition-colors text-base font-medium">
-                    11 3050-2881
-                  </a>
-                </div>
-              </div>
-              
-              <!-- Email -->
-              <div class="flex items-center gap-4 p-4 rounded-xl bg-neutral-800/50 hover:bg-neutral-800 transition-colors duration-200">
-                <div class="w-12 h-12 rounded-xl bg-brand-yellow-500 flex items-center justify-center shrink-0">
-                  <Icon name="bx:envelope" class="w-6 h-6 text-brand-blue-900" />
-                </div>
-                <div class="min-w-0">
-                  <p class="text-sm text-neutral-400 mb-1">Email</p>
-                  <a href="mailto:flexai.logistica@gmail.com" class="text-white hover:text-brand-yellow-500 transition-colors text-base font-medium break-all">
-                    flexai.logistica@gmail.com
-                  </a>
-                </div>
-              </div>
-              
-              <!-- Horario -->
-              <div class="flex items-center gap-4 p-4 rounded-xl bg-neutral-800/50 hover:bg-neutral-800 transition-colors duration-200">
-                <div class="w-12 h-12 rounded-xl bg-brand-yellow-500 flex items-center justify-center shrink-0">
-                  <Icon name="bx:time" class="w-6 h-6 text-brand-blue-900" />
-                </div>
-                <div class="min-w-0">
-                  <p class="text-sm text-neutral-400 mb-1">Horario de Atención</p>
-                  <p class="text-white text-base font-medium">Lun - Sáb: 9:00 - 22:00</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-      </div>
-      
-      <!-- Contact info móvil - Mantener para móviles -->
-      <div class="block md:hidden py-6 border-t border-neutral-800 mb-6">
-        <h3 class="font-semibold text-white mb-6 text-lg text-center">Información de Contacto</h3>
-        <div class="grid grid-cols-1 gap-4">
-          <!-- Teléfono -->
-          <div class="flex items-center gap-4 p-4 rounded-xl bg-neutral-800/50 hover:bg-neutral-800 transition-colors duration-200">
-            <div class="w-12 h-12 rounded-xl bg-brand-yellow-500 flex items-center justify-center shrink-0">
-              <Icon name="bx:phone" class="w-6 h-6 text-brand-blue-900" />
-            </div>
-            <div class="min-w-0">
-              <p class="text-sm text-neutral-400 mb-1">Teléfono</p>
-              <a href="tel:+5491130502881" class="text-white hover:text-brand-yellow-500 transition-colors text-base font-medium">
-                11 3050-2881
-              </a>
-            </div>
-          </div>
-          
-          <!-- Email -->
-          <div class="flex items-center gap-4 p-4 rounded-xl bg-neutral-800/50 hover:bg-neutral-800 transition-colors duration-200">
-            <div class="w-12 h-12 rounded-xl bg-brand-yellow-500 flex items-center justify-center shrink-0">
-              <Icon name="bx:envelope" class="w-6 h-6 text-brand-blue-900" />
-            </div>
-            <div class="min-w-0">
-              <p class="text-sm text-neutral-400 mb-1">Email</p>
-              <a href="mailto:flexai.logistica@gmail.com" class="text-white hover:text-brand-yellow-500 transition-colors text-sm font-medium break-all">
-                flexai.logistica@gmail.com
-              </a>
-            </div>
-          </div>
-          
-          <!-- Horario -->
-          <div class="flex items-center gap-4 p-4 rounded-xl bg-neutral-800/50 hover:bg-neutral-800 transition-colors duration-200">
-            <div class="w-12 h-12 rounded-xl bg-brand-yellow-500 flex items-center justify-center shrink-0">
-              <Icon name="bx:time" class="w-6 h-6 text-brand-blue-900" />
-            </div>
-            <div class="min-w-0">
-              <p class="text-sm text-neutral-400 mb-1">Horario de Atención</p>
-              <p class="text-white text-base font-medium">Lun - Sáb: 9:00 - 22:00</p>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      <!-- CTA Section - Nuevo para móvil -->
-      <div class="py-6 md:py-6 border-t border-neutral-800 mb-6 md:mb-6 text-center">
-        <h3 class="font-semibold text-white mb-4 text-lg">¿Listo para optimizar tus envíos?</h3>
-        <p class="text-neutral-400 mb-6 max-w-md mx-auto">
-          Contactanos ahora y descubre cómo FLEXAI puede mejorar tu logística
-        </p>
-        <a
-          href="https://wa.me/5491130502881"
-          class="inline-flex items-center gap-3 px-8 py-4 bg-brand-yellow-500 text-brand-blue-900 hover:bg-brand-yellow-400 font-semibold text-lg rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 touch-manipulation"
-        >
-          <Icon name="bx:phone" class="w-6 h-6" />
-          <span>Contactar por WhatsApp</span>
-        </a>
-      </div>
-      
-      <!-- Bottom section -->
-      <div class="flex flex-col md:flex-row justify-between items-center gap-4 pt-6 border-t border-neutral-800">
-        <p class="text-sm text-neutral-400 text-center md:text-left">
-          Copyright © {new Date().getFullYear()} FLEXAI. Todos los derechos reservados.
-        </p>
-        <div class="flex gap-4 text-sm text-neutral-400">
-          <a href="/privacidad" class="hover:text-brand-yellow-500 transition-colors">Privacidad</a>
-          <a href="/terminos" class="hover:text-brand-yellow-500 transition-colors">Términos</a>
+            ))
+          }
         </div>
       </div>
     </div>
+
+    <div class="mt-20 flex flex-col gap-4 border-t border-cream/10 py-8 text-sm text-cream/40 md:flex-row md:items-center md:justify-between">
+      <p>© {year} {SITE.fullName}. Todos los derechos reservados.</p>
+      <p>Cada paquete, a tiempo.</p>
+    </div>
   </Container>
+
+  <div class="pointer-events-none select-none px-3 pb-2" aria-hidden="true">
+    <Logo class="h-auto w-full text-cream/[0.06] [&_path]:stroke-0" />
+  </div>
 </footer>

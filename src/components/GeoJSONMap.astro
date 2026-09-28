@@ -1,789 +1,532 @@
 ---
-// Importar datos y configuración
-import { zonesData } from '../data/zones.js';
-import { MAP_CONFIG, getCSSVariables } from '../config/map.js';
+import { Icon } from "astro-icon/components";
+import { ZONE_LIST, formatPrice } from "../data/zones";
 
-// Generar variables CSS para el componente
-const cssVariables = getCSSVariables();
+const localityOptions = [
+  ...new Set(
+    ZONE_LIST.flatMap((zone) => [
+      ...(zone.id === "CABA" ? ["CABA"] : zone.localities),
+      ...(zone.searchAliases ?? []).flatMap((alias) => alias.names),
+    ]),
+  ),
+].sort((a, b) => a.localeCompare(b, "es"));
 ---
 
-<div class="geojson-map-container">
-  <div id="map" class="leaflet-map"></div>
-  
-  <!-- Panel de información -->
-  <div class="info-panel" id="zone-info">
-    <!-- Selector de tipo de servicio -->
-    <div class="service-selector">
-      <div class="toggle-container">
-        <div class="toggle-switch">
-          <input type="checkbox" id="serviceToggle" class="toggle-input">
-          <label for="serviceToggle" class="toggle-slider">
-            <span class="toggle-option left">Standard</span>
-            <span class="toggle-option right">Pro</span>
-            <span class="toggle-button">
-              <span class="button-text">Standard</span>
-            </span>
-          </label>
-        </div>
+<div class="grid gap-6 lg:grid-cols-[1fr_400px]">
+  <div class="relative min-h-[440px] overflow-hidden rounded-3xl ring-1 ring-cream/10 md:min-h-[640px]">
+    <div id="coverage-map" class="absolute inset-0 bg-ink-soft" aria-label="Mapa de cobertura AMBA"></div>
+    <p id="map-status" class="pointer-events-none absolute inset-0 z-[500] flex items-center justify-center text-cream/50">Cargando mapa…</p>
+
+    <button
+      id="map-reset"
+      type="button"
+      class="absolute right-3 top-3 z-[500] flex items-center gap-2 rounded-full bg-ink/90 px-4 py-3 font-display text-xs uppercase tracking-wider text-cream ring-1 ring-cream/15 backdrop-blur transition-colors hover:text-accent"
+    >
+      <Icon name="bx:expand-alt" class="h-4 w-4" />
+      Ver todo
+    </button>
+
+    <p id="map-hint" class="pointer-events-none absolute bottom-3 left-3 z-[500] rounded-full bg-ink/80 px-3 py-1.5 text-xs text-cream/60 lg:hidden">
+      Usá dos dedos para mover el mapa
+    </p>
+
+    <!-- Mobile: selection summary over the map, since the side panel sits below it. -->
+    <a
+      id="map-summary"
+      href="#zone-panel"
+      class="absolute inset-x-3 bottom-8 z-[500] hidden items-center justify-between gap-4 rounded-2xl bg-ink/95 px-5 py-4 ring-1 ring-accent/60 backdrop-blur lg:hidden"
+    >
+      <span>
+        <span id="map-summary-place" class="block font-display text-lg uppercase leading-tight"></span>
+        <span id="map-summary-zone" class="block text-xs text-cream/50"></span>
+      </span>
+      <span class="flex items-center gap-2">
+        <span id="map-summary-price" class="font-display text-2xl text-accent"></span>
+        <Icon name="bx:chevron-down" class="h-5 w-5 text-cream/60" />
+      </span>
+    </a>
+  </div>
+
+  <aside id="zone-panel" class="flex scroll-mt-24 flex-col gap-6 rounded-3xl bg-ink-soft p-6 ring-1 ring-cream/10 md:p-8">
+    <form id="locality-search" class="relative" role="search">
+      <label for="locality-input" class="eyebrow text-cream/40">Buscá tu localidad</label>
+      <div class="relative mt-2">
+        <Icon name="bx:search" class="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-cream/40" />
+        <input
+          id="locality-input"
+          list="locality-options"
+          autocomplete="off"
+          placeholder="Ej: Quilmes, Pilar, Tigre…"
+          class="w-full rounded-full border-cream/15 bg-ink py-3 pl-12 pr-4 text-cream placeholder:text-cream/30 focus:border-accent focus:ring-0"
+        />
+      </div>
+      <datalist id="locality-options">
+        {localityOptions.map((name) => <option value={name} />)}
+      </datalist>
+      <p id="search-feedback" class="mt-2 hidden text-sm text-cream/50" role="status"></p>
+    </form>
+
+    <div class="grid grid-cols-2 rounded-full bg-ink p-1" role="group" aria-label="Plan">
+      <button type="button" class="plan-btn rounded-full py-2.5 font-display text-sm uppercase tracking-wider" data-plan="standard" aria-pressed="true">Standard</button>
+      <button type="button" class="plan-btn rounded-full py-2.5 font-display text-sm uppercase tracking-wider" data-plan="pro" aria-pressed="false">Pro</button>
+    </div>
+
+    <div aria-live="polite">
+      <p class="eyebrow text-cream/40">Zona</p>
+      <h2 id="zone-title" class="mt-2 font-display text-4xl uppercase">AMBA</h2>
+      <p id="zone-description" class="mt-1 text-cream/60">Tocá el mapa, buscá tu localidad o elegí una zona para ver la tarifa.</p>
+      <p id="zone-note" class="mt-3 hidden rounded-xl bg-accent/10 px-4 py-3 text-sm text-accent"></p>
+
+      <div id="zone-price-wrap" class="mt-6 hidden border-y border-cream/10 py-5">
+        <p class="eyebrow text-cream/40">Tarifa por paquete · <span id="zone-plan">Standard</span></p>
+        <p id="zone-price" class="mt-2 font-display text-5xl text-accent"></p>
+        <p class="mt-1 text-xs text-cream/40">IVA no incluido</p>
       </div>
     </div>
 
-    <div class="info-content">
-      <h3 class="zone-title">Área Metropolitana de Buenos Aires</h3>
-      <p class="zone-description">Pasa el cursor sobre el mapa para ver información de cada zona</p>
-      <div class="price-info" style="display: none;">
-        <div class="price-item">
-          <span class="price-label">Precio:</span>
-          <span class="price-value selected-price">$0</span>
-        </div>
-      </div>
-      <div class="municipalities-info" style="display: none;">
-        <h4>Municipios incluidos:</h4>
-        <div class="municipalities-list"></div>
-      </div>
-    </div>
-  </div>
+    <details id="zone-localities-wrap" class="group hidden">
+      <summary class="flex cursor-pointer list-none items-center justify-between text-sm text-cream/70 hover:text-cream">
+        <span>Localidades incluidas (<span id="zone-localities-count"></span>)</span>
+        <Icon name="bx:chevron-down" class="h-5 w-5 transition-transform group-open:rotate-180" />
+      </summary>
+      <ul id="zone-localities" class="mt-3 flex flex-wrap gap-2"></ul>
+    </details>
+
+    <ul class="mt-auto grid grid-cols-2 gap-2" aria-label="Zonas">
+      {
+        ZONE_LIST.map((zone) => (
+          <li>
+            <button
+              type="button"
+              class="zone-btn flex w-full flex-col gap-1 rounded-xl border border-cream/10 px-4 py-3 text-left transition-colors hover:border-accent aria-pressed:border-accent aria-pressed:bg-cream/5"
+              data-zone={zone.id}
+              aria-pressed="false"
+            >
+              <span class="flex items-center gap-2">
+                <span class="h-3 w-3 shrink-0 rounded-full ring-1 ring-cream/30" style={`background:${zone.color}`} />
+                <span class="font-display uppercase">{zone.name}</span>
+              </span>
+              <span class="zone-btn-price text-sm text-cream/50" data-standard={formatPrice(zone.prices.standard)} data-pro={formatPrice(zone.prices.pro)}>
+                {formatPrice(zone.prices.standard)}
+              </span>
+            </button>
+          </li>
+        ))
+      }
+    </ul>
+
+    <a id="zone-cta" href="#" target="_blank" rel="noopener noreferrer" class="btn-primary w-full">Consultar por WhatsApp</a>
+  </aside>
 </div>
 
-<!-- Leaflet CSS -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-  integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-  crossorigin=""/>
-
-<style define:vars={cssVariables}>
-  .geojson-map-container {
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 1rem;
+<style is:global>
+  #coverage-map .leaflet-tooltip.zone-tooltip {
+    background: rgb(var(--color-ink));
+    color: rgb(var(--color-cream));
+    border: 0;
+    border-radius: 999px;
+    padding: 6px 12px;
+    font-family: Kanit, sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    box-shadow: none;
   }
 
-  @media (min-width: 1024px) {
-    .geojson-map-container {
-      flex-direction: row;
-    }
+  #coverage-map .leaflet-tooltip.zone-tooltip::before {
+    display: none;
   }
 
-  .leaflet-map {
-    flex: 1;
-    height: 500px;
-    min-height: 400px;
-    border-radius: 12px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-    border: 2px solid #e5e7eb;
-    position: relative;
-    z-index: 10;
+  /* Dark blue basemap from standard OSM tiles. */
+  #coverage-map .map-tiles {
+    filter: grayscale(1) invert(1) brightness(0.62) contrast(0.95) sepia(1) hue-rotate(175deg) saturate(1.6);
   }
 
-  .info-panel {
-    flex: 0 0 300px;
-    background: white;
-    border-radius: 12px;
-    padding: 1.5rem;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-    border: 2px solid #e5e7eb;
-    transition: all 0.3s ease;
-  }
-
-  .service-selector {
-    margin-bottom: 1.5rem;
-    padding-bottom: 1rem;
-    border-bottom: 2px solid #e5e7eb;
-  }
-
-  .toggle-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0.5rem;
-  }
-
-  .toggle-switch {
-    position: relative;
-    display: inline-block;
-  }
-
-  .toggle-input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-    position: absolute;
-  }
-
-  .toggle-slider {
-    position: relative;
-    display: flex;
-    align-items: center;
-    width: var(--toggle-width, 200px);
-    height: var(--toggle-height, 48px);
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-    border-radius: calc(var(--toggle-height, 48px) / 2);
-    cursor: pointer;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s ease;
-    box-shadow: 
-      inset 0 2px 4px rgba(0, 0, 0, 0.1),
-      0 2px 8px rgba(0, 0, 0, 0.1);
-    border: 2px solid #e9ecef;
-    overflow: hidden;
-  }
-
-  .toggle-slider:hover {
-    box-shadow: 
-      inset 0 2px 4px rgba(0, 0, 0, 0.15),
-      0 4px 12px rgba(0, 0, 0, 0.15);
-    transform: translateY(-1px);
-  }
-
-  .toggle-option {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: #6b7280;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    z-index: 1;
-    pointer-events: none;
-    user-select: none;
-  }
-
-  .toggle-option.left {
-    left: 20px;
-  }
-
-  .toggle-option.right {
-    right: 20px;
-  }
-
-  .toggle-button {
-    position: absolute;
-    top: 4px;
-    left: 4px;
-    width: var(--toggle-button-width, 96px);
-    height: 40px;
-    background: linear-gradient(135deg, var(--color-primary, #FFCF15) 0%, #FFD700 100%);
-    border-radius: 20px;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 
-      0 4px 12px rgba(255, 207, 21, 0.3),
-      inset 0 1px 2px rgba(255, 255, 255, 0.2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 2;
-  }
-
-  .button-text {
-    font-size: 0.85rem;
-    font-weight: 700;
-    color: var(--color-secondary, #0D395A);
-    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.3);
-    transition: all 0.3s ease;
-    user-select: none;
-  }
-
-  .toggle-input:checked + .toggle-slider .toggle-button {
-    transform: translateX(var(--toggle-button-width, 96px));
-    background: linear-gradient(135deg, var(--color-secondary, #0D395A) 0%, var(--color-tertiary, #1E5A96) 100%);
-  }
-
-  .toggle-input:checked + .toggle-slider .button-text {
-    color: var(--color-primary, #FFCF15);
-  }
-
-  .toggle-input:checked + .toggle-slider .toggle-option.left {
-    color: var(--color-secondary, #0D395A);
-    font-weight: 700;
-  }
-
-  .toggle-input:checked + .toggle-slider .toggle-option.right {
-    color: var(--color-primary, #FFCF15);
-    font-weight: 700;
-  }
-
-  .toggle-input:not(:checked) + .toggle-slider .toggle-option.left {
-    color: var(--color-primary, #FFCF15);
-    font-weight: 700;
-  }
-
-  .toggle-input:not(:checked) + .toggle-slider .toggle-option.right {
-    color: var(--color-secondary, #0D395A);
-    font-weight: 700;
-  }
-
-  .toggle-input:focus + .toggle-slider {
-    outline: 2px solid var(--color-primary, #FFCF15);
-    outline-offset: 2px;
-  }
-
-  .toggle-input:checked:focus + .toggle-slider {
-    outline: 2px solid var(--color-secondary, #0D395A);
-    outline-offset: 2px;
-  }
-
-  /* Animación de pulso sutil */
-  @keyframes pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.02); }
-  }
-
-  .toggle-slider:active {
-    animation: pulse 0.2s ease-in-out;
-  }
-
-  .info-content {
-    height: 100%;
-  }
-
-  .zone-title {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: var(--color-secondary);
-    margin-bottom: 0.5rem;
-    font-family: 'Istok Web', sans-serif;
-  }
-
-  .zone-description {
-    color: #6b7280;
-    margin-bottom: 1rem;
-    font-size: 1rem;
-  }
-
-  .price-info {
-    margin-bottom: 1.5rem;
-  }
-
-  .price-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.5rem 0;
-    border-bottom: 1px solid #e5e7eb;
-  }
-
-  .price-item:last-child {
-    border-bottom: none;
-  }
-
-  .price-label {
-    font-weight: 600;
-    color: #374151;
-  }
-
-  .price-value {
-    font-weight: bold;
-    font-size: 1.2rem;
-  }
-
-  .price-value.selected-price {
-    color: var(--color-secondary);
-  }
-
-  .municipalities-info h4 {
-    font-weight: bold;
-    color: var(--color-secondary);
-    margin-bottom: 0.5rem;
-    font-size: 1.1rem;
-  }
-
-  .municipalities-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.25rem;
-  }
-
-  .municipality-tag {
-    background: var(--color-primary);
-    color: var(--color-secondary);
-    padding: 0.25rem 0.5rem;
-    border-radius: 6px;
-    font-size: 0.8rem;
-    font-weight: 500;
-  }
-
-  /* Asegurar que Leaflet no interfiera con el header */
-  .leaflet-map .leaflet-control-container,
-  .leaflet-map .leaflet-popup,
-  .leaflet-map .leaflet-tooltip {
-    z-index: 15 !important;
-  }
-
-  .leaflet-map .leaflet-pane {
-    z-index: 5 !important;
-  }
-
-  /* Responsive */
-  @media (max-width: 1024px) {
-    .geojson-map-container {
-      flex-direction: column;
-    }
-    
-    .info-panel {
-      flex: none;
-      order: -1;
-    }
-  }
-
-  @media (max-width: 640px) {
-    .info-panel {
-      padding: 1rem;
-    }
-    
-    .leaflet-map {
-      height: 400px;
-    }
-
-    .toggle-slider {
-      width: 200px;
-      height: 48px;
-      border-width: 3px;
-    }
-
-    .toggle-button {
-      width: 94px;
-      height: 40px;
-      top: 3px;
-      left: 3px;
-    }
-
-    .toggle-input:checked + .toggle-slider .toggle-button {
-      transform: translateX(94px);
-    }
-
-    .toggle-option {
-      font-size: 0.85rem;
-      font-weight: 700;
-    }
-
-    .toggle-option.left {
-      left: 24px;
-    }
-
-    .toggle-option.right {
-      right: 24px;
-    }
-
-    .button-text {
-      font-size: 0.85rem;
-      font-weight: 700;
-    }
-
-    .toggle-slider:active {
-      transform: scale(0.98);
-    }
-  }
-
-  @media (max-width: 480px) {
-    .toggle-slider {
-      width: 180px;
+  @media (pointer: coarse) {
+    #coverage-map .leaflet-bar a {
+      width: 44px;
       height: 44px;
+      line-height: 44px;
+      font-size: 22px;
     }
+  }
 
-    .toggle-button {
-      width: 84px;
-      height: 36px;
-    }
+  /* Browsers draw a focus ring around the SVG path's bounding box on tap: hide it on the map. */
+  #coverage-map {
+    -webkit-tap-highlight-color: transparent;
+  }
 
-    .toggle-input:checked + .toggle-slider .toggle-button {
-      transform: translateX(84px);
-    }
+  #coverage-map path.leaflet-interactive:focus {
+    outline: none;
+  }
 
-    .toggle-option {
-      font-size: 0.8rem;
-    }
+  /* Place names drawn above the colored zones. The marker is a zero-size anchor. */
+  #coverage-map .map-label span {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    font-family: Kanit, sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 1.1;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: rgb(var(--color-cream));
+    text-shadow:
+      0 0 3px rgb(var(--color-ink)),
+      0 0 6px rgb(var(--color-ink));
+    pointer-events: none;
+  }
 
-    .toggle-option.left {
-      left: 20px;
-    }
+  #coverage-map .map-label--zone span {
+    font-size: 15px;
+    font-weight: 600;
+  }
 
-    .toggle-option.right {
-      right: 20px;
-    }
+  #coverage-map.leaflet-container {
+    background: rgb(var(--color-ink-soft));
+    font-family: inherit;
+  }
 
-    .button-text {
-      font-size: 0.8rem;
-    }
+  #coverage-map .leaflet-bar a {
+    background: rgb(var(--color-ink));
+    color: rgb(var(--color-cream));
+    border-color: rgb(var(--color-cream) / 0.15);
+  }
+
+  #coverage-map .leaflet-control-attribution {
+    background: rgb(var(--color-ink) / 0.8);
+    color: rgb(var(--color-cream) / 0.5);
+  }
+
+  #coverage-map .leaflet-control-attribution a {
+    color: rgb(var(--color-cream) / 0.7);
+  }
+
+  .plan-btn[aria-pressed="true"] {
+    background: rgb(var(--color-accent));
+    color: rgb(var(--color-on-accent));
+  }
+
+  .plan-btn[aria-pressed="false"] {
+    color: rgb(var(--color-cream) / 0.6);
   }
 </style>
 
 <script>
-  // Debug inicial
-  console.log('Script del mapa iniciando...');
-  
-  // Importar Leaflet y datos
-  Promise.all([
-    import('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'),
-    import('../data/zones.js'),
-    import('../config/map.js')
-  ]).then(([leafletModule, zonesModule, configModule]) => {
-    console.log('Leaflet y datos cargados correctamente');
-    
-    // Extraer datos importados
-    const { zonesData, getZoneForMunicipality } = zonesModule;
-    const { MAP_CONFIG, getWhatsAppUrl } = configModule;
+  import L from "leaflet";
+  import "leaflet/dist/leaflet.css";
+  import type { FeatureCollection } from "geojson";
+  import { ZONES, ZONE_LIST, PLANS, PARTIDO_EXCEPTIONS, formatPrice, type PlanId, type ZoneId } from "../data/zones";
+  import { whatsappUrl } from "../data/site";
 
-    // Inicializar el mapa usando configuración
-    const map = L.map('map').setView(MAP_CONFIG.MAP.CENTER, MAP_CONFIG.MAP.ZOOM);
+  // Leaflet writes colors as SVG attributes, which can't use var(): resolve theme tokens once.
+  const rootStyle = getComputedStyle(document.documentElement);
+  const themeColor = (token: string) =>
+    `rgb(${rootStyle.getPropertyValue(`--color-${token}`).trim().split(/\s+/).join(", ")})`;
 
-    // Agregar tiles de OpenStreetMap
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap contributors'
+  const $ = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T;
+
+  const status = $("map-status");
+  const title = $("zone-title");
+  const description = $("zone-description");
+  const priceWrap = $("zone-price-wrap");
+  const price = $("zone-price");
+  const planLabel = $("zone-plan");
+  const localitiesWrap = $("zone-localities-wrap");
+  const localities = $("zone-localities");
+  const localitiesCount = $("zone-localities-count");
+  const cta = $<HTMLAnchorElement>("zone-cta");
+  const searchForm = $<HTMLFormElement>("locality-search");
+  const searchInput = $<HTMLInputElement>("locality-input");
+  const searchFeedback = $("search-feedback");
+  const note = $("zone-note");
+  const summary = $("map-summary");
+  const summaryPlace = $("map-summary-place");
+  const summaryZone = $("map-summary-zone");
+  const summaryPrice = $("map-summary-price");
+  const hint = $("map-hint");
+  const planButtons = document.querySelectorAll<HTMLButtonElement>(".plan-btn");
+  const zoneButtons = document.querySelectorAll<HTMLButtonElement>(".zone-btn");
+
+  type Selection = { zone: ZoneId; place: string; within?: string };
+
+  let plan: PlanId = "standard";
+  let selected: Selection | null = null;
+  let hovered: ZoneId | null = null;
+  let overview: { center: L.LatLng; zoom: number } | null = null;
+  const layersByZone = new Map<ZoneId, L.Polygon[]>();
+  const layersByPlace = new Map<string, L.Polygon>();
+
+  const normalize = (text: string) =>
+    text.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").trim();
+
+  // Localities listed per zone (includes places without their own polygon, e.g. Nordelta).
+  const localityZone = new Map<string, Selection>(
+    ZONE_LIST.flatMap((zone) => [
+      ...[zone.name, ...zone.localities].map((name) => [normalize(name), { zone: zone.id, place: name }] as const),
+      ...(zone.searchAliases ?? []).flatMap(({ within, names }) =>
+        names.map((name) => [normalize(name), { zone: zone.id, place: name, ...(within ? { within } : {}) }] as const),
+      ),
+    ]),
+  );
+
+  function styleFor(zone: ZoneId): L.PathOptions {
+    const isSelected = zone === selected?.zone;
+    const isHovered = zone === hovered;
+    return {
+      fillColor: themeColor(ZONES[zone].colorToken),
+      fillOpacity: isSelected ? 0.85 : isHovered ? 0.8 : selected ? 0.3 : 0.62,
+      color: isSelected ? themeColor("highlight") : themeColor("ink"),
+      weight: isSelected ? 1.5 : 1,
+    };
+  }
+
+  function paintMap() {
+    layersByZone.forEach((layers, zone) => layers.forEach((layer) => layer.setStyle(styleFor(zone))));
+    const placeLayer = selected && layersByPlace.get(normalize(selected.within ?? selected.place));
+    placeLayer?.setStyle({ weight: 3.5, color: themeColor("highlight"), fillOpacity: 0.95 }).bringToFront();
+  }
+
+  function render() {
+    planButtons.forEach((button) => button.setAttribute("aria-pressed", String(button.dataset["plan"] === plan)));
+    zoneButtons.forEach((button) => {
+      button.setAttribute("aria-pressed", String(button.dataset["zone"] === selected?.zone));
+      const label = button.querySelector<HTMLElement>(".zone-btn-price")!;
+      label.textContent = label.dataset[plan] ?? "";
+    });
+    paintMap();
+
+    summary.classList.toggle("hidden", !selected);
+    summary.classList.toggle("flex", Boolean(selected));
+    hint.classList.toggle("hidden", Boolean(selected));
+
+    const exceptions = selected && !selected.within ? (PARTIDO_EXCEPTIONS[selected.place] ?? []) : [];
+    const notes = exceptions.flatMap((name) => {
+      const exception = localityZone.get(normalize(name));
+      return exception && exception.zone !== selected?.zone ? [`${name} tiene tarifa ${ZONES[exception.zone].name}.`] : [];
+    });
+    note.textContent = notes.join(" ");
+    note.classList.toggle("hidden", notes.length === 0);
+
+    if (!selected) {
+      cta.href = whatsappUrl("Hola FLEXAI, quiero información sobre la cobertura de envíos.");
+      return;
+    }
+
+    const zone = ZONES[selected.zone];
+    const isZoneOnly = selected.place === zone.name;
+    title.textContent = isZoneOnly ? zone.name : selected.place;
+    const area = selected.within ? `${selected.within} · ${zone.name}` : `${zone.name} · ${zone.description}`;
+    description.textContent = isZoneOnly ? zone.description : area;
+    planLabel.textContent = PLANS[plan].name;
+    price.textContent = formatPrice(zone.prices[plan]);
+    priceWrap.classList.remove("hidden");
+
+    summaryPlace.textContent = title.textContent;
+    summaryZone.textContent = `${zone.name} · ${PLANS[plan].name}`;
+    summaryPrice.textContent = price.textContent;
+
+    localitiesCount.textContent = String(zone.localities.length);
+    localities.replaceChildren(
+      ...zone.localities.map((name) => {
+        const item = document.createElement("li");
+        item.className = "rounded-full bg-cream/10 px-3 py-1 text-xs text-cream/80";
+        item.textContent = name;
+        return item;
+      }),
+    );
+    localitiesWrap.classList.remove("hidden");
+
+    const place = isZoneOnly ? zone.name : `${selected.place} (${zone.name})`;
+    cta.href = whatsappUrl(`Hola FLEXAI, quiero información del plan ${PLANS[plan].name} para ${place}.`);
+  }
+
+  function focusSelection() {
+    if (!selected) return;
+    const placeLayer = layersByPlace.get(normalize(selected.within ?? selected.place));
+    const layers = placeLayer ? [placeLayer] : (layersByZone.get(selected.zone) ?? []);
+    if (!layers.length) return;
+    const bounds = L.featureGroup(layers).getBounds();
+    map.flyToBounds(bounds, { padding: [40, 40], maxZoom: 12, duration: 0.8 });
+  }
+
+  function select(selection: Selection, { fly = true } = {}) {
+    selected = selection;
+    render();
+    if (fly) focusSelection();
+  }
+
+  planButtons.forEach((button) =>
+    button.addEventListener("click", () => {
+      plan = button.dataset["plan"] as PlanId;
+      render();
+    }),
+  );
+
+  zoneButtons.forEach((button) =>
+    button.addEventListener("click", () => {
+      const zone = button.dataset["zone"] as ZoneId;
+      select({ zone, place: ZONES[zone].name });
+    }),
+  );
+
+  function searchLocality() {
+    const query = normalize(searchInput.value);
+    if (!query) return;
+    const partial = [...localityZone.entries()].filter(([name]) => name.includes(query)).map(([, value]) => value);
+    const zonesFound = new Set(partial.map((item) => item.zone));
+
+    // e.g. "La Matanza" is split between GBA 1 and GBA 2: ask for the locality instead of guessing.
+    if (!localityZone.has(query) && zonesFound.size > 1) {
+      const options = partial.slice(0, 4).map((item) => `${item.place} (${ZONES[item.zone].name})`);
+      searchFeedback.textContent = `Hay más de una zona: ${options.join(", ")}. Escribí tu localidad.`;
+      searchFeedback.classList.remove("hidden");
+      return;
+    }
+
+    const match = localityZone.get(query) ?? partial[0];
+
+    if (!match) {
+      searchFeedback.textContent = "No encontramos esa localidad. Escribinos y te confirmamos si llegamos.";
+      searchFeedback.classList.remove("hidden");
+      return;
+    }
+
+    searchFeedback.classList.add("hidden");
+    searchFeedback.textContent = "";
+    searchInput.value = match.place;
+    select(match);
+  }
+
+  searchForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    searchLocality();
+  });
+
+  // Choosing an option from the datalist fires "change" without submitting.
+  searchInput.addEventListener("change", searchLocality);
+
+  const isTouch = window.matchMedia("(pointer: coarse)").matches;
+
+  const map = L.map("coverage-map", {
+    scrollWheelZoom: false,
+    dragging: !isTouch,
+    zoomSnap: 0.25,
+    minZoom: 8,
+    maxZoom: 13,
+  }).setView([-34.62, -58.45], 9);
+
+  L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    className: "map-tiles",
+  }).addTo(map);
+
+  // Labels live in their own pane: map → zones → labels → hover tooltip.
+  map.createPane("labels");
+  const labelsPane = map.getPane("labels")!;
+  labelsPane.style.zIndex = "450"; // above zones (overlayPane 400), below tooltips (650)
+  labelsPane.style.pointerEvents = "none";
+
+  // Labels in priority order (bigger areas first); overlapping ones are hidden.
+  const labels: L.Marker[] = [];
+
+  const addLabel = (position: L.LatLng, text: string, className = "") => {
+    const marker = L.marker(position, {
+      pane: "labels",
+      interactive: false,
+      keyboard: false,
+      icon: L.divIcon({ className: `map-label ${className}`, html: `<span>${text}</span>`, iconSize: [0, 0] }),
     }).addTo(map);
+    labels.push(marker);
+  };
 
-    // Referencias a elementos del DOM
-    const infoPanel = document.getElementById('zone-info');
-    const zoneTitle = infoPanel.querySelector('.zone-title');
-    const zoneDescription = infoPanel.querySelector('.zone-description');
-    const priceInfo = infoPanel.querySelector('.price-info');
-    const municipalitiesInfo = infoPanel.querySelector('.municipalities-info');
-    const municipalitiesList = infoPanel.querySelector('.municipalities-list');
-    const selectedPrice = infoPanel.querySelector('.price-value.selected-price');
-    const serviceToggle = document.getElementById('serviceToggle');
-    const buttonText = infoPanel.querySelector('.button-text');
+  function resolveLabelCollisions() {
+    const placed: DOMRect[] = [];
+    labels.forEach((marker) => {
+      const element = marker.getElement();
+      const text = element?.firstElementChild;
+      if (!element || !text) return;
+      element.style.visibility = "visible";
+      const box = text.getBoundingClientRect();
+      const overlaps = placed.some(
+        (other) => box.left < other.right + 4 && box.right > other.left - 4 && box.top < other.bottom + 2 && box.bottom > other.top - 2,
+      );
+      if (overlaps) element.style.visibility = "hidden";
+      else placed.push(box);
+    });
+  }
 
-    // Función para obtener el tipo de servicio seleccionado
-    function getSelectedServiceType() {
-      return serviceToggle.checked ? 'pro' : 'standard';
-    }
+  map.on("zoomend moveend", resolveLabelCollisions);
 
-    // Función para actualizar el texto del botón
-    function updateToggleText() {
-      const isProSelected = serviceToggle.checked;
-      buttonText.textContent = isProSelected ? 'Pro' : 'Standard';
-    }
+  // The map fills its grid cell, whose height follows the side panel.
+  new ResizeObserver(() => map.invalidateSize()).observe($("coverage-map"));
 
-    // Función para mostrar información de zona
-    function showZoneInfo(zoneId, municipalityName = null) {
-      const zone = zonesData[zoneId];
-      if (!zone) return;
+  // Enable wheel zoom only after the user interacts with the map, so page scroll is never hijacked.
+  map.once("focus click", () => map.scrollWheelZoom.enable());
 
-      const serviceType = getSelectedServiceType();
-      const price = serviceType === 'pro' ? zone.proPrice : zone.standardPrice;
+  $("map-reset").addEventListener("click", () => {
+    selected = null;
+    title.textContent = "AMBA";
+    description.textContent = "Tocá el mapa, buscá tu localidad o elegí una zona para ver la tarifa.";
+    priceWrap.classList.add("hidden");
+    localitiesWrap.classList.add("hidden");
+    searchInput.value = "";
+    render();
+    if (overview) map.flyTo(overview.center, overview.zoom, { duration: 0.8 });
+  });
 
-      zoneTitle.textContent = zone.name;
-      // Mostrar el nombre del municipio específico en lugar de la descripción genérica
-      zoneDescription.textContent = municipalityName || zone.description;
-      selectedPrice.textContent = `$${price.toLocaleString()}`;
-      
-      // Mostrar municipios
-      municipalitiesList.innerHTML = '';
-      zone.municipalities.forEach(municipality => {
-        const tag = document.createElement('span');
-        tag.className = 'municipality-tag';
-        tag.textContent = municipality;
-        municipalitiesList.appendChild(tag);
-      });
+  fetch("/data/amba.geojson")
+    .then((response) => response.json() as Promise<FeatureCollection>)
+    .then((data) => {
+      const layer = L.geoJSON(data, {
+        style: (feature) => styleFor(feature?.properties?.["zone"] as ZoneId),
+        onEachFeature: (feature, featureLayer) => {
+          const zone = feature.properties?.["zone"] as ZoneId;
+          const place = String(feature.properties?.["name"] ?? "");
+          const polygon = featureLayer as L.Polygon;
 
-      priceInfo.style.display = 'block';
-      municipalitiesInfo.style.display = 'block';
-    }
+          layersByZone.set(zone, [...(layersByZone.get(zone) ?? []), polygon]);
+          if (zone !== "CABA") layersByPlace.set(normalize(place), polygon);
 
-    // Función para ocultar información
-    function hideZoneInfo() {
-      // Si hay una zona seleccionada, mostrar esa información
-      if (selectedZone) {
-        showZoneInfo(selectedZone, selectedMunicipality);
-        return;
-      }
-      
-      // Si no hay zona seleccionada, mostrar mensaje por defecto
-      zoneTitle.textContent = 'Área Metropolitana de Buenos Aires';
-      zoneDescription.textContent = 'Pasa el cursor sobre el mapa para ver información de cada zona';
-      priceInfo.style.display = 'none';
-      municipalitiesInfo.style.display = 'none';
-    }
+          polygon.bindTooltip(`${place} · ${ZONES[zone].name}`, { className: "zone-tooltip", direction: "top", sticky: true });
+          polygon.on({
+            mouseover: () => {
+              hovered = zone;
+              paintMap();
+            },
+            mouseout: () => {
+              hovered = null;
+              paintMap();
+            },
+            click: () => select({ zone, place: zone === "CABA" ? "CABA" : place }, { fly: false }),
+          });
+        },
+      }).addTo(map);
 
-    // Variables para manejar zonas
-    let currentZone = null; // Zona mostrada temporalmente (hover)
-    let selectedZone = null; // Zona seleccionada permanentemente (click)
-    let currentMunicipality = null; // Municipio actual (hover)
-    let selectedMunicipality = null; // Municipio seleccionado (click)
+      const caba = layersByZone.get("CABA");
+      if (caba?.length) addLabel(L.featureGroup(caba).getBounds().getCenter(), "CABA", "map-label--zone");
 
-    // Event listener para cambios en el toggle de servicio
-    serviceToggle.addEventListener('change', () => {
-      updateToggleText();
-      // Actualizar la información de la zona que esté visible (hover o seleccionada)
-      if (currentZone) {
-        showZoneInfo(currentZone, currentMunicipality);
-      } else if (selectedZone) {
-        showZoneInfo(selectedZone, selectedMunicipality);
-      }
+      const area = (polygon: L.Polygon) => {
+        const bounds = polygon.getBounds();
+        return (bounds.getEast() - bounds.getWest()) * (bounds.getNorth() - bounds.getSouth());
+      };
+      [...layersByPlace.values()]
+        .sort((a, b) => area(b) - area(a))
+        .forEach((polygon) => addLabel(polygon.getCenter(), String(polygon.feature?.properties?.["name"] ?? "")));
+
+      map.invalidateSize();
+      // Fit all zones, then zoom one level closer around the inner zones so the core AMBA reads larger.
+      const innerZones: ZoneId[] = ["CABA", "GBA1", "GBA2"];
+      const inner = L.featureGroup(innerZones.flatMap((zone) => layersByZone.get(zone) ?? [])).getBounds();
+      overview = { center: inner.getCenter(), zoom: map.getBoundsZoom(layer.getBounds(), false, L.point(16, 16)) + 1 };
+      map.setView(overview.center, overview.zoom);
+      resolveLabelCollisions();
+      status.remove();
+      render();
+    })
+    .catch(() => {
+      status.textContent = "No pudimos cargar el mapa. Usá el buscador o la lista de zonas.";
     });
 
-    // Inicializar el texto del toggle
-    updateToggleText();
-
-    // URLs de los GeoJSON desde configuración
-    const buenosAiresGeojsonUrl = MAP_CONFIG.GEOJSON_URLS.BUENOS_AIRES;
-    const cabaGeojsonUrl = MAP_CONFIG.GEOJSON_URLS.CABA;
-    
-    console.log('Iniciando carga de GeoJSON...');
-    
-    // Primero cargar solo Buenos Aires para asegurar que funciona
-    fetch(buenosAiresGeojsonUrl)
-      .then(response => response.json())
-      .then(buenosAiresData => {
-        // Debug: mostrar información del GeoJSON
-        console.log('Municipios de Buenos Aires:', buenosAiresData.features.length);
-        console.log('Todos los nombres en GeoJSON:', buenosAiresData.features.map(f => 
-          f.properties.departamento || 'sin nombre'
-        ).sort());
-        
-        // Filtrar solo los municipios del AMBA con mapeo exacto
-        const ambaFeatures = buenosAiresData.features.filter(feature => {
-          const name = feature.properties.departamento || '';
-          const zone = getZoneForMunicipality(name);
-          
-          // Filtro especial para San Fernando: excluir el que limita con Campana
-          if (name.toLowerCase() === 'san fernando') {
-            // Obtener el centroide del polígono para determinar ubicación
-            const geometry = feature.geometry;
-            if (geometry && geometry.coordinates) {
-              // Calcular centroide aproximado
-              let totalLat = 0, totalLng = 0, pointCount = 0;
-              
-              const processCoordinates = (coords) => {
-                if (Array.isArray(coords[0])) {
-                  coords.forEach(processCoordinates);
-                } else {
-                  totalLng += coords[0];
-                  totalLat += coords[1];
-                  pointCount++;
-                }
-              };
-              
-              processCoordinates(geometry.coordinates);
-              
-              if (pointCount > 0) {
-                const centroidLat = totalLat / pointCount;
-                const centroidLng = totalLng / pointCount;
-                
-                console.log(`🔍 San Fernando encontrado: lat=${centroidLat}, lng=${centroidLng}`);
-                
-                // Por ahora, incluir ambos para ver las coordenadas exactas
-                // Luego ajustaremos el filtro
-              }
-            }
-          }
-          
-          if (zone) {
-            console.log(`Municipio AMBA encontrado: ${name} -> ${zone}`);
-          } else {
-            console.log(`Municipio NO mapeado: ${name}`);
-          }
-          return zone !== null;
-        });
-
-        // Crear el layer GeoJSON
-        const geojsonLayer = L.geoJSON(ambaFeatures, {
-          style: function(feature) {
-            const name = feature.properties.departamento || '';
-            const zone = getZoneForMunicipality(name);
-            
-            // Si no tiene zona asignada, no mostrar
-            if (!zone || !zonesData[zone]) {
-              return MAP_CONFIG.STYLES.DISABLED;
-            }
-            
-            const zoneData = zonesData[zone];
-            
-            return {
-              fillColor: zoneData.color,
-              weight: MAP_CONFIG.STYLES.DEFAULT.weight,
-              opacity: MAP_CONFIG.STYLES.DEFAULT.opacity,
-              color: MAP_CONFIG.STYLES.DEFAULT.color,
-              dashArray: MAP_CONFIG.STYLES.DEFAULT.dashArray,
-              fillOpacity: MAP_CONFIG.STYLES.DEFAULT.fillOpacity
-            };
-          },
-          onEachFeature: function(feature, layer) {
-            const name = feature.properties.departamento || '';
-            const zone = getZoneForMunicipality(name);
-            
-            // Solo agregar interactividad si tiene zona válida
-            if (!zone || !zonesData[zone]) {
-              return; // No agregar eventos a municipios fuera del AMBA
-            }
-            
-            const zoneData = zonesData[zone];
-            
-            // Agregar eventos
-            layer.on({
-              mouseover: function(e) {
-                const currentLayer = e.target;
-                currentLayer.setStyle({
-                  weight: MAP_CONFIG.STYLES.HOVER.weight,
-                  color: MAP_CONFIG.COLORS.PRIMARY,
-                  dashArray: MAP_CONFIG.STYLES.HOVER.dashArray,
-                  fillOpacity: MAP_CONFIG.STYLES.HOVER.fillOpacity,
-                  fillColor: zoneData.hoverColor
-                });
-                currentLayer.bringToFront();
-                currentZone = zone;
-                currentMunicipality = name;
-                showZoneInfo(zone, name);
-              },
-              mouseout: function(e) {
-                geojsonLayer.resetStyle(e.target);
-                currentZone = null;
-                currentMunicipality = null;
-                hideZoneInfo();
-              },
-              click: function(e) {
-                // Establecer como zona seleccionada permanentemente
-                selectedZone = zone;
-                selectedMunicipality = name;
-                currentZone = zone;
-                currentMunicipality = name;
-                showZoneInfo(zone, name);
-                
-                // Resaltar visualmente la zona seleccionada
-                const currentLayer = e.target;
-                currentLayer.setStyle({
-                  weight: 4,
-                  color: MAP_CONFIG.COLORS.PRIMARY,
-                  dashArray: MAP_CONFIG.STYLES.HOVER.dashArray,
-                  fillOpacity: 0.8,
-                  fillColor: zoneData.color
-                });
-                currentLayer.bringToFront();
-              }
-            });
-            
-            // Tooltip - Mostrar el nombre real del municipio
-            layer.bindTooltip(`${name} (${zoneData.name})`, {
-              permanent: false,
-              direction: 'center',
-              className: 'custom-tooltip'
-            });
-          }
-        }).addTo(map);
-
-        // Ajustar la vista del mapa a los datos
-        map.fitBounds(geojsonLayer.getBounds());
-        
-        console.log('Mapa cargado exitosamente con municipios del GBA');
-        
-        // Ahora intentar cargar CABA como segundo paso
-        fetch(cabaGeojsonUrl)
-          .then(response => response.json())
-          .then(cabaData => {
-            console.log('CABA GeoJSON cargado:', cabaData.features.length, 'comunas');
-            
-            // Usar todas las comunas de CABA como features individuales pero tratarlas como una zona
-            const cabaFeatures = cabaData.features.map(feature => ({
-              ...feature,
-              properties: {
-                ...feature.properties,
-                departamento: 'Ciudad Autónoma de Buenos Aires', // Nombre normalizado para mapeo
-                zona: 'CABA'
-              }
-            }));
-            
-            // Crear un layer separado para CABA
-            const cabaLayer = L.geoJSON(cabaFeatures, {
-              style: function(feature) {
-                const zone = 'CABA';
-                const zoneData = zonesData[zone];
-                
-                return {
-                  fillColor: zoneData.color,
-                  weight: MAP_CONFIG.STYLES.DEFAULT.weight,
-                  opacity: MAP_CONFIG.STYLES.DEFAULT.opacity,
-                  color: MAP_CONFIG.STYLES.DEFAULT.color,
-                  dashArray: MAP_CONFIG.STYLES.DEFAULT.dashArray,
-                  fillOpacity: MAP_CONFIG.STYLES.DEFAULT.fillOpacity
-                };
-              },
-              onEachFeature: function(feature, layer) {
-                const zone = 'CABA';
-                const zoneData = zonesData[zone];
-                
-                // Agregar eventos
-                layer.on({
-                  mouseover: function(e) {
-                    const currentLayer = e.target;
-                    currentLayer.setStyle({
-                      weight: MAP_CONFIG.STYLES.HOVER.weight,
-                      color: MAP_CONFIG.COLORS.PRIMARY,
-                      dashArray: MAP_CONFIG.STYLES.HOVER.dashArray,
-                      fillOpacity: MAP_CONFIG.STYLES.HOVER.fillOpacity,
-                      fillColor: zoneData.hoverColor
-                    });
-                    currentLayer.bringToFront();
-                    currentZone = zone;
-                    currentMunicipality = 'CABA';
-                    showZoneInfo(zone, 'CABA');
-                  },
-                  mouseout: function(e) {
-                    cabaLayer.resetStyle(e.target);
-                    currentZone = null;
-                    currentMunicipality = null;
-                    hideZoneInfo();
-                  },
-                  click: function(e) {
-                    // Establecer CABA como zona seleccionada permanentemente
-                    selectedZone = zone;
-                    selectedMunicipality = 'CABA';
-                    currentZone = zone;
-                    currentMunicipality = 'CABA';
-                    showZoneInfo(zone, 'CABA');
-                    
-                    // Resaltar visualmente CABA seleccionada
-                    const currentLayer = e.target;
-                    currentLayer.setStyle({
-                      weight: 4,
-                      color: MAP_CONFIG.COLORS.PRIMARY,
-                      dashArray: MAP_CONFIG.STYLES.HOVER.dashArray,
-                      fillOpacity: 0.8,
-                      fillColor: zoneData.color
-                    });
-                    currentLayer.bringToFront();
-                  }
-                });
-                
-                // Tooltip
-                layer.bindTooltip(`CABA (${zoneData.name})`, {
-                  permanent: false,
-                  direction: 'center',
-                  className: 'custom-tooltip'
-                });
-              }
-            }).addTo(map);
-            
-            console.log('CABA agregado al mapa exitosamente');
-          })
-          .catch(error => {
-            console.warn('No se pudo cargar CABA, pero el mapa GBA funciona:', error);
-          });
-      })
-      .catch(error => {
-        console.error('Error cargando datos GeoJSON:', error);
-        console.error('Stack:', error.stack);
-        
-        // Fallback: mostrar un mensaje de error
-        const errorDiv = document.createElement('div');
-        errorDiv.innerHTML = `
-          <div style="padding: 2rem; text-align: center; color: #dc2626;">
-            <h3>Error cargando el mapa</h3>
-            <p>No se pudieron cargar los datos geográficos. Por favor, intenta recargar la página.</p>
-            <p style="font-size: 0.8rem; margin-top: 1rem;">Error: ${error.message}</p>
-          </div>
-        `;
-        document.getElementById('map').appendChild(errorDiv);
-      });
-  });
+  render();
 </script>
-
-<style>
-  .custom-tooltip {
-    background: rgba(13, 57, 90, 0.9);
-    color: white;
-    border: none;
-    border-radius: 6px;
-    padding: 0.5rem;
-    font-weight: 600;
-  }
-</style>

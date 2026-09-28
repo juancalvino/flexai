@@ -1,0 +1,24 @@
+---
+import Container from "../container.astro";
+import Sectionhead from "../sectionhead.astro";
+import { STEPS } from "../../data/services";
+---
+
+<section class="section bg-cream-light">
+  <Container>
+    <Sectionhead eyebrow="Cómo funciona" title={["Tres pasos.", "Cero vueltas."]} accent={1} class="mb-12 md:mb-20" />
+    <ol class="grid gap-px overflow-hidden rounded-3xl bg-ink/10 md:grid-cols-3">
+      {
+        STEPS.map((step, index) => (
+          <li class="flex items-start gap-6 bg-cream-light p-6 md:min-h-[280px] md:flex-col md:justify-between md:gap-12 md:p-10" data-reveal="up" data-delay={index * 0.12}>
+            <span class="font-display text-6xl font-medium leading-none text-accent md:text-8xl">0{index + 1}</span>
+            <div>
+              <h3 class="font-display text-2xl uppercase md:text-3xl">{step.title}</h3>
+              <p class="mt-3 text-ink/65">{step.description}</p>
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+  </Container>
+</section>

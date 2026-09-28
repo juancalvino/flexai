@@ -1,0 +1,17 @@
+---
+// Placeholder for an image that will be generated later.
+// `prompt` describes the image to create and is shown as a visible label.
+interface Props {
+  prompt: string;
+  alt?: string;
+  class?: string;
+  [key: string]: unknown;
+}
+
+const { prompt, alt = "", class: className, ...rest } = Astro.props;
+---
+
+<figure class:list={["img-slot", className]} role="img" aria-label={alt || prompt} {...rest}>
+  <figcaption class="img-slot__label">&lt;colocar imagen: {prompt}&gt;</figcaption>
+  <slot />
+</figure>

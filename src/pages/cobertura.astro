@@ -1,47 +1,42 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import mapaAmba from "../assets/mapaAmba.png";
-import { Picture } from "astro:assets";
+import Container from "../components/container.astro";
 import Sectionhead from "../components/sectionhead.astro";
+import PageHero from "../components/sections/PageHero.astro";
 import GeoJSONMap from "../components/GeoJSONMap.astro";
+import ContactCta from "../components/sections/ContactCta.astro";
+import { ZONE_LIST } from "../data/zones";
 ---
 
-<Layout title="Cobertura">
-  <Sectionhead>
-    <Fragment slot="title">Cobertura</Fragment>
-    <Fragment slot="desc"></Fragment>
-  </Sectionhead>
-  <!-- Mapa GeoJSON Real -->
-  <div class="px-5 lg:px-20 mb-10">
-    <GeoJSONMap />
-  </div>
-  <div
-    class="bg-brand-blue-600 p-8 md:px-20 md:py-10 mt-10 mx-auto max-w-5xl shadow-lg rounded-lg flex flex-col items-center text-center">
-    <h2 class="text-white text-4xl md:text-6xl tracking-tight"> Zonas Cubiertas </h2>
-    <div><h3 class="text-white font-bold mt-5 text-lg md:text-2xl">📍 CABA </h3>
-      <p class="text-white text-lg md:text-xl"> Todas las comunas </p>
-    </div>
-    <div><h3 class="text-white font-bold mt-5 text-lg md:text-2xl">📍 GBA 1 </h3>
-      <p class="text-white text-lg md:text-xl"> Vicente López, San Isidro, San Fernando, San Martín, Tres de Febrero,
-        Morón, Hurlingham, Ituzaingó, Matanza Norte, Lomas de Zamora, Lanús, Avellaneda. </p>
-    </div>
-    <div><h3 class="text-white font-bold mt-5 text-lg md:text-2xl">📍 GBA 2 </h3>
-      <p class="text-white text-lg md:text-xl"> Tigre, Malvinas Argentinas, José C. Paz, San Miguel, Moreno, Merlo,
-        Matanza Sur, Ezeiza, Esteban Echeverría, Almirante Brown, Quilmes, Florencio Varela, Berazategui. </p>
-    </div>
-    <div><h3 class="text-white font-bold mt-5 text-lg md:text-2xl">📍 GBA 3 </h3>
-      <p class="text-white text-lg md:text-xl">Berisso, Campana, Canning, Del Viso, Derqui, Ensenada, Escobar, Garín, General Rodríguez,
-        Guernica, Cañuelas, Ingeniero Maschwitz, La Plata Centro, La Plata Norte, La Plata Oeste, Luján, Marcos Paz,
-        Nordelta, Pilar, San Vicente, Villa Rosa, Zarate. </p>
-    </div>
-  </div>
-  </div>
+<Layout title="Cobertura" description="Zonas de entrega de FLEXAI en CABA y GBA. Consultá el mapa interactivo y la tarifa de cada zona.">
+  <PageHero eyebrow="Cobertura · AMBA" title={["Llegamos a", "donde vende", "tu tienda."]} accent={2}>
+    <p>Todas las zonas habilitadas por Mercado Libre en CABA y el conurbano, organizadas en cuatro zonas de tarifa.</p>
+  </PageHero>
 
+  <section class="bg-ink pb-24 text-cream md:pb-36">
+    <Container>
+      <GeoJSONMap />
+    </Container>
+  </section>
+
+  <section class="section bg-cream">
+    <Container>
+      <Sectionhead eyebrow="Zonas cubiertas" title={["Localidad", "por localidad."]} accent={1} class="mb-16" />
+      <div class="divide-y divide-ink/10 border-y border-ink/10">
+        {
+          ZONE_LIST.map((zone) => (
+            <div class="grid gap-4 py-10 md:grid-cols-[240px_1fr]" data-reveal="up">
+              <div class="flex items-center gap-4">
+                <span class="h-4 w-4 rounded-full ring-1 ring-ink/20" style={`background:${zone.color}`} />
+                <h3 class="font-display text-3xl uppercase">{zone.name}</h3>
+              </div>
+              <p class="text-lg leading-relaxed text-ink/70">{zone.localities.join(" · ")}</p>
+            </div>
+          ))
+        }
+      </div>
+    </Container>
+  </section>
+
+  <ContactCta />
 </Layout>
-
-<style>
-    .content_map {
-        display: flex;
-        justify-content: center;
-    }
-</style>

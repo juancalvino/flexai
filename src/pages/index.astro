@@ -1,15 +1,22 @@
 ---
-import Container from "../components/container.astro";
-import Cta from "../components/cta.astro";
-import Features from "../components/features.astro";
-import Intro from "../components/intro.astro";
 import Layout from "../layouts/Layout.astro";
+import HeroSection from "../components/sections/HeroSection.astro";
+import ZoneMarquee from "../components/sections/ZoneMarquee.astro";
+import StatsSection from "../components/sections/StatsSection.astro";
+import ServicesSection from "../components/sections/ServicesSection.astro";
+import MotionGallery from "../components/sections/MotionGallery.astro";
+import StepsSection from "../components/sections/StepsSection.astro";
+import CoverageTeaser from "../components/sections/CoverageTeaser.astro";
+import ContactCta from "../components/sections/ContactCta.astro";
 ---
 
-<Layout title="">
-  <Container>
-    <Intro />
-    <Features />
-    <Cta />
-  </Container>
+<Layout>
+  <HeroSection />
+  <ZoneMarquee />
+  <StatsSection />
+  <ServicesSection />
+  <MotionGallery />
+  <StepsSection />
+  <CoverageTeaser />
+  <ContactCta />
 </Layout>

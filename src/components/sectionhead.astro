@@ -1,12 +1,40 @@
 ---
-const { align = "center" } = Astro.props;
+// Section heading: eyebrow + large title + optional description.
+import Lines from "./ui/Lines.astro";
+
+interface Props {
+  eyebrow?: string;
+  title: string[];
+  tag?: "h1" | "h2";
+  tone?: "light" | "dark";
+  accent?: number | undefined;
+  class?: string;
+}
+
+const { eyebrow, title, tag = "h2", tone = "light", accent, class: className } = Astro.props;
 ---
 
-<div class:list={["mt-8 lg:mt-12", align === "center" && "text-center"]}>
-  <h1 class="text-4xl text-gray-800 lg:text-5xl font-bold lg:tracking-tight">
-    <slot name="title">Title</slot>
-  </h1>
-  <p class="text-xl mt-2 text-slate-700">
-    <slot name="desc">Some description goes here</slot>
-  </p>
+<div class:list={["max-w-4xl", className]}>
+  {
+    eyebrow && (
+      <p
+        class:list={["eyebrow mb-6", tone === "dark" ? "text-accent" : "text-ink/60"]}
+        data-reveal="fade"
+      >
+        {eyebrow}
+      </p>
+    )
+  }
+  <Lines tag={tag} lines={title} accent={accent} class:list={["text-display-sm uppercase", tone === "dark" ? "text-cream" : "text-ink"]} />
+  {
+    Astro.slots.has("default") && (
+      <div
+        class:list={["mt-8 max-w-2xl text-lg leading-relaxed", tone === "dark" ? "text-cream/70" : "text-ink/70"]}
+        data-reveal="up"
+        data-delay="0.2"
+      >
+        <slot />
+      </div>
+    )
+  }
 </div>
