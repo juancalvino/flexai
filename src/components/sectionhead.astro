@@ -25,7 +25,7 @@ const { eyebrow, title, tag = "h2", tone = "light", accent, class: className } =
       </p>
     )
   }
-  <Lines tag={tag} lines={title} accent={accent} class="text-display-sm uppercase" />
+  <Lines tag={tag} lines={title} accent={accent} class:list={["text-display-sm uppercase", tone === "dark" ? "text-cream" : "text-ink"]} />
   {
     Astro.slots.has("default") && (
       <div
