@@ -1,0 +1,14 @@
+---
+import { Icon } from "astro-icon/components";
+import { whatsappUrl, DEFAULT_WHATSAPP_MESSAGE } from "../../data/site";
+---
+
+<a
+  href={whatsappUrl(DEFAULT_WHATSAPP_MESSAGE)}
+  target="_blank"
+  rel="noopener noreferrer"
+  aria-label="Escribinos por WhatsApp"
+  class="fixed bottom-5 right-5 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg shadow-black/20 transition-transform duration-300 ease-out-expo hover:scale-110 md:bottom-8 md:right-8"
+>
+  <Icon name="simple-icons:whatsapp" class="h-7 w-7" />
+</a>

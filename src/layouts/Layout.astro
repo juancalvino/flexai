@@ -1,181 +1,93 @@
 ---
 import { SEO } from "astro-seo";
-import Footer from "../components/footer.astro";
+import Analytics from "@vercel/analytics/astro";
 import Navbar from "../components/navbar/navbar.astro";
-import WhatsappIcon from "../components/ui/icons/whatsappIcon.astro";
-import Analytics from '@vercel/analytics/astro';
+import Footer from "../components/footer.astro";
+import WhatsAppFloat from "../components/ui/WhatsAppFloat.astro";
+import { SITE } from "../data/site";
 
 import "@fontsource-variable/inter/index.css";
-import '@fontsource-variable/bricolage-grotesque';
-import '../styles/global.css';
+import "@fontsource/kanit/400.css";
+import "@fontsource/kanit/500.css";
+import "@fontsource/kanit/600.css";
+import "../styles/global.css";
 
-import { DEFAULT_SEO, ENV } from '../config/index.ts';
-import type { SeoData } from '../types/business';
-
-export interface Props extends Partial<SeoData> {
+interface Props {
   title?: string;
   description?: string;
   image?: string;
-  type?: 'website' | 'article';
   noIndex?: boolean;
 }
 
-const {
-  title,
-  description = DEFAULT_SEO.description,
-  image,
-  type = 'website',
-  canonical,
-  noIndex = false,
-  ...props
-} = Astro.props;
+const { title, description = SITE.description, image = SITE.ogImage, noIndex = false } = Astro.props;
 
-// Construct full title
-const fullTitle = title 
-  ? `${title} | ${DEFAULT_SEO.siteName}`
-  : DEFAULT_SEO.title;
+const fullTitle = title ? `${title} | ${SITE.fullName}` : `${SITE.fullName} · ${SITE.tagline}`;
+const canonicalURL = new URL(Astro.url.pathname, Astro.site).toString();
+const imageURL = new URL(image, Astro.site).toString();
 
-// Resolve canonical URL
-const canonicalURL = canonical || new URL(Astro.url.pathname, Astro.site).toString();
-
-// Resolve image URL
-const resolvedImage = image 
-  ? new URL(image, Astro.site).toString()
-  : new URL("/assets/logoFlexai.png", Astro.site).toString();
-
-// Structured data for SEO
 const structuredData = {
   "@context": "https://schema.org",
   "@type": "Organization",
-  "name": "FLEXAI",
-  "description": DEFAULT_SEO.description,
-  "url": ENV.SITE_URL,
-  "logo": resolvedImage,
-  "contactPoint": {
+  name: SITE.name,
+  description: SITE.description,
+  url: SITE.url,
+  logo: new URL("/assets/logoFlexai.png", Astro.site).toString(),
+  contactPoint: {
     "@type": "ContactPoint",
-    "telephone": "+54-11-3050-2881",
-    "contactType": "customer service",
-    "areaServed": "AR",
-    "availableLanguage": "Spanish"
+    telephone: `+${SITE.whatsappNumber}`,
+    contactType: "customer service",
+    areaServed: "AR",
+    availableLanguage: "Spanish",
   },
-  "sameAs": [
-    "https://instagram.com/flexai.logistica"
-  ]
+  sameAs: [SITE.instagram],
 };
 ---
 
-<!DOCTYPE html>
-<html lang="es">
+<!doctype html>
+<html lang="es-AR">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
-    
+    <meta name="theme-color" content="#1F1E1D" />
+    <link rel="manifest" href="/manifest.json" />
     {noIndex && <meta name="robots" content="noindex, nofollow" />}
-    
+
+    <script is:inline>
+      if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        document.documentElement.classList.add("js");
+      }
+    </script>
+
     <SEO
       title={fullTitle}
       description={description}
       canonical={canonicalURL}
       openGraph={{
-        basic: {
-          url: canonicalURL,
-          type: type,
-          title: fullTitle,
-          image: resolvedImage,
-        },
-        image: {
-          alt: "FLEXAI - Logística para Mercado Libre",
-          width: 1200,
-          height: 630,
-        },
-        optional: {
-          description: description,
-          siteName: DEFAULT_SEO.siteName,
-          locale: "es_AR",
-        }
+        basic: { url: canonicalURL, type: "website", title: fullTitle, image: imageURL },
+        image: { alt: `${SITE.name} · ${SITE.tagline}`, width: 1200, height: 630 },
+        optional: { description, siteName: SITE.fullName, locale: "es_AR" },
       }}
-      twitter={{
-        card: "summary_large_image",
-        site: "@flexai_logistica",
-        title: fullTitle,
-        description: description,
-        image: resolvedImage,
-      }}
+      twitter={{ card: "summary_large_image", title: fullTitle, description, image: imageURL }}
     />
-    
-    <!-- Structured Data -->
     <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
-    
-    <!-- Preconnect to external domains -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    
-    <!-- DNS prefetch for performance -->
-    <link rel="dns-prefetch" href="https://instagram.com" />
-    <link rel="dns-prefetch" href="https://wa.me" />
-    
-    <!-- Theme color for mobile browsers -->
-    <meta name="theme-color" content="#FFCF15" />
-    <meta name="msapplication-TileColor" content="#FFCF15" />
-    
-    <!-- PWA manifest -->
-    <link rel="manifest" href="/manifest.json" />
   </head>
-  
-  <body class="min-h-screen flex flex-col">
+
+  <body class="flex min-h-screen flex-col">
+    <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-full focus:bg-brand-yellow-500 focus:px-4 focus:py-2 focus:text-ink">
+      Saltar al contenido
+    </a>
     <Navbar />
-    
-    <main class="flex-grow">
+    <main id="main" class="flex-grow">
       <slot />
     </main>
-    
     <Footer />
-    <WhatsappIcon />
-    
-    <!-- Global styles -->
-    <style is:global>
-      @import url('https://fonts.googleapis.com/css2?family=Istok+Web:ital,wght@0,400;0,700;1,400;1,700&display=swap');
-      
-      /* Performance optimizations */
-      img {
-        content-visibility: auto;
-      }
-      
-      /* Improve text rendering */
-      body {
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-        text-rendering: optimizeLegibility;
-      }
-      
-      /* Focus styles for accessibility */
-      :focus-visible {
-        outline: 2px solid theme('colors.brand.yellow.500');
-        outline-offset: 2px;
-        border-radius: 0.25rem;
-      }
-      
-      /* Smooth scrolling */
-      html {
-        scroll-behavior: smooth;
-      }
-      
-      /* Reduce motion for users who prefer it */
-      @media (prefers-reduced-motion: reduce) {
-        *,
-        ::before,
-        ::after {
-          animation-duration: 0.01ms !important;
-          animation-iteration-count: 1 !important;
-          transition-duration: 0.01ms !important;
-          scroll-behavior: auto !important;
-        }
-      }
-    </style>
-    
-    <!-- Analytics -->
+    <WhatsAppFloat />
     <Analytics />
+
+    <script>
+      import "../scripts/motion";
+    </script>
   </body>
 </html>

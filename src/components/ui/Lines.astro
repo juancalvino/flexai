@@ -1,0 +1,22 @@
+---
+// Headline split into masked lines that slide up on reveal (see scripts/motion.ts).
+interface Props {
+  lines: string[];
+  tag?: "h1" | "h2" | "h3" | "p";
+  class?: string;
+  delay?: number;
+  accent?: number | undefined;
+}
+
+const { lines, tag: Tag = "h2", class: className, delay = 0, accent } = Astro.props;
+---
+
+<Tag class={className} data-lines data-delay={delay}>
+  {
+    lines.map((line, index) => (
+      <span class="line block overflow-hidden pb-[0.08em]">
+        <span class:list={["block", index === accent && "text-brand-yellow-500"]}>{line}</span>
+      </span>
+    ))
+  }
+</Tag>
