@@ -27,18 +27,18 @@ const year = new Date().getFullYear();
 
       <nav aria-label="Pie de página">
         <p class="eyebrow mb-6 text-cream/40">Navegación</p>
-        <ul class="space-y-3">
+        <ul class="space-y-1">
           {
             NAVIGATION.map((item) => (
               <li>
-                <a href={item.path} class="text-cream/80 transition-colors hover:text-brand-yellow-500">
+                <a href={item.path} class="inline-block py-2 text-cream/80 transition-colors hover:text-brand-yellow-500">
                   {item.title}
                 </a>
               </li>
             ))
           }
           <li>
-            <a href={SITE.lightDataUrl} target="_blank" rel="noopener noreferrer" class="text-cream/80 transition-colors hover:text-brand-yellow-500">
+            <a href={SITE.lightDataUrl} target="_blank" rel="noopener noreferrer" class="inline-block py-2 text-cream/80 transition-colors hover:text-brand-yellow-500">
               Sistema LightData
             </a>
           </li>
@@ -47,14 +47,14 @@ const year = new Date().getFullYear();
 
       <div>
         <p class="eyebrow mb-6 text-cream/40">Contacto</p>
-        <ul class="space-y-3 text-cream/80">
+        <ul class="space-y-1 text-cream/80">
           <li>
-            <a href={SITE.phoneHref} class="transition-colors hover:text-brand-yellow-500">{SITE.phoneDisplay}</a>
+            <a href={SITE.phoneHref} class="inline-block py-2 transition-colors hover:text-brand-yellow-500">{SITE.phoneDisplay}</a>
           </li>
           <li>
-            <a href={`mailto:${SITE.email}`} class="break-all transition-colors hover:text-brand-yellow-500">{SITE.email}</a>
+            <a href={`mailto:${SITE.email}`} class="inline-block break-all py-2 transition-colors hover:text-brand-yellow-500">{SITE.email}</a>
           </li>
-          <li>Lunes a sábado · AMBA, Argentina</li>
+          <li class="py-2">Lunes a sábado · AMBA, Argentina</li>
         </ul>
         <div class="mt-8 flex gap-3">
           {

@@ -33,7 +33,7 @@
   }
 
   .section {
-    @apply relative py-24 md:py-36;
+    @apply relative py-20 md:py-36;
   }
 
   .btn {

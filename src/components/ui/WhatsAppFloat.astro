@@ -4,11 +4,20 @@ import { whatsappUrl, DEFAULT_WHATSAPP_MESSAGE } from "../../data/site";
 ---
 
 <a
+  id="whatsapp-float"
   href={whatsappUrl(DEFAULT_WHATSAPP_MESSAGE)}
   target="_blank"
   rel="noopener noreferrer"
   aria-label="Escribinos por WhatsApp"
-  class="fixed bottom-5 right-5 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg shadow-black/20 transition-transform duration-300 ease-out-expo hover:scale-110 md:bottom-8 md:right-8"
+  class="fixed bottom-[calc(1.25rem+env(safe-area-inset-bottom))] right-5 z-40 flex h-14 w-14 translate-y-24 items-center justify-center rounded-full bg-[#25D366] text-white opacity-0 shadow-lg shadow-black/20 transition-[transform,opacity] duration-500 ease-out-expo hover:scale-110 data-[visible]:translate-y-0 data-[visible]:opacity-100 md:bottom-8 md:right-8"
 >
   <Icon name="simple-icons:whatsapp" class="h-7 w-7" />
 </a>
+
+<script>
+  // Shown after the first screen so it never covers the hero call to action.
+  const button = document.getElementById("whatsapp-float")!;
+  const update = () => button.toggleAttribute("data-visible", window.scrollY > window.innerHeight * 0.6);
+  update();
+  window.addEventListener("scroll", update, { passive: true });
+</script>
