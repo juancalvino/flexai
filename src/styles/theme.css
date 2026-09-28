@@ -6,10 +6,10 @@
  * In plain CSS use them as rgb(var(--color-accent)) or rgb(var(--color-accent) / 0.5).
  */
 :root {
-  /* Dark base: page backgrounds, dark sections, text on light surfaces. */
-  --color-ink: 31 30 29;
-  --color-ink-soft: 41 39 39;
-  --color-ink-muted: 58 56 54;
+  /* Dark base (very dark FLEXAI blues): dark sections and text on light surfaces. */
+  --color-ink: 8 20 33;
+  --color-ink-soft: 14 30 48;
+  --color-ink-muted: 27 46 68;
 
   /* Light base: page background and text on dark surfaces. */
   --color-cream: 243 241 235;
@@ -18,7 +18,7 @@
 
   /* Brand accent (buttons, highlights) and the text color used on top of it. */
   --color-accent: 255 207 21;
-  --color-on-accent: 31 30 29;
+  --color-on-accent: 8 20 33;
 
   /* Secondary brand color, used sparingly for details. */
   --color-secondary: 13 57 90;
@@ -30,5 +30,5 @@
   --color-zone-1: 255 207 21;
   --color-zone-2: 217 197 144;
   --color-zone-3: 157 184 207;
-  --color-zone-4: 74 123 167;
+  --color-zone-4: 92 142 190;
 }
