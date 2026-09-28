@@ -1,109 +1,47 @@
 import { defineConfig } from "astro/config";
 import tailwind from "@astrojs/tailwind";
-import mdx from "@astrojs/mdx";
 import sitemap from "@astrojs/sitemap";
 import icon from "astro-icon";
 import { securityConfig } from "./astro.config.security.mjs";
 
+const isDev = process.env.NODE_ENV === "development";
+
 export default defineConfig({
   site: "https://flexai.com.ar",
-  // Apply server security configuration for development
-  ...(process.env.NODE_ENV === 'development' && securityConfig.server ? { 
-    server: securityConfig.server 
-  } : {}),
   integrations: [
-    tailwind({
-      // Apply base styles
-      applyBaseStyles: true,
-    }),
-    mdx({
-      // Optimize MDX processing
-      syntaxHighlight: 'shiki',
-      shikiConfig: {
-        theme: 'github-light',
-        wrap: true,
-      },
-    }),
+    tailwind({ applyBaseStyles: true }),
     sitemap({
-      // Generate sitemap with priority and changefreq
-      customPages: [
-        'https://flexai.com.ar',
-        'https://flexai.com.ar/precios',
-        'https://flexai.com.ar/cobertura',
-        'https://flexai.com.ar/nosotros',
-      ],
       i18n: {
-        defaultLocale: 'es',
-        locales: {
-          es: 'es-AR',
-        },
+        defaultLocale: "es",
+        locales: { es: "es-AR" },
       },
     }),
     icon({
-      // Optimize icon loading
       include: {
-        bx: ['*'],
-        'simple-icons': ['instagram', 'whatsapp', 'linkedin'],
-        uil: ['*'],
+        bx: ["*"],
+        "simple-icons": ["instagram", "whatsapp", "linkedin"],
+        uil: ["*"],
       },
     }),
   ],
-  output: 'static',
+  output: "static",
   build: {
-    // Build optimizations
-    inlineStylesheets: 'auto',
-  },
-  image: {
-    // Image optimization settings
-    service: {
-      entrypoint: 'astro/assets/services/sharp',
-    },
-    domains: [
-      'flexai.com.ar',
-      'lightdata.flexai.com.ar',
-    ],
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: '**.flexai.com.ar',
-      },
-    ],
+    inlineStylesheets: "auto",
   },
   prefetch: {
-    // Prefetch optimization
     prefetchAll: false,
-    defaultStrategy: 'hover',
+    defaultStrategy: "hover",
   },
   vite: {
-    // Vite optimizations
     build: {
-      // CSS code splitting
       cssCodeSplit: true,
-      // Minification
-      minify: 'esbuild',
-      // Source maps for production debugging
+      minify: "esbuild",
       sourcemap: false,
     },
-    // Development server with security configuration
-    server: {
-      ...(process.env.NODE_ENV === 'development' ? securityConfig.server : {
-        host: true,
-        port: 3000,
-      }),
-    },
-    // Plugin optimizations
+    server: isDev ? securityConfig.server : { host: true, port: 3000 },
     esbuild: {
-      // Drop console logs in production
-      drop: process.env.NODE_ENV === 'production' ? ['console', 'debugger'] : [],
+      drop: process.env.NODE_ENV === "production" ? ["console", "debugger"] : [],
     },
-    // Apply additional security config for development
-    ...(process.env.NODE_ENV === 'development' ? securityConfig.vite : {}),
-  },
-  markdown: {
-    // Markdown processing optimizations
-    shikiConfig: {
-      theme: 'github-light',
-      wrap: true,
-    },
+    ...(isDev ? securityConfig.vite : {}),
   },
 });
