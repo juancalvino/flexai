@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://www.flexai.com.ar/
+Sitemap: https://flexai.com.ar/sitemap-index.xml
