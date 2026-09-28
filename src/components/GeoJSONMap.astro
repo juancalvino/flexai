@@ -421,10 +421,10 @@ const localityOptions = [
     className: "map-tiles",
   }).addTo(map);
 
-  // Labels live in their own pane above the zones (map → zones → text).
+  // Labels live in their own pane: map → zones → labels → hover tooltip.
   map.createPane("labels");
   const labelsPane = map.getPane("labels")!;
-  labelsPane.style.zIndex = "650";
+  labelsPane.style.zIndex = "450"; // above zones (overlayPane 400), below tooltips (650)
   labelsPane.style.pointerEvents = "none";
 
   // Labels in priority order (bigger areas first); overlapping ones are hidden.
