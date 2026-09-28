@@ -2,9 +2,14 @@
 import { Icon } from "astro-icon/components";
 import { ZONE_LIST, formatPrice } from "../data/zones";
 
-const localityOptions = ZONE_LIST.flatMap((zone) =>
-  zone.id === "CABA" ? [{ name: "CABA", zone: zone.id }] : zone.localities.map((name) => ({ name, zone: zone.id })),
-).sort((a, b) => a.name.localeCompare(b.name, "es"));
+const localityOptions = [
+  ...new Set(
+    ZONE_LIST.flatMap((zone) => [
+      ...(zone.id === "CABA" ? ["CABA"] : zone.localities),
+      ...(zone.searchAliases ?? []).flatMap((alias) => alias.names),
+    ]),
+  ),
+].sort((a, b) => a.localeCompare(b, "es"));
 ---
 
 <div class="grid gap-6 lg:grid-cols-[1fr_400px]">
@@ -56,7 +61,7 @@ const localityOptions = ZONE_LIST.flatMap((zone) =>
         />
       </div>
       <datalist id="locality-options">
-        {localityOptions.map((option) => <option value={option.name} />)}
+        {localityOptions.map((name) => <option value={name} />)}
       </datalist>
       <p id="search-feedback" class="mt-2 hidden text-sm text-cream/50" role="status"></p>
     </form>
@@ -70,6 +75,7 @@ const localityOptions = ZONE_LIST.flatMap((zone) =>
       <p class="eyebrow text-cream/40">Zona</p>
       <h2 id="zone-title" class="mt-2 font-display text-4xl uppercase">AMBA</h2>
       <p id="zone-description" class="mt-1 text-cream/60">Tocá el mapa, buscá tu localidad o elegí una zona para ver la tarifa.</p>
+      <p id="zone-note" class="mt-3 hidden rounded-xl bg-accent/10 px-4 py-3 text-sm text-accent"></p>
 
       <div id="zone-price-wrap" class="mt-6 hidden border-y border-cream/10 py-5">
         <p class="eyebrow text-cream/40">Tarifa por paquete · <span id="zone-plan">Standard</span></p>
@@ -130,9 +136,9 @@ const localityOptions = ZONE_LIST.flatMap((zone) =>
     display: none;
   }
 
-  /* Dark basemap from standard OSM tiles. */
+  /* Dark blue basemap from standard OSM tiles. */
   #coverage-map .map-tiles {
-    filter: grayscale(1) invert(1) brightness(0.7) contrast(0.9);
+    filter: grayscale(1) invert(1) brightness(0.62) contrast(0.95) sepia(1) hue-rotate(175deg) saturate(1.6);
   }
 
   @media (pointer: coarse) {
@@ -151,6 +157,29 @@ const localityOptions = ZONE_LIST.flatMap((zone) =>
 
   #coverage-map path.leaflet-interactive:focus {
     outline: none;
+  }
+
+  /* Place names drawn above the colored zones. The marker is a zero-size anchor. */
+  #coverage-map .map-label span {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    font-family: Kanit, sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 1.1;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: rgb(var(--color-cream));
+    text-shadow:
+      0 0 3px rgb(var(--color-ink)),
+      0 0 6px rgb(var(--color-ink));
+    pointer-events: none;
+  }
+
+  #coverage-map .map-label--zone span {
+    font-size: 15px;
+    font-weight: 600;
   }
 
   #coverage-map.leaflet-container {
@@ -187,7 +216,7 @@ const localityOptions = ZONE_LIST.flatMap((zone) =>
   import L from "leaflet";
   import "leaflet/dist/leaflet.css";
   import type { FeatureCollection } from "geojson";
-  import { ZONES, ZONE_LIST, PLANS, formatPrice, type PlanId, type ZoneId } from "../data/zones";
+  import { ZONES, ZONE_LIST, PLANS, PARTIDO_EXCEPTIONS, formatPrice, type PlanId, type ZoneId } from "../data/zones";
   import { whatsappUrl } from "../data/site";
 
   // Leaflet writes colors as SVG attributes, which can't use var(): resolve theme tokens once.
@@ -210,6 +239,7 @@ const localityOptions = ZONE_LIST.flatMap((zone) =>
   const searchForm = $<HTMLFormElement>("locality-search");
   const searchInput = $<HTMLInputElement>("locality-input");
   const searchFeedback = $("search-feedback");
+  const note = $("zone-note");
   const summary = $("map-summary");
   const summaryPlace = $("map-summary-place");
   const summaryZone = $("map-summary-zone");
@@ -218,7 +248,7 @@ const localityOptions = ZONE_LIST.flatMap((zone) =>
   const planButtons = document.querySelectorAll<HTMLButtonElement>(".plan-btn");
   const zoneButtons = document.querySelectorAll<HTMLButtonElement>(".zone-btn");
 
-  type Selection = { zone: ZoneId; place: string };
+  type Selection = { zone: ZoneId; place: string; within?: string };
 
   let plan: PlanId = "standard";
   let selected: Selection | null = null;
@@ -232,9 +262,12 @@ const localityOptions = ZONE_LIST.flatMap((zone) =>
 
   // Localities listed per zone (includes places without their own polygon, e.g. Nordelta).
   const localityZone = new Map<string, Selection>(
-    ZONE_LIST.flatMap((zone) =>
-      [zone.name, ...zone.localities].map((name) => [normalize(name), { zone: zone.id, place: name }] as const),
-    ),
+    ZONE_LIST.flatMap((zone) => [
+      ...[zone.name, ...zone.localities].map((name) => [normalize(name), { zone: zone.id, place: name }] as const),
+      ...(zone.searchAliases ?? []).flatMap(({ within, names }) =>
+        names.map((name) => [normalize(name), { zone: zone.id, place: name, ...(within ? { within } : {}) }] as const),
+      ),
+    ]),
   );
 
   function styleFor(zone: ZoneId): L.PathOptions {
@@ -250,7 +283,7 @@ const localityOptions = ZONE_LIST.flatMap((zone) =>
 
   function paintMap() {
     layersByZone.forEach((layers, zone) => layers.forEach((layer) => layer.setStyle(styleFor(zone))));
-    const placeLayer = selected && layersByPlace.get(normalize(selected.place));
+    const placeLayer = selected && layersByPlace.get(normalize(selected.within ?? selected.place));
     placeLayer?.setStyle({ weight: 3.5, color: themeColor("highlight"), fillOpacity: 0.95 }).bringToFront();
   }
 
@@ -267,6 +300,14 @@ const localityOptions = ZONE_LIST.flatMap((zone) =>
     summary.classList.toggle("flex", Boolean(selected));
     hint.classList.toggle("hidden", Boolean(selected));
 
+    const exceptions = selected && !selected.within ? (PARTIDO_EXCEPTIONS[selected.place] ?? []) : [];
+    const notes = exceptions.flatMap((name) => {
+      const exception = localityZone.get(normalize(name));
+      return exception && exception.zone !== selected?.zone ? [`${name} tiene tarifa ${ZONES[exception.zone].name}.`] : [];
+    });
+    note.textContent = notes.join(" ");
+    note.classList.toggle("hidden", notes.length === 0);
+
     if (!selected) {
       cta.href = whatsappUrl("Hola FLEXAI, quiero información sobre la cobertura de envíos.");
       return;
@@ -275,7 +316,8 @@ const localityOptions = ZONE_LIST.flatMap((zone) =>
     const zone = ZONES[selected.zone];
     const isZoneOnly = selected.place === zone.name;
     title.textContent = isZoneOnly ? zone.name : selected.place;
-    description.textContent = isZoneOnly ? zone.description : `${zone.name} · ${zone.description}`;
+    const area = selected.within ? `${selected.within} · ${zone.name}` : `${zone.name} · ${zone.description}`;
+    description.textContent = isZoneOnly ? zone.description : area;
     planLabel.textContent = PLANS[plan].name;
     price.textContent = formatPrice(zone.prices[plan]);
     priceWrap.classList.remove("hidden");
@@ -301,7 +343,7 @@ const localityOptions = ZONE_LIST.flatMap((zone) =>
 
   function focusSelection() {
     if (!selected) return;
-    const placeLayer = layersByPlace.get(normalize(selected.place));
+    const placeLayer = layersByPlace.get(normalize(selected.within ?? selected.place));
     const layers = placeLayer ? [placeLayer] : (layersByZone.get(selected.zone) ?? []);
     if (!layers.length) return;
     const bounds = L.featureGroup(layers).getBounds();
@@ -331,7 +373,18 @@ const localityOptions = ZONE_LIST.flatMap((zone) =>
   function searchLocality() {
     const query = normalize(searchInput.value);
     if (!query) return;
-    const match = localityZone.get(query) ?? [...localityZone.entries()].find(([name]) => name.includes(query))?.[1];
+    const partial = [...localityZone.entries()].filter(([name]) => name.includes(query)).map(([, value]) => value);
+    const zonesFound = new Set(partial.map((item) => item.zone));
+
+    // e.g. "La Matanza" is split between GBA 1 and GBA 2: ask for the locality instead of guessing.
+    if (!localityZone.has(query) && zonesFound.size > 1) {
+      const options = partial.slice(0, 4).map((item) => `${item.place} (${ZONES[item.zone].name})`);
+      searchFeedback.textContent = `Hay más de una zona: ${options.join(", ")}. Escribí tu localidad.`;
+      searchFeedback.classList.remove("hidden");
+      return;
+    }
+
+    const match = localityZone.get(query) ?? partial[0];
 
     if (!match) {
       searchFeedback.textContent = "No encontramos esa localidad. Escribinos y te confirmamos si llegamos.";
@@ -340,6 +393,7 @@ const localityOptions = ZONE_LIST.flatMap((zone) =>
     }
 
     searchFeedback.classList.add("hidden");
+    searchFeedback.textContent = "";
     searchInput.value = match.place;
     select(match);
   }
@@ -366,6 +420,43 @@ const localityOptions = ZONE_LIST.flatMap((zone) =>
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
     className: "map-tiles",
   }).addTo(map);
+
+  // Labels live in their own pane above the zones (map → zones → text).
+  map.createPane("labels");
+  const labelsPane = map.getPane("labels")!;
+  labelsPane.style.zIndex = "650";
+  labelsPane.style.pointerEvents = "none";
+
+  // Labels in priority order (bigger areas first); overlapping ones are hidden.
+  const labels: L.Marker[] = [];
+
+  const addLabel = (position: L.LatLng, text: string, className = "") => {
+    const marker = L.marker(position, {
+      pane: "labels",
+      interactive: false,
+      keyboard: false,
+      icon: L.divIcon({ className: `map-label ${className}`, html: `<span>${text}</span>`, iconSize: [0, 0] }),
+    }).addTo(map);
+    labels.push(marker);
+  };
+
+  function resolveLabelCollisions() {
+    const placed: DOMRect[] = [];
+    labels.forEach((marker) => {
+      const element = marker.getElement();
+      const text = element?.firstElementChild;
+      if (!element || !text) return;
+      element.style.visibility = "visible";
+      const box = text.getBoundingClientRect();
+      const overlaps = placed.some(
+        (other) => box.left < other.right + 4 && box.right > other.left - 4 && box.top < other.bottom + 2 && box.bottom > other.top - 2,
+      );
+      if (overlaps) element.style.visibility = "hidden";
+      else placed.push(box);
+    });
+  }
+
+  map.on("zoomend moveend", resolveLabelCollisions);
 
   // The map fills its grid cell, whose height follows the side panel.
   new ResizeObserver(() => map.invalidateSize()).observe($("coverage-map"));
@@ -412,12 +503,24 @@ const localityOptions = ZONE_LIST.flatMap((zone) =>
         },
       }).addTo(map);
 
+      const caba = layersByZone.get("CABA");
+      if (caba?.length) addLabel(L.featureGroup(caba).getBounds().getCenter(), "CABA", "map-label--zone");
+
+      const area = (polygon: L.Polygon) => {
+        const bounds = polygon.getBounds();
+        return (bounds.getEast() - bounds.getWest()) * (bounds.getNorth() - bounds.getSouth());
+      };
+      [...layersByPlace.values()]
+        .sort((a, b) => area(b) - area(a))
+        .forEach((polygon) => addLabel(polygon.getCenter(), String(polygon.feature?.properties?.["name"] ?? "")));
+
       map.invalidateSize();
       // Fit all zones, then zoom one level closer around the inner zones so the core AMBA reads larger.
       const innerZones: ZoneId[] = ["CABA", "GBA1", "GBA2"];
       const inner = L.featureGroup(innerZones.flatMap((zone) => layersByZone.get(zone) ?? [])).getBounds();
       overview = { center: inner.getCenter(), zoom: map.getBoundsZoom(layer.getBounds(), false, L.point(16, 16)) + 1 };
       map.setView(overview.center, overview.zoom);
+      resolveLabelCollisions();
       status.remove();
       render();
     })
