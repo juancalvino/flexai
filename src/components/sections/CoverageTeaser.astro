@@ -1,0 +1,28 @@
+---
+import Container from "../container.astro";
+import Sectionhead from "../sectionhead.astro";
+import { ZONE_LIST } from "../../data/zones";
+---
+
+<section class="section bg-ink text-cream">
+  <Container>
+    <div class="grid gap-16 lg:grid-cols-2 lg:items-end">
+      <Sectionhead eyebrow="Cobertura" title={["De CABA", "al tercer cordón."]} tone="dark" accent={1}>
+        <p>Cubrimos todas las zonas habilitadas por Mercado Libre en el Área Metropolitana de Buenos Aires.</p>
+      </Sectionhead>
+
+      <ul class="grid grid-cols-2 gap-3">
+        {
+          ZONE_LIST.map((zone, index) => (
+            <li class="rounded-2xl border border-cream/10 p-6 transition-colors duration-300 hover:border-brand-yellow-500" data-reveal="up" data-delay={index * 0.08}>
+              <span class="mb-6 block h-3 w-3 rounded-full ring-1 ring-cream/30" style={`background:${zone.color}`} />
+              <p class="font-display text-3xl uppercase">{zone.name}</p>
+              <p class="mt-1 text-sm text-cream/50">{zone.description}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+    <a href="/cobertura" class="btn-primary mt-16" data-reveal="fade">Explorar el mapa</a>
+  </Container>
+</section>

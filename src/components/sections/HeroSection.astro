@@ -1,0 +1,46 @@
+---
+import Container from "../container.astro";
+import Lines from "../ui/Lines.astro";
+import ImageSlot from "../ui/ImageSlot.astro";
+import { whatsappUrl, DEFAULT_WHATSAPP_MESSAGE } from "../../data/site";
+---
+
+<section class="relative flex min-h-[100svh] flex-col overflow-hidden bg-ink text-cream">
+  <div class="absolute inset-0" data-reveal="clip">
+    <ImageSlot
+      prompt="fotografía cinematográfica nocturna de una avenida de Buenos Aires con estelas de luces de tránsito y un repartidor en moto en primer plano, desenfoque de movimiento, tonos oscuros con acentos amarillos, formato 16:9 horizontal"
+      alt="Repartidor de FLEXAI en moto por una avenida de Buenos Aires"
+      class="h-[115%] w-full pt-20"
+      data-parallax="0.12"
+    />
+    <div class="absolute inset-0 bg-gradient-to-t from-ink via-ink/60 to-ink/30"></div>
+  </div>
+
+  <Container class="relative flex flex-1 flex-col justify-end pb-16 pt-32 md:pb-20">
+    <div class="mb-10 flex flex-wrap gap-3" data-reveal="fade" data-delay="0.4">
+      <span class="eyebrow rounded-full border border-cream/25 px-4 py-2">FLEXAI · Logística</span>
+      <span class="eyebrow rounded-full border border-cream/25 px-4 py-2">AMBA · Argentina</span>
+    </div>
+
+    <Lines tag="h1" lines={["Tus envíos Flex,", "a tiempo.", "Siempre."]} accent={1} class="text-display-lg uppercase" delay={0.2} />
+
+    <div class="mt-12 flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
+      <p class="max-w-md text-lg leading-relaxed text-cream/75" data-reveal="up" data-delay="0.6">
+        Logística de última milla para vendedores de Mercado Libre. Dos recorridos diarios en CABA y GBA, con seguimiento en tiempo real.
+      </p>
+      <div class="flex flex-wrap gap-3" data-reveal="up" data-delay="0.75">
+        <a href={whatsappUrl(DEFAULT_WHATSAPP_MESSAGE)} target="_blank" rel="noopener noreferrer" class="btn-primary">
+          Hablanos
+        </a>
+        <a href="/servicios" class="btn-ghost">Ver tarifas</a>
+      </div>
+    </div>
+  </Container>
+
+  <div class="absolute bottom-6 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-3 md:flex" aria-hidden="true">
+    <span class="eyebrow text-[10px] text-cream/50">Scroll</span>
+    <span class="relative block h-12 w-px overflow-hidden bg-cream/15">
+      <span class="absolute inset-x-0 top-0 h-1/2 animate-scroll-cue bg-brand-yellow-500"></span>
+    </span>
+  </div>
+</section>

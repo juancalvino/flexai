@@ -1,0 +1,27 @@
+---
+// Dark hero used by inner pages.
+import Container from "../container.astro";
+import Lines from "../ui/Lines.astro";
+
+interface Props {
+  eyebrow: string;
+  title: string[];
+  accent?: number | undefined;
+}
+
+const { eyebrow, title, accent } = Astro.props;
+---
+
+<section class="relative overflow-hidden bg-ink pb-20 pt-40 text-cream md:pb-28 md:pt-52">
+  <Container>
+    <p class="eyebrow mb-8 text-brand-yellow-500" data-reveal="fade">{eyebrow}</p>
+    <Lines tag="h1" lines={title} accent={accent} class="text-display-md uppercase" />
+    {
+      Astro.slots.has("default") && (
+        <div class="mt-10 max-w-2xl text-lg leading-relaxed text-cream/70" data-reveal="up" data-delay="0.3">
+          <slot />
+        </div>
+      )
+    }
+  </Container>
+</section>

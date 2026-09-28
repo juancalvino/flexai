@@ -1,0 +1,78 @@
+---
+import { Icon } from "astro-icon/components";
+import Container from "../container.astro";
+import Sectionhead from "../sectionhead.astro";
+import ImageSlot from "../ui/ImageSlot.astro";
+
+const slides = [
+  {
+    title: "Operación",
+    description: "Una red preparada para mover cada paquete del día.",
+    prompt: "depósito logístico con estanterías y paquetes de Mercado Libre clasificados por zona, luz natural, fotografía vertical 4:5",
+  },
+  {
+    title: "Equipo",
+    description: "Personas reales detrás de cada entrega.",
+    prompt: "retrato grupal de repartidores sonrientes con remeras negras y detalles amarillos frente a sus motos, fotografía vertical 4:5",
+  },
+  {
+    title: "Tecnología",
+    description: "Datos en tiempo real para decidir mejor.",
+    prompt: "primer plano de una pantalla con mapa de rutas de entrega y puntos amarillos sobre fondo oscuro, fotografía vertical 4:5",
+  },
+  {
+    title: "Última milla",
+    description: "El momento donde cada minuto cuenta.",
+    prompt: "repartidor entregando un paquete en la puerta de una casa del conurbano bonaerense, luz de tarde, fotografía vertical 4:5",
+  },
+  {
+    title: "Retiro en tienda",
+    description: "Pasamos a buscar tus ventas por tu depósito o local.",
+    prompt: "vendedor entregando cajas embaladas a un repartidor en la puerta de un local comercial, fotografía vertical 4:5",
+  },
+];
+---
+
+<section class="section overflow-hidden bg-cream">
+  <Container>
+    <div class="mb-14 flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
+      <Sectionhead eyebrow="FLEXAI en movimiento" title={["La operación,", "en cada calle."]} accent={1} />
+      <div class="flex gap-3" data-reveal="fade">
+        <button type="button" class="gallery-prev flex h-12 w-12 items-center justify-center rounded-full border border-ink/20 transition-colors hover:bg-ink hover:text-cream" aria-label="Anterior">
+          <Icon name="bx:left-arrow-alt" class="h-6 w-6" />
+        </button>
+        <button type="button" class="gallery-next flex h-12 w-12 items-center justify-center rounded-full border border-ink/20 transition-colors hover:bg-ink hover:text-cream" aria-label="Siguiente">
+          <Icon name="bx:right-arrow-alt" class="h-6 w-6" />
+        </button>
+      </div>
+    </div>
+  </Container>
+
+  <ul
+    class="gallery-track flex snap-x snap-mandatory gap-5 overflow-x-auto scroll-smooth px-5 pb-6 [scrollbar-width:none] md:px-10 [&::-webkit-scrollbar]:hidden"
+    tabindex="0"
+    aria-label="Galería FLEXAI en movimiento"
+  >
+    {
+      slides.map((slide, index) => (
+        <li class="group w-[78vw] shrink-0 snap-start sm:w-[46vw] lg:w-[28vw]" data-reveal="up" data-delay={index * 0.08}>
+          <ImageSlot prompt={slide.prompt} alt={slide.title} class="aspect-[4/5] rounded-3xl transition-transform duration-700 ease-out-expo group-hover:scale-[0.98]" />
+          <div class="mt-5 flex items-baseline justify-between gap-4">
+            <h3 class="font-display text-2xl uppercase">{slide.title}</h3>
+            <span class="font-display text-sm text-ink/40">0{index + 1}</span>
+          </div>
+          <p class="mt-2 text-ink/60">{slide.description}</p>
+        </li>
+      ))
+    }
+  </ul>
+</section>
+
+<script>
+  document.querySelectorAll<HTMLElement>(".gallery-track").forEach((track) => {
+    const section = track.closest("section");
+    const step = () => (track.querySelector("li")?.getBoundingClientRect().width ?? 300) + 20;
+    section?.querySelector(".gallery-prev")?.addEventListener("click", () => track.scrollBy({ left: -step() }));
+    section?.querySelector(".gallery-next")?.addEventListener("click", () => track.scrollBy({ left: step() }));
+  });
+</script>
