@@ -8,6 +8,8 @@ export interface Zone {
   name: string;
   description: string;
   localities: string[];
+  /** Extra places (neighborhoods, towns) the map search resolves to this zone; `within` is the map polygon to focus. */
+  searchAliases?: { within?: string; names: string[] }[];
   prices: Record<PlanId, number>;
   /** Theme token in src/styles/theme.css (--color-<token>). */
   colorToken: string;
@@ -23,6 +25,20 @@ export const ZONES: Record<ZoneId, Zone> = {
     name: "CABA",
     description: "Todas las comunas de la Ciudad",
     localities: ["Todas las comunas"],
+    searchAliases: [
+      {
+        names: [
+          "Agronomía", "Almagro", "Balvanera", "Barracas", "Belgrano", "Boedo", "Caballito", "Chacarita",
+          "Coghlan", "Colegiales", "Constitución", "Flores", "Floresta", "La Boca", "La Paternal", "Liniers",
+          "Mataderos", "Monte Castro", "Monserrat", "Nueva Pompeya", "Núñez", "Palermo", "Parque Avellaneda",
+          "Parque Chacabuco", "Parque Chas", "Parque Patricios", "Puerto Madero", "Recoleta", "Retiro",
+          "Saavedra", "San Cristóbal", "San Nicolás", "San Telmo", "Vélez Sarsfield", "Versalles", "Villa Crespo",
+          "Villa del Parque", "Villa Devoto", "Villa General Mitre", "Villa Lugano", "Villa Luro", "Villa Ortúzar",
+          "Villa Pueyrredón", "Villa Real", "Villa Riachuelo", "Villa Santa Rita", "Villa Soldati", "Villa Urquiza",
+          "Capital Federal",
+        ],
+      },
+    ],
     prices: { standard: 3100, pro: 2800 },
     colorToken: "zone-1",
     color: themeColor("zone-1"),
@@ -35,6 +51,16 @@ export const ZONES: Record<ZoneId, Zone> = {
       "Vicente López", "San Isidro", "San Fernando", "San Martín",
       "Tres de Febrero", "Morón", "Hurlingham", "Ituzaingó",
       "La Matanza Norte", "Lomas de Zamora", "Lanús", "Avellaneda",
+    ],
+    // La Matanza inside Camino de Cintura (INDEC "La Matanza 1").
+    searchAliases: [
+      {
+        within: "La Matanza Norte",
+        names: [
+          "Aldo Bonzi", "La Tablada", "Lomas del Mirador", "Ramos Mejía", "San Justo", "Tapiales",
+          "Villa Madero", "Villa Luzuriaga", "Matanza 1",
+        ],
+      },
     ],
     prices: { standard: 4000, pro: 3700 },
     colorToken: "zone-2",
@@ -49,6 +75,16 @@ export const ZONES: Record<ZoneId, Zone> = {
       "Moreno", "Merlo", "La Matanza Sur", "Ezeiza", "Esteban Echeverría",
       "Almirante Brown", "Presidente Perón", "Quilmes", "Florencio Varela",
       "Berazategui",
+    ],
+    // La Matanza outside Camino de Cintura (INDEC "La Matanza 2").
+    searchAliases: [
+      {
+        within: "La Matanza Sur",
+        names: [
+          "Ciudad Evita", "González Catán", "Gregorio de Laferrere", "Laferrere", "Isidro Casanova",
+          "Rafael Castillo", "20 de Junio", "Virrey del Pino", "Matanza 2",
+        ],
+      },
     ],
     prices: { standard: 5000, pro: 4700 },
     colorToken: "zone-3",
@@ -106,7 +142,7 @@ export const GEOJSON_DEPARTMENTS: Record<string, { zone: ZoneId; label: string }
   "moron": { zone: "GBA1", label: "Morón" },
   "hurlingham": { zone: "GBA1", label: "Hurlingham" },
   "ituzaingo": { zone: "GBA1", label: "Ituzaingó" },
-  "la matanza": { zone: "GBA1", label: "La Matanza" },
+  "la matanza": { zone: "GBA1", label: "La Matanza Norte" },
   "lomas de zamora": { zone: "GBA1", label: "Lomas de Zamora" },
   "lanus": { zone: "GBA1", label: "Lanús" },
   "avellaneda": { zone: "GBA1", label: "Avellaneda" },
@@ -135,4 +171,29 @@ export const GEOJSON_DEPARTMENTS: Record<string, { zone: ZoneId; label: string }
   "pilar": { zone: "GBA3", label: "Pilar" },
   "san vicente": { zone: "GBA3", label: "San Vicente" },
   "zarate": { zone: "GBA3", label: "Zárate" },
+};
+
+// Departments split in two zones along a road. The generator cuts the polygon with the road
+// line: the piece containing `innerPoint` gets `inner`, the rest gets `outer`.
+export const GEOJSON_SPLITS: Record<string, {
+  road: string;
+  innerPoint: [number, number];
+  inner: { zone: ZoneId; label: string };
+  outer: { zone: ZoneId; label: string };
+}> = {
+  "la matanza": {
+    road: "scripts/data/rp4-camino-de-cintura.geojson",
+    innerPoint: [-58.563, -34.683], // San Justo
+    inner: { zone: "GBA1", label: "La Matanza Norte" },
+    outer: { zone: "GBA2", label: "La Matanza Sur" },
+  },
+};
+
+// Localities priced in a different zone than the partido that contains them on the map.
+// The map shows a note when one of these partidos is selected.
+export const PARTIDO_EXCEPTIONS: Record<string, string[]> = {
+  "Tigre": ["Nordelta"],
+  "Presidente Perón": ["Guernica"],
+  "Esteban Echeverría": ["Canning"],
+  "Ezeiza": ["Canning"],
 };
