@@ -1,0 +1,146 @@
+---
+import { Icon } from "astro-icon/components";
+import Layout from "../layouts/Layout.astro";
+import Container from "../components/container.astro";
+import PageHero from "../components/sections/PageHero.astro";
+import { SITE } from "../data/site";
+
+const localities = ["CABA", "GBA Norte", "GBA Oeste", "GBA Sur", "GBA Este", "La Plata"];
+const volumes = ["Menos de 10 por día", "10 a 50 por día", "50 a 100 por día", "Más de 100 por día"];
+
+const fieldClass =
+  "mt-2 w-full rounded-xl border-ink/15 bg-cream-light px-4 py-3 text-ink placeholder:text-ink/35 focus:border-ink focus:ring-0";
+const labelClass = "eyebrow text-ink/60";
+---
+
+<Layout title="Contacto" description="Completá el formulario y te contactamos por WhatsApp para armar tu propuesta de envíos Flex.">
+  <PageHero eyebrow="Contacto" title={["Contanos", "sobre tu tienda."]} accent={1}>
+    <p>Completá el formulario y te respondemos por WhatsApp con una propuesta a medida.</p>
+  </PageHero>
+
+  <section class="section bg-cream">
+    <Container class="grid gap-16 lg:grid-cols-[1fr_1.6fr]">
+      <aside class="flex flex-col gap-8" data-reveal="up">
+        <div>
+          <p class="eyebrow mb-3 text-ink/50">WhatsApp</p>
+          <a href={SITE.phoneHref} class="font-display text-3xl transition-colors hover:text-brand-blue-500">{SITE.phoneDisplay}</a>
+        </div>
+        <div>
+          <p class="eyebrow mb-3 text-ink/50">Email</p>
+          <a href={`mailto:${SITE.email}`} class="break-all font-display text-2xl transition-colors hover:text-brand-blue-500">{SITE.email}</a>
+        </div>
+        <div>
+          <p class="eyebrow mb-3 text-ink/50">Horario</p>
+          <p class="text-lg">Lunes a sábado</p>
+        </div>
+      </aside>
+
+      <div data-reveal="up" data-delay="0.1">
+        <form id="contact-form" class="grid gap-6 rounded-3xl bg-cream-light p-6 ring-1 ring-ink/10 sm:grid-cols-2 md:p-10" novalidate>
+          <label class="block">
+            <span class={labelClass}>Nombre y apellido *</span>
+            <input name="name" type="text" required autocomplete="name" class={fieldClass} />
+          </label>
+          <label class="block">
+            <span class={labelClass}>Teléfono *</span>
+            <input name="phone" type="tel" required autocomplete="tel" inputmode="tel" pattern="[0-9+\s\-()]{8,}" class={fieldClass} />
+          </label>
+          <label class="block">
+            <span class={labelClass}>Email *</span>
+            <input name="email" type="email" required autocomplete="email" class={fieldClass} />
+          </label>
+          <label class="block">
+            <span class={labelClass}>Nombre de la tienda *</span>
+            <input name="store" type="text" required autocomplete="organization" class={fieldClass} />
+          </label>
+          <label class="block">
+            <span class={labelClass}>Zona de retiro *</span>
+            <select name="locality" required class={fieldClass}>
+              <option value="">Seleccioná una opción</option>
+              {localities.map((item) => <option>{item}</option>)}
+            </select>
+          </label>
+          <label class="block">
+            <span class={labelClass}>Envíos diarios *</span>
+            <select name="volume" required class={fieldClass}>
+              <option value="">Seleccioná una opción</option>
+              {volumes.map((item) => <option>{item}</option>)}
+            </select>
+          </label>
+          <label class="block sm:col-span-2">
+            <span class={labelClass}>Link de tu tienda en Mercado Libre</span>
+            <input name="url" type="url" placeholder="https://" class={fieldClass} />
+          </label>
+          <label class="block sm:col-span-2">
+            <span class={labelClass}>Mensaje</span>
+            <textarea name="message" rows="4" class={fieldClass}></textarea>
+          </label>
+
+          <p id="form-error" class="hidden text-sm text-red-700 sm:col-span-2" role="alert">
+            Revisá los campos marcados con * antes de enviar.
+          </p>
+
+          <button type="submit" class="btn-dark sm:col-span-2">
+            <Icon name="simple-icons:whatsapp" class="h-4 w-4" />
+            Enviar por WhatsApp
+          </button>
+        </form>
+
+        <div id="form-success" class="hidden rounded-3xl bg-ink p-10 text-cream" role="status" tabindex="-1">
+          <p class="eyebrow text-brand-yellow-500">Listo</p>
+          <h2 class="mt-4 font-display text-4xl uppercase">¡Gracias por escribirnos!</h2>
+          <p class="mt-4 text-cream/70">
+            Abrimos WhatsApp con tu consulta. Si no se abrió, <a id="form-fallback" class="text-brand-yellow-500 underline" target="_blank" rel="noopener noreferrer" href="#">tocá acá</a>.
+          </p>
+          <a href="/" class="btn-ghost mt-8">Volver al inicio</a>
+        </div>
+      </div>
+    </Container>
+  </section>
+</Layout>
+
+<script>
+  import { whatsappUrl } from "../data/site";
+
+  const form = document.getElementById("contact-form") as HTMLFormElement;
+  const error = document.getElementById("form-error")!;
+  const success = document.getElementById("form-success")!;
+  const fallback = document.getElementById("form-fallback") as HTMLAnchorElement;
+
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+
+    form.querySelectorAll<HTMLInputElement>("input, select, textarea").forEach((field) => {
+      field.setAttribute("aria-invalid", String(!field.checkValidity()));
+      field.classList.toggle("!border-red-600", !field.checkValidity());
+    });
+
+    if (!form.checkValidity()) {
+      error.classList.remove("hidden");
+      form.querySelector<HTMLElement>(":invalid")?.focus();
+      return;
+    }
+
+    const data = new FormData(form);
+    const value = (key: string) => String(data.get(key) ?? "").trim();
+    const lines = [
+      "Hola FLEXAI, quiero información sobre el servicio de envíos.",
+      `Nombre: ${value("name")}`,
+      `Teléfono: ${value("phone")}`,
+      `Email: ${value("email")}`,
+      `Tienda: ${value("store")}`,
+      `Zona de retiro: ${value("locality")}`,
+      `Envíos diarios: ${value("volume")}`,
+      value("url") && `Link: ${value("url")}`,
+      value("message") && `Mensaje: ${value("message")}`,
+    ].filter(Boolean);
+
+    const url = whatsappUrl(lines.join("\n"));
+    fallback.href = url;
+    window.open(url, "_blank", "noopener");
+
+    form.classList.add("hidden");
+    success.classList.remove("hidden");
+    success.focus();
+  });
+</script>
