@@ -26,8 +26,8 @@ Keep the primary FLEXAI experience on dev/main without public prices or collecti
 
 ## Tasks
 - [x] T1: Restore and verify coverage map behavior. Status: done. Existing map copy changes preserve OFF semantics. Runtime failure recovered by restarting Astro after explicit authorization; independent verification passed. Commit: f131128600a9b2bc41214a6dc02f991310255927.
-- [ ] T2: Consolidate and polish contact/quotation flow. Status: verified, pending commit/review. Finish shared form, deterministic intent handling, validation feedback and styling; preserve recruitment flow; verify messages without sending. Commit: pending.
-- [ ] T3: Make variant copy and independent flags coherent. Status: pending. Fix home CTA, collective gating, price disclosure in OFF output where feasible, remaining about/services copy; verify four flag combinations and final OFF build. Commit: pending.
+- [x] T2: Consolidate and polish contact/quotation flow. Status: done. Shared form/intent/validation/styling verified including independent browser assertions. Commit: 1435e9fbf2c40e090cbee0ba03d6a4cb6c544d95.
+- [ ] T3: Make variant copy and independent flags coherent. Status: verified, pending commit/review. Fix home CTA, collective gating, price disclosure in OFF output where feasible, remaining about/services copy; verify four flag combinations and final OFF build. Commit: pending.
 - [ ] T4: Synchronize branches and start verified comparison previews. Status: pending. Safely integrate shared commits, retain ON config on pricing branch, fast-forward main to validated OFF dev; verify both builds/browser flows and report URLs/commits. Commit: pending.
 
 ## Acceptance and checks
@@ -47,7 +47,7 @@ Read-only audit confirmed collectiveShipping is nested under pricing, ServicesSe
 - RDD mode: on (global). Earlier unrelated adapter issue is historical, not a current result.
 
 ## Next step
-Consolidate contact flow, with seller-only quotation entry, general two-intent contact and reliable validation. Keep services-page legacy form removal in T3 so each committed snapshot remains coherent.
+Finish coherent copy, independent feature gating and legacy services form removal; verify all four configurations and leave flags OFF.
 
 ## T1 evidence
 - RED: Leaflet optimized dependency returned 504 Outdated Optimize Dep; map measured 610x640 but had zero polygons.
@@ -68,3 +68,15 @@ Consolidate contact flow, with seller-only quotation entry, general two-intent c
 - Build (6 pages), npx --no-install tsc --noEmit and git diff --check passed. Mobile390x844 and desktop1440x1000 have no overflow.
 - Parent services-intent browser spot check returned true. LSP probe unsupported (no Astro LSP server); not a clean-diagnostics claim.
 - Browser checks used DOM click/requestSubmit; screenshots returned base64 only, no saved visual evidence. No automated dependency-based test harness added.
+
+- T2 commit 1435e9f includes inherited contact/floating refactor (684 diff lines), kept as one behavior area with its docs. Services-page migration/deleted legacy form remains T3.
+- T2 native review unavailable (review-413f3847284f72e5, no reviewer model); ASSESS unassessable, independent verifier applied. No native verdict/approval.
+- Independent T2 static build/type/diff passed. Old test tab disappeared, then proxy failed because dev server had exited; confirmed no listener on4321, recreated managed dev terminal term_748a7acb-9699-4784-af1e-f6befc2aa5c7. Browser retest then passed all scoped modes, invalid-driver isolation, delivery-error/focus and valid seller payload. No real messages, DOM interactions only.
+
+## T3 evidence
+- RED observed: OFF Ver planes/Tarifas claras, nested collective gating, trailing CTA and downloadable price table. GREEN:20/20 tests across all four flags using isolated builds.
+- Map serializes public data at build time; OFF has no commercial prices/plans, ON preserves all eight amounts. Geometry/data unchanged. Legacy seller form deletion and services link migration consolidated.
+- Tests create isolated fixtures, preserve active flags, and clean only own fixtures by default; explicit FLEXAI_KEEP_VARIANT_FIXTURES=1 retains them. Independent default run20/20 passed and all4 new temp trees disappeared;24 pre-existing fixtures preserved.
+- Writer isolated OFF/ON browser checks passed polygons, zones/search/exceptions/reset and all ON prices/toggle. Actual dev had recurring Leaflet504; parent closed only owned dev terminal and started production preview on4321, terminal term_bb74af70-ae7d-406c-bb4a-bb90ef3054b9. Actual-hostname map then passed53 polygons, no prices, no optimizer URLs.
+- Independent build6pages/type/diff passed. Verifier initially ran tsc concurrently with build and encountered generated-file race; sequential tsc passed. Future checks must be sequential.
+- Review workload: inherited migration/deletion plus matrix test totals480 source/test diff lines, slightly above400, one bounded variant behavior unit; no unrelated expansion.

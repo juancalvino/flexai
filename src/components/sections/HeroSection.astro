@@ -3,6 +3,7 @@ import Container from "../container.astro";
 import Lines from "../ui/Lines.astro";
 import ImageSlot from "../ui/ImageSlot.astro";
 import { whatsappUrl, DEFAULT_WHATSAPP_MESSAGE } from "../../data/site";
+import { FEATURES } from "../../data/features";
 ---
 
 <section class="relative flex min-h-[100svh] flex-col overflow-hidden bg-ink text-cream">
@@ -32,7 +33,7 @@ import { whatsappUrl, DEFAULT_WHATSAPP_MESSAGE } from "../../data/site";
         <a href={whatsappUrl(DEFAULT_WHATSAPP_MESSAGE)} target="_blank" rel="noopener noreferrer" class="btn-primary">
           Hablanos
         </a>
-        <a href="/servicios" class="btn-ghost">Ver tarifas</a>
+        <a href="/servicios" class="btn-ghost">{FEATURES.pricing ? "Ver tarifas" : "Ver servicios"}</a>
       </div>
     </div>
   </Container>
