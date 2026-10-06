@@ -4,7 +4,7 @@
 
 export const FEATURES: { pricing: boolean; collectiveShipping: boolean } = {
   /** Show Standard/Pro prices per zone in /servicios and the coverage map. */
-  pricing: false,
+  pricing: true,
   /** Show the collective shipping call-to-action. */
-  collectiveShipping: false,
+  collectiveShipping: true,
 };
