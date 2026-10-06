@@ -28,7 +28,7 @@ Keep the primary FLEXAI experience on dev/main without public prices or collecti
 - [x] T1: Restore and verify coverage map behavior. Status: done. Existing map copy changes preserve OFF semantics. Runtime failure recovered by restarting Astro after explicit authorization; independent verification passed. Commit: f131128600a9b2bc41214a6dc02f991310255927.
 - [x] T2: Consolidate and polish contact/quotation flow. Status: done. Shared form/intent/validation/styling verified including independent browser assertions. Commit: 1435e9fbf2c40e090cbee0ba03d6a4cb6c544d95.
 - [x] T3: Make variant copy and independent flags coherent. Status: done. Independent flags/copy and price-free OFF client output verified; matrix20/20 and browser passed. Commit: 83591bf5507793c928f011bdbb3e04cb0fd1e0b4.
-- [ ] T4: Synchronize branches and start verified comparison previews. Status: in_progress. Safely integrate shared commits, retain ON config on pricing branch, fast-forward main to validated OFF dev; verify both builds/browser flows and report URLs/commits. Commit: pending.
+- [x] T4: Synchronize branches and start verified comparison previews. Status: done. Shared commits integrated, main fast-forwarded to OFF dev, pricing keeps ON configuration, both production previews verified. Work-unit integration commit: 1575061b3a60953e8008320721a0d3ec91c67fed; final evidence synchronized separately.
 
 ## Acceptance and checks
 - Browser map: nonzero dimensions, initialized Leaflet, visible polygons, no initialization exception; search/zone/reset and responsive layout work.
@@ -47,7 +47,7 @@ Read-only audit confirmed collectiveShipping is nested under pricing, ServicesSe
 - RDD mode: on (global). Earlier unrelated adapter issue is historical, not a current result.
 
 ## Next step
-Create separate same-clone pricing worktree, merge shared commits retaining ON configuration, fast-forward main to OFF dev, validate both final builds/browser previews and report URLs.
+Human comparison: open the two local previews below. Keep their terminal tabs running. Push/PR/publication remain unrequested. Native review may be revisited only after reviewer configuration is available; no approval claimed.
 
 ## T1 evidence
 - RED: Leaflet optimized dependency returned 504 Outdated Optimize Dep; map measured 610x640 but had zero polygons.
@@ -82,3 +82,28 @@ Create separate same-clone pricing worktree, merge shared commits retaining ON c
 - Review workload: inherited migration/deletion plus matrix test totals480 source/test diff lines, slightly above400, one bounded variant behavior unit; no unrelated expansion.
 
 - T3 commit83591bf finalized the variant unit. Native review unavailable (review-7915c4b2cc98b872), no configured reviewer model, no approval. ASSESS unassessable; independent20/20/build/type/browser verification already passed same source candidate. Parent browser spot check confirmed53 polygons, plans:null, noPrices:true.
+
+## T4 progress
+- Created Orca worktree /Users/juanmanuelcalvino/orca/workspaces/flexai/flexai-pricing-preview, switched to existing feat/precios-standar-pro and merged shared dev commits without rewriting history. Integration commit1575061b3a60953e8008320721a0d3ec91c67fed.
+- dev/main synchronized at5f07dcabcdc2985ff8984279a8ef161f4b4ae01c before final evidence docs. Only branch content difference is src/data/features.ts (+2/-2).
+- Pricing worktree has independent node_modules installed via npm ci --ignore-scripts --no-audit --no-fund --prefer-offline; lock unchanged. Build6pages/type/diff passed.
+- Both production previews live: OFF http://127.0.0.1:4321/servicios (also original Orca proxy), ON http://127.0.0.1:4322/servicios. Owned terminal handles term_bb74af70-ae7d-406c-bb4a-bb90ef3054b9 and term_8967f7eb-4910-4c7a-94cd-cf2e85ecc971. No push/publication.
+- Independent Orca final DOM/handler smoke passed both variants: coherent pages, quotation navigation, contact modes,53 polygons, OFF price-free data, ON3100->2800 and Quilmes4700/reset, mobile/desktop dimensions without DOM overflow.
+- Native ON-config review unavailable (review-b6040dd4f5df8831; missing model); ASSESS medium with conservative small-profile bias requests independent verifier, already running/completed functional checks. No native approval or acknowledgement.
+- Resolved verification uncertainty: Orca trusted clicks/captures were unreliable. Independent Chrome verification below confirmed actual pointer behavior and mobile layout using cached Playwright1.61.1, without repo dependency changes.
+
+## Final independent Chrome evidence
+- Command: node /tmp/flexai-browser-check.PNQ0HX/verify.cjs (temporary script, cached Playwright1.61.1, own isolated headless Chrome; no install/user profile). Contexts set before navigation at1440x1000 and390x844.
+- OFF/ON at both sizes:53 interactive polygons; real locator.click CABA updates AMBA->CABA. OFF shows Consultar without prices/plan controls.
+- ON at both sizes: actual pointer Pro changes3100->2800; native datalist Enter on Quilmes resolves GBA2/4700; real reset restores AMBA, clears query and deselects zones. No force/DOM-click fallback.
+- Both mobile contact viewports: header y=0,height80 before/after natural wheel scroll, width390, no overflowing controls or blank665px region. Parent visually inspected off-mobile-contact-form.png and on-mobile-coverage.png. Desktop contact renders normally.
+- Earlier case-sensitive accessible-name/text test assumptions failed; corrected selectors/assertions passed. No source defect inferred from those test probes. Zero pageerrors; no submissions or WhatsApp navigation. Own browser instances closed, preview servers retained.
+- Evidence: /tmp/flexai-browser-check.PNQ0HX/{inspection.json,interactions.json,case-assertion-probe.json}; viewport screenshots in same directory. Full-page captures while scrolled are not evidence for fixed-navbar position.
+
+## Final comparison and limitations
+- Primary: main/dev, pricing=false and collectiveShipping=false; http://127.0.0.1:4321/servicios and /cobertura. Existing Orca proxy remains http://flexai.orca.localhost:59170/.
+- Alternate: feat/precios-standar-pro, both true; http://127.0.0.1:4322/servicios and /cobertura.
+- Automated regression matrix20/20, build6pages and sequential TypeScript/diff checks passed; real Chrome map interactions and responsive visuals passed for both variants.
+- Native review unavailable for all4 work-unit candidates (review-reliability model missing); no native verdict/acknowledgement. Independent verification applied, no global tooling changed.
+- Astro LSP unavailable (no configured server). Browserslist17-month freshness warning retained. Local Vercel analytics script returns404; tile ERR_ABORTED samples observed during browser testing, with no map blocker reproduced. No claim of comprehensive network audit.
+- No push, publication or real WhatsApp message. Pre-existing .codegraph remains untracked and excluded. No unrelated source changes left pending.
