@@ -1,32 +1,59 @@
-# Feature: Standard/Pro pricing & quote forms
+# Feature: Comparable pricing variants
 
-## Goal
+## Objective
+Keep the primary FLEXAI experience on dev/main without public prices or collective shipping, and keep feat/precios-standar-pro with both enabled. Share the same reliable map, contact form and coherent Spanish copy. Start two simultaneous local previews after validation.
 
-Show Standard/Pro prices and collective shipping only on a dedicated pricing branch.
-Hide prices (show "Consultar") on `dev` and `main`, and replace the "Consultar" click
-with a focused seller quote form. Enhance the driver intake form on `/contacto`.
+## Reconciled baseline
+- dev: d2cd355 added independent pricing/collectiveShipping flags (both OFF).
+- feat/precios-standar-pro: 310ed05 enabled both flags; baseline branch delta is only src/data/features.ts.
+- main: e834948, ancestor of dev; origin/main ee20e63 is 28 commits ahead of main and one behind dev. No remote mutation requested.
+- Pending shared edits include ContactForm extraction, SellerQuoteForm deletion, contact/floating choices, copy and map guards. Preserve them; exclude pre-existing .codegraph/.
+- Older tasks described an inline form/modal; these are superseded by navigation to /contacto?intent=services.
+- Previous builds/curl checks are not browser proof and do not prove the latest ON state.
+- User explicitly authorized local work-unit commits, main synchronization and both previews; no push/publication.
 
-## Branch strategy
-
-- `dev` / `main`: `FEATURES.pricing = false`, `FEATURES.collectiveShipping = false`.
-- `feat/precios-standar-pro`: both flags `true`.
+## Scope and constraints
+- Primary configuration: pricing=false, collectiveShipping=false. Alternate: both true.
+- Flags remain independent; verify mixed configurations too.
+- No Standard/Pro cards, thresholds, public-price promises or collective promotion in the primary rendered UI.
+- Consultar tarifa navigates to Contact with seller intent fixed, without another intent question. Direct /contacto retains both choices; work links select recruitment.
+- Use Contratar el servicio everywhere. No contact-page phone/hours sidebar.
+- Keep seller and driver intake fields and encoded WhatsApp messages; do not send real messages during tests.
+- Do not attribute internal size categories to official Mercado Libre tiers.
+- Diagnose the map from runtime evidence, not HTTP status alone.
+- Single writer at a time; preserve existing changes and branch history. No unrelated environment repair.
+- Review candidates are work-unit commit ranges, not the whole dirty tree/feature branch.
 
 ## Tasks
+- [ ] T1: Restore and verify coverage map behavior. Status: verified, pending commit/review. Existing map copy changes preserve OFF semantics. Runtime-only failure recovered by restarting the confirmed Astro process after explicit authorization. Commit: pending.
+- [ ] T2: Consolidate and polish contact/quotation flow. Status: pending. Finish shared form, deterministic intent handling, validation feedback and styling; preserve recruitment flow; verify messages without sending. Commit: pending.
+- [ ] T3: Make variant copy and independent flags coherent. Status: pending. Fix home CTA, collective gating, price disclosure in OFF output where feasible, remaining about/services copy; verify four flag combinations and final OFF build. Commit: pending.
+- [ ] T4: Synchronize branches and start verified comparison previews. Status: pending. Safely integrate shared commits, retain ON config on pricing branch, fast-forward main to validated OFF dev; verify both builds/browser flows and report URLs/commits. Commit: pending.
 
-1. Add feature flags in `src/data/features.ts`.
-2. Build the focused seller quote form (`src/components/sections/SellerQuoteForm.astro`).
-3. Gate prices + collective shipping and mount the quote form in `src/pages/servicios.astro`.
-4. Gate prices/toggle/chips in `src/components/GeoJSONMap.astro`.
-5. Enhance driver intake fields in `src/pages/contacto.astro`.
-6. Verify build with flags off (no prices in `dist/`).
-7. Create the pricing branch with flags on and verify build (prices present).
+## Acceptance and checks
+- Browser map: nonzero dimensions, initialized Leaflet, visible polygons, no initialization exception; search/zone/reset and responsive layout work.
+- Browser contact: direct/services/work entry, native validation plus required checkbox groups, no irrelevant required fields; stub window.open and inspect encoded WhatsApp payload.
+- Build/type/diff checks per work unit, plus focused regression evidence. Use meaningful RED/GREEN for deterministic behavior fixes; purely visual changes get browser inspection.
+- Both variant servers stay bound to separate same-clone worktrees and output directories. Compare home, services, coverage and contact at desktop/mobile widths.
+- Main/dev have flags OFF; pricing has ON. Final shared source differences limited to intended configuration.
+- Native review follows user-owned RDD setting; record declined/unavailable checks truthfully and run required independent verification.
 
-## Form fields
+## Analysis
+Read-only audit confirmed collectiveShipping is nested under pricing, ServicesSection always says Ver planes, ContactForm initializes intent twice, /nosotros contains unconditional Tarifas claras, and existing OFF client bundle contains price data. Map root cause is not yet established. No test runner currently declared. Orca is running with browser automation available.
 
-- Seller: zona, tamaño de paquete (Pequeño/Mediano/Grande, within Mercado Envíos Flex limits), paquetes/día, empresa.
-- Driver: zona de origen, zona de interés, vehículo, tamaño de vehículo, disponibilidad (días + horario).
+## Verification evidence
+- Initial read-only ancestry: main...origin/main = 0/28; origin/main...dev = 0/1; dev...pricing = 0/1; main is an ancestor of dev.
+- Existing branch diff: only src/data/features.ts (two booleans).
+- RDD mode: on (global). Earlier unrelated adapter issue is historical, not a current result.
 
-## Verification
+## Next step
+Commit/review the verified map work unit, then consolidate contact flow.
 
-- `npm run build` must pass on both flag states.
-- `grep` of `dist/` must show no price strings when flags are off, and prices present when on.
+## T1 evidence
+- RED: Leaflet optimized dependency returned 504 Outdated Optimize Dep; map measured 610x640 but had zero polygons.
+- Recovery: user chose A; stopped only confirmed Astro PID26089 and restarted managed terminal term_9796dec7-cced-4e15-a889-e8337152fd4d on 4321. No geometry fix needed.
+- GREEN: unchanged initialization loads 53 polygons; all zone buttons, Quilmes/Tigre, ambiguous La Matanza, Ramos Mejia/Gonzalez Catan, unknown locality, reset geometry and mobile polygon selection passed.
+- Responsive: 390x844 gives map350x440; desktop1440x1000 gives map896x640. No captured interaction errors.
+- npm run build, npx --no-install tsc --noEmit and git diff --check passed. Build did not reintroduce the optimizer failure. Browserslist freshness warning nonblocking.
+- Parent reran exact original browser initialization assertion: PASS.
+- Pricing ON interaction verification remains T3/T4.

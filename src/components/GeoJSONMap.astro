@@ -77,7 +77,11 @@ const localityOptions = [
     <div aria-live="polite">
       <p class="eyebrow text-cream/40">Zona</p>
       <h2 id="zone-title" class="mt-2 font-display text-4xl uppercase">AMBA</h2>
-      <p id="zone-description" class="mt-1 text-cream/60">Tocá el mapa, buscá tu localidad o elegí una zona para ver la tarifa.</p>
+          <p id="zone-description" class="mt-1 text-cream/60">
+            {FEATURES.pricing
+              ? "Tocá el mapa, buscá tu localidad o elegí una zona para ver la tarifa."
+              : "Tocá el mapa, buscá tu localidad o elegí una zona para consultar la tarifa."}
+          </p>
       <p id="zone-note" class="mt-3 hidden rounded-xl bg-accent/10 px-4 py-3 text-sm text-accent"></p>
 
           {FEATURES.pricing && (
@@ -485,7 +489,9 @@ const localityOptions = [
   $("map-reset").addEventListener("click", () => {
     selected = null;
     title.textContent = "AMBA";
-    description.textContent = "Tocá el mapa, buscá tu localidad o elegí una zona para ver la tarifa.";
+        description.textContent = FEATURES.pricing
+          ? "Tocá el mapa, buscá tu localidad o elegí una zona para ver la tarifa."
+          : "Tocá el mapa, buscá tu localidad o elegí una zona para consultar la tarifa.";
     if (FEATURES.pricing) priceWrap.classList.add("hidden");
     localitiesWrap.classList.add("hidden");
     searchInput.value = "";
