@@ -4,13 +4,16 @@ import Container from "../container.astro";
 import Sectionhead from "../sectionhead.astro";
 import ImageSlot from "../ui/ImageSlot.astro";
 import { SERVICES } from "../../data/services";
+import { FEATURES } from "../../data/features";
 ---
 
 <section class="section bg-ink text-cream" id="servicios">
   <Container>
     <div class="mb-20 flex flex-col gap-10 md:flex-row md:items-end md:justify-between">
       <Sectionhead eyebrow="Servicios" title={["Todo lo que tu", "tienda necesita", "para vender más."]} tone="dark" accent={1} />
-      <a href="/servicios" class="btn-ghost shrink-0 self-start md:self-auto" data-reveal="fade">Ver planes y tarifas</a>
+      <a href={FEATURES.pricing ? "/servicios#tarifas" : "/contacto?intent=services"} class="btn-ghost shrink-0 self-start md:self-auto" data-reveal="fade">
+        {FEATURES.pricing ? "Ver planes y tarifas" : "Contactanos"}
+      </a>
     </div>
 
     <ol class="flex flex-col gap-6 md:gap-10">

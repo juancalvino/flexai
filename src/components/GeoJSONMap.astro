@@ -1,7 +1,19 @@
 ---
 import { Icon } from "astro-icon/components";
-import { ZONE_LIST, formatPrice } from "../data/zones";
+import { ZONE_LIST, PLANS, PARTIDO_EXCEPTIONS, formatPrice } from "../data/zones";
 import { FEATURES } from "../data/features";
+
+// Serialize only the public variant. The browser never imports the commercial table.
+const mapData = {
+  zones: ZONE_LIST.map(({ prices, ...zone }) => ({
+    ...zone,
+    ...(FEATURES.pricing ? {
+      prices: { standard: formatPrice(prices.standard), pro: formatPrice(prices.pro) },
+    } : {}),
+  })),
+  plans: FEATURES.pricing ? { standard: PLANS.standard.name, pro: PLANS.pro.name } : null,
+  exceptions: PARTIDO_EXCEPTIONS,
+};
 
 const localityOptions = [
   ...new Set(
@@ -15,7 +27,7 @@ const localityOptions = [
 
 <div class="grid gap-6 lg:grid-cols-[1fr_400px]">
   <div class="relative isolate min-h-[440px] overflow-hidden rounded-3xl ring-1 ring-cream/10 md:min-h-[640px]">
-    <div id="coverage-map" class="absolute inset-0 bg-ink-soft" aria-label="Mapa de cobertura AMBA"></div>
+    <div id="coverage-map" data-map={JSON.stringify(mapData)} class="absolute inset-0 bg-ink-soft" aria-label="Mapa de cobertura AMBA"></div>
     <p id="map-status" class="pointer-events-none absolute inset-0 z-[500] flex items-center justify-center text-cream/50">Cargando mapa…</p>
 
     <button
@@ -77,7 +89,11 @@ const localityOptions = [
     <div aria-live="polite">
       <p class="eyebrow text-cream/40">Zona</p>
       <h2 id="zone-title" class="mt-2 font-display text-4xl uppercase">AMBA</h2>
-      <p id="zone-description" class="mt-1 text-cream/60">Tocá el mapa, buscá tu localidad o elegí una zona para ver la tarifa.</p>
+          <p id="zone-description" class="mt-1 text-cream/60">
+            {FEATURES.pricing
+              ? "Tocá el mapa, buscá tu localidad o elegí una zona para ver la tarifa."
+              : "Tocá el mapa, buscá tu localidad o elegí una zona para consultar la tarifa."}
+          </p>
       <p id="zone-note" class="mt-3 hidden rounded-xl bg-accent/10 px-4 py-3 text-sm text-accent"></p>
 
           {FEATURES.pricing && (
@@ -225,9 +241,8 @@ const localityOptions = [
   import L from "leaflet";
   import "leaflet/dist/leaflet.css";
   import type { FeatureCollection } from "geojson";
-  import { ZONES, ZONE_LIST, PLANS, PARTIDO_EXCEPTIONS, formatPrice, type PlanId, type ZoneId } from "../data/zones";
+  import type { Zone, PlanId, ZoneId } from "../data/zones";
   import { whatsappUrl } from "../data/site";
-  import { FEATURES } from "../data/features";
 
   // Leaflet writes colors as SVG attributes, which can't use var(): resolve theme tokens once.
   const rootStyle = getComputedStyle(document.documentElement);
@@ -235,6 +250,14 @@ const localityOptions = [
     `rgb(${rootStyle.getPropertyValue(`--color-${token}`).trim().split(/\s+/).join(", ")})`;
 
   const $ = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T;
+
+  type MapZone = Omit<Zone, "prices"> & { prices?: Record<PlanId, string> };
+  const { zones: ZONE_LIST, plans, exceptions: PARTIDO_EXCEPTIONS } = JSON.parse($("coverage-map").dataset["map"]!) as {
+    zones: MapZone[];
+    plans: Record<PlanId, string> | null;
+    exceptions: Record<string, string[]>;
+  };
+  const ZONES = Object.fromEntries(ZONE_LIST.map((zone) => [zone.id, zone])) as Record<ZoneId, MapZone>;
 
   const status = $("map-status");
   const title = $("zone-title");
@@ -299,13 +322,13 @@ const localityOptions = [
 
   function render() {
     planButtons.forEach((button) => button.setAttribute("aria-pressed", String(button.dataset["plan"] === plan)));
-        zoneButtons.forEach((button) => {
-          button.setAttribute("aria-pressed", String(button.dataset["zone"] === selected?.zone));
-          if (FEATURES.pricing) {
-            const label = button.querySelector<HTMLElement>(".zone-btn-price")!;
-            label.textContent = label.dataset[plan] ?? "";
-          }
-        });
+    zoneButtons.forEach((button) => {
+      button.setAttribute("aria-pressed", String(button.dataset["zone"] === selected?.zone));
+      if (plans) {
+        const label = button.querySelector<HTMLElement>(".zone-btn-price")!;
+        label.textContent = label.dataset[plan] ?? "";
+      }
+    });
     paintMap();
 
     summary.classList.toggle("hidden", !selected);
@@ -315,7 +338,9 @@ const localityOptions = [
     const exceptions = selected && !selected.within ? (PARTIDO_EXCEPTIONS[selected.place] ?? []) : [];
     const notes = exceptions.flatMap((name) => {
       const exception = localityZone.get(normalize(name));
-      return exception && exception.zone !== selected?.zone ? [`${name} tiene tarifa ${ZONES[exception.zone].name}.`] : [];
+      return exception && exception.zone !== selected?.zone
+        ? [plans ? `${name} tiene tarifa ${ZONES[exception.zone].name}.` : `${name} pertenece a la zona ${ZONES[exception.zone].name}.`]
+        : [];
     });
     note.textContent = notes.join(" ");
     note.classList.toggle("hidden", notes.length === 0);
@@ -330,15 +355,15 @@ const localityOptions = [
     title.textContent = isZoneOnly ? zone.name : selected.place;
     const area = selected.within ? `${selected.within} · ${zone.name}` : `${zone.name} · ${zone.description}`;
     description.textContent = isZoneOnly ? zone.description : area;
-        if (FEATURES.pricing) {
-          planLabel.textContent = PLANS[plan].name;
-          price.textContent = formatPrice(zone.prices[plan]);
-          priceWrap.classList.remove("hidden");
-        }
+    if (plans) {
+      planLabel.textContent = plans[plan];
+      price.textContent = zone.prices?.[plan] ?? "";
+      priceWrap.classList.remove("hidden");
+    }
 
-        summaryPlace.textContent = title.textContent;
-        summaryZone.textContent = FEATURES.pricing ? `${zone.name} · ${PLANS[plan].name}` : zone.name;
-        summaryPrice.textContent = FEATURES.pricing ? price.textContent : "Consultar";
+    summaryPlace.textContent = title.textContent;
+    summaryZone.textContent = plans ? `${zone.name} · ${plans[plan]}` : zone.name;
+    summaryPrice.textContent = plans ? price.textContent : "Consultar";
 
     localitiesCount.textContent = String(zone.localities.length);
     localities.replaceChildren(
@@ -352,11 +377,11 @@ const localityOptions = [
     localitiesWrap.classList.remove("hidden");
 
     const place = isZoneOnly ? zone.name : `${selected.place} (${zone.name})`;
-        cta.href = whatsappUrl(
-          FEATURES.pricing
-            ? `Hola FLEXAI, quiero información del plan ${PLANS[plan].name} para ${place}.`
-            : `Hola FLEXAI, quiero consultar la tarifa para ${place}.`,
-        );
+    cta.href = whatsappUrl(
+      plans
+        ? `Hola FLEXAI, quiero información del plan ${plans[plan]} para ${place}.`
+        : `Hola FLEXAI, quiero consultar la tarifa para ${place}.`,
+    );
   }
 
   function focusSelection() {
@@ -485,8 +510,10 @@ const localityOptions = [
   $("map-reset").addEventListener("click", () => {
     selected = null;
     title.textContent = "AMBA";
-    description.textContent = "Tocá el mapa, buscá tu localidad o elegí una zona para ver la tarifa.";
-    if (FEATURES.pricing) priceWrap.classList.add("hidden");
+    description.textContent = plans
+      ? "Tocá el mapa, buscá tu localidad o elegí una zona para ver la tarifa."
+      : "Tocá el mapa, buscá tu localidad o elegí una zona para consultar la tarifa.";
+    if (plans) priceWrap.classList.add("hidden");
     localitiesWrap.classList.add("hidden");
     searchInput.value = "";
     render();
