@@ -27,8 +27,8 @@ Keep the primary FLEXAI experience on dev/main without public prices or collecti
 ## Tasks
 - [x] T1: Restore and verify coverage map behavior. Status: done. Existing map copy changes preserve OFF semantics. Runtime failure recovered by restarting Astro after explicit authorization; independent verification passed. Commit: f131128600a9b2bc41214a6dc02f991310255927.
 - [x] T2: Consolidate and polish contact/quotation flow. Status: done. Shared form/intent/validation/styling verified including independent browser assertions. Commit: 1435e9fbf2c40e090cbee0ba03d6a4cb6c544d95.
-- [ ] T3: Make variant copy and independent flags coherent. Status: verified, pending commit/review. Fix home CTA, collective gating, price disclosure in OFF output where feasible, remaining about/services copy; verify four flag combinations and final OFF build. Commit: pending.
-- [ ] T4: Synchronize branches and start verified comparison previews. Status: pending. Safely integrate shared commits, retain ON config on pricing branch, fast-forward main to validated OFF dev; verify both builds/browser flows and report URLs/commits. Commit: pending.
+- [x] T3: Make variant copy and independent flags coherent. Status: done. Independent flags/copy and price-free OFF client output verified; matrix20/20 and browser passed. Commit: 83591bf5507793c928f011bdbb3e04cb0fd1e0b4.
+- [ ] T4: Synchronize branches and start verified comparison previews. Status: in_progress. Safely integrate shared commits, retain ON config on pricing branch, fast-forward main to validated OFF dev; verify both builds/browser flows and report URLs/commits. Commit: pending.
 
 ## Acceptance and checks
 - Browser map: nonzero dimensions, initialized Leaflet, visible polygons, no initialization exception; search/zone/reset and responsive layout work.
@@ -47,7 +47,7 @@ Read-only audit confirmed collectiveShipping is nested under pricing, ServicesSe
 - RDD mode: on (global). Earlier unrelated adapter issue is historical, not a current result.
 
 ## Next step
-Finish coherent copy, independent feature gating and legacy services form removal; verify all four configurations and leave flags OFF.
+Create separate same-clone pricing worktree, merge shared commits retaining ON configuration, fast-forward main to OFF dev, validate both final builds/browser previews and report URLs.
 
 ## T1 evidence
 - RED: Leaflet optimized dependency returned 504 Outdated Optimize Dep; map measured 610x640 but had zero polygons.
@@ -80,3 +80,5 @@ Finish coherent copy, independent feature gating and legacy services form remova
 - Writer isolated OFF/ON browser checks passed polygons, zones/search/exceptions/reset and all ON prices/toggle. Actual dev had recurring Leaflet504; parent closed only owned dev terminal and started production preview on4321, terminal term_bb74af70-ae7d-406c-bb4a-bb90ef3054b9. Actual-hostname map then passed53 polygons, no prices, no optimizer URLs.
 - Independent build6pages/type/diff passed. Verifier initially ran tsc concurrently with build and encountered generated-file race; sequential tsc passed. Future checks must be sequential.
 - Review workload: inherited migration/deletion plus matrix test totals480 source/test diff lines, slightly above400, one bounded variant behavior unit; no unrelated expansion.
+
+- T3 commit83591bf finalized the variant unit. Native review unavailable (review-7915c4b2cc98b872), no configured reviewer model, no approval. ASSESS unassessable; independent20/20/build/type/browser verification already passed same source candidate. Parent browser spot check confirmed53 polygons, plans:null, noPrices:true.
