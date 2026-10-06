@@ -1,23 +1,133 @@
 ---
 import { Icon } from "astro-icon/components";
-import { whatsappUrl, DEFAULT_WHATSAPP_MESSAGE } from "../../data/site";
 ---
 
-<a
-  id="whatsapp-float"
-  href={whatsappUrl(DEFAULT_WHATSAPP_MESSAGE)}
-  target="_blank"
-  rel="noopener noreferrer"
-  aria-label="Escribinos por WhatsApp"
-  class="fixed bottom-[calc(1.25rem+env(safe-area-inset-bottom))] right-5 z-40 flex h-14 w-14 translate-y-24 items-center justify-center rounded-full bg-[#25D366] text-white opacity-0 shadow-lg shadow-black/20 transition-[transform,opacity] duration-500 ease-out-expo hover:scale-110 data-[visible]:translate-y-0 data-[visible]:opacity-100 md:bottom-8 md:right-8"
->
-  <Icon name="simple-icons:whatsapp" class="h-7 w-7" />
-</a>
+<div class="fixed bottom-[calc(1.25rem+env(safe-area-inset-bottom))] right-5 z-40 flex flex-col items-end gap-3 md:bottom-8 md:right-8">
+  <div
+    id="whatsapp-popup"
+    role="dialog"
+    aria-label="Opciones de contacto por WhatsApp"
+    hidden
+    class="wa-popup w-[min(20rem,calc(100vw-2.5rem))] rounded-2xl bg-cream p-3 shadow-xl shadow-black/20 ring-1 ring-ink/10"
+  >
+    <p class="eyebrow mb-2 px-1 text-ink/50">¿Cómo podemos ayudarte?</p>
+    <div class="grid gap-2">
+      <a
+        href="/contacto?intent=services"
+        class="group flex items-start gap-3 rounded-xl border border-ink/15 bg-cream-light px-4 py-3 transition-colors hover:border-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+      >
+        <Icon name="simple-icons:whatsapp" class="mt-0.5 h-5 w-5 shrink-0 text-[#25D366]" />
+        <span>
+          <span class="block font-display text-sm font-medium uppercase tracking-wider text-ink group-hover:text-secondary">Contratar el servicio</span>
+          <span class="block text-sm text-ink/60">Quiero enviar con FLEXAI</span>
+        </span>
+      </a>
+      <a
+        href="/contacto?intent=work"
+        class="group flex items-start gap-3 rounded-xl border border-ink/15 bg-cream-light px-4 py-3 transition-colors hover:border-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+      >
+        <Icon name="simple-icons:whatsapp" class="mt-0.5 h-5 w-5 shrink-0 text-[#25D366]" />
+        <span>
+          <span class="block font-display text-sm font-medium uppercase tracking-wider text-ink group-hover:text-secondary">Trabajar con nosotros</span>
+          <span class="block text-sm text-ink/60">Quiero ser parte del equipo</span>
+        </span>
+      </a>
+    </div>
+  </div>
+
+  <button
+    id="whatsapp-float"
+    type="button"
+    aria-haspopup="dialog"
+    aria-controls="whatsapp-popup"
+    aria-expanded="false"
+    aria-label="Abrir opciones de contacto por WhatsApp"
+    class="flex h-14 w-14 translate-y-24 items-center justify-center rounded-full bg-[#25D366] text-white opacity-0 shadow-lg shadow-black/20 transition-[transform,opacity] duration-500 ease-out-expo hover:scale-110 data-[visible]:translate-y-0 data-[visible]:opacity-100"
+  >
+    <Icon name="simple-icons:whatsapp" class="h-7 w-7" />
+  </button>
+</div>
+
+<style>
+  .wa-popup {
+    transform-origin: bottom right;
+    animation: wa-pop-in 0.18s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  @keyframes wa-pop-in {
+    from {
+      opacity: 0;
+      transform: translateY(0.5rem) scale(0.96);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+</style>
 
 <script>
+  const button = document.getElementById("whatsapp-float") as HTMLButtonElement;
+  const popup = document.getElementById("whatsapp-popup") as HTMLElement;
+  const wrapper = button.parentElement as HTMLElement;
+  const choices = Array.from(popup.querySelectorAll<HTMLElement>('a[href]'));
+
+  const setExpanded = (open: boolean) => {
+    button.setAttribute("aria-expanded", String(open));
+    button.setAttribute(
+      "aria-label",
+      open ? "Cerrar opciones de contacto por WhatsApp" : "Abrir opciones de contacto por WhatsApp"
+    );
+  };
+
+  const open = () => {
+    popup.hidden = false;
+    setExpanded(true);
+    choices[0]?.focus();
+  };
+
+  const close = (returnFocus = false) => {
+    popup.hidden = true;
+    setExpanded(false);
+    // Only move focus back to the trigger while it is actually on screen.
+    if (returnFocus && button.hasAttribute("data-visible")) button.focus();
+  };
+
+  button.addEventListener("click", () => {
+    if (popup.hidden) open();
+    else close(true);
+  });
+
   // Shown after the first screen so it never covers the hero call to action.
-  const button = document.getElementById("whatsapp-float")!;
-  const update = () => button.toggleAttribute("data-visible", window.scrollY > window.innerHeight * 0.6);
+  // Dismiss the popup too if the trigger scrolls back out of view.
+  const update = () => {
+    const visible = window.scrollY > window.innerHeight * 0.6;
+    button.toggleAttribute("data-visible", visible);
+    if (!visible && !popup.hidden) close(false);
+  };
   update();
   window.addEventListener("scroll", update, { passive: true });
+
+  // Escape works from either the trigger or the popup.
+  wrapper.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && !popup.hidden) {
+      event.preventDefault();
+      close(true);
+    }
+  });
+
+  // Non-modal dialog: let Tab leave freely and dismiss once focus exits the control.
+  wrapper.addEventListener("focusout", (event) => {
+    const next = event.relatedTarget;
+    if (!popup.hidden && (!(next instanceof Node) || !wrapper.contains(next))) {
+      close(false);
+    }
+  });
+
+  // Close when interacting outside the floating control and its popup.
+  document.addEventListener("click", (event) => {
+    if (!popup.hidden && event.target instanceof Node && !wrapper.contains(event.target)) {
+      close(false);
+    }
+  });
 </script>

@@ -25,8 +25,8 @@ Keep the primary FLEXAI experience on dev/main without public prices or collecti
 - Review candidates are work-unit commit ranges, not the whole dirty tree/feature branch.
 
 ## Tasks
-- [ ] T1: Restore and verify coverage map behavior. Status: verified, pending commit/review. Existing map copy changes preserve OFF semantics. Runtime-only failure recovered by restarting the confirmed Astro process after explicit authorization. Commit: pending.
-- [ ] T2: Consolidate and polish contact/quotation flow. Status: pending. Finish shared form, deterministic intent handling, validation feedback and styling; preserve recruitment flow; verify messages without sending. Commit: pending.
+- [x] T1: Restore and verify coverage map behavior. Status: done. Existing map copy changes preserve OFF semantics. Runtime failure recovered by restarting Astro after explicit authorization; independent verification passed. Commit: f131128600a9b2bc41214a6dc02f991310255927.
+- [ ] T2: Consolidate and polish contact/quotation flow. Status: verified, pending commit/review. Finish shared form, deterministic intent handling, validation feedback and styling; preserve recruitment flow; verify messages without sending. Commit: pending.
 - [ ] T3: Make variant copy and independent flags coherent. Status: pending. Fix home CTA, collective gating, price disclosure in OFF output where feasible, remaining about/services copy; verify four flag combinations and final OFF build. Commit: pending.
 - [ ] T4: Synchronize branches and start verified comparison previews. Status: pending. Safely integrate shared commits, retain ON config on pricing branch, fast-forward main to validated OFF dev; verify both builds/browser flows and report URLs/commits. Commit: pending.
 
@@ -47,7 +47,7 @@ Read-only audit confirmed collectiveShipping is nested under pricing, ServicesSe
 - RDD mode: on (global). Earlier unrelated adapter issue is historical, not a current result.
 
 ## Next step
-Commit/review the verified map work unit, then consolidate contact flow.
+Consolidate contact flow, with seller-only quotation entry, general two-intent contact and reliable validation. Keep services-page legacy form removal in T3 so each committed snapshot remains coherent.
 
 ## T1 evidence
 - RED: Leaflet optimized dependency returned 504 Outdated Optimize Dep; map measured 610x640 but had zero polygons.
@@ -57,3 +57,14 @@ Commit/review the verified map work unit, then consolidate contact flow.
 - npm run build, npx --no-install tsc --noEmit and git diff --check passed. Build did not reintroduce the optimizer failure. Browserslist freshness warning nonblocking.
 - Parent reran exact original browser initialization assertion: PASS.
 - Pricing ON interaction verification remains T3/T4.
+
+- T1 independent verification: build/type/diff passed; real browser 53 interactive polygons, OFF guidance, GBA1 -> Quilmes/GBA2 -> reset passed. Orca ref-click acknowledgements did not change state; DOM .click() exercised handlers. Tested dirty live checkout, not isolated commit.
+- T1 native review unavailable: review-9c508578851f6438 is still reviewing, no verdict/acknowledgement. Host relay lacks configured review-reliability model. No global configuration changed. ASSESS unassessable; mandated independent verifier completed above.
+
+## T2 evidence
+- RED: services entry exposed two redundant intent choices. GREEN: seller entry locked, intent selector hidden and disabled; direct/work/malformed query handling passed.
+- One effective intent now governs visibility/constraints/payload; checkbox errors are associated and focus the first invalid control.
+- Seller/driver/non-driver WhatsApp payloads checked with window.open stubbed. No messages sent.
+- Build (6 pages), npx --no-install tsc --noEmit and git diff --check passed. Mobile390x844 and desktop1440x1000 have no overflow.
+- Parent services-intent browser spot check returned true. LSP probe unsupported (no Astro LSP server); not a clean-diagnostics claim.
+- Browser checks used DOM click/requestSubmit; screenshots returned base64 only, no saved visual evidence. No automated dependency-based test harness added.
