@@ -1,6 +1,7 @@
 ---
 import { Icon } from "astro-icon/components";
 import { ZONE_LIST, formatPrice } from "../data/zones";
+import { FEATURES } from "../data/features";
 
 const localityOptions = [
   ...new Set(
@@ -66,10 +67,12 @@ const localityOptions = [
       <p id="search-feedback" class="mt-2 hidden text-sm text-cream/50" role="status"></p>
     </form>
 
-    <div class="grid grid-cols-2 rounded-full bg-ink p-1" role="group" aria-label="Plan">
-      <button type="button" class="plan-btn rounded-full py-2.5 font-display text-sm uppercase tracking-wider" data-plan="standard" aria-pressed="true">Standard</button>
-      <button type="button" class="plan-btn rounded-full py-2.5 font-display text-sm uppercase tracking-wider" data-plan="pro" aria-pressed="false">Pro</button>
-    </div>
+        {FEATURES.pricing && (
+          <div class="grid grid-cols-2 rounded-full bg-ink p-1" role="group" aria-label="Plan">
+            <button type="button" class="plan-btn rounded-full py-2.5 font-display text-sm uppercase tracking-wider" data-plan="standard" aria-pressed="true">Standard</button>
+            <button type="button" class="plan-btn rounded-full py-2.5 font-display text-sm uppercase tracking-wider" data-plan="pro" aria-pressed="false">Pro</button>
+          </div>
+        )}
 
     <div aria-live="polite">
       <p class="eyebrow text-cream/40">Zona</p>
@@ -77,11 +80,13 @@ const localityOptions = [
       <p id="zone-description" class="mt-1 text-cream/60">Tocá el mapa, buscá tu localidad o elegí una zona para ver la tarifa.</p>
       <p id="zone-note" class="mt-3 hidden rounded-xl bg-accent/10 px-4 py-3 text-sm text-accent"></p>
 
-      <div id="zone-price-wrap" class="mt-6 hidden border-y border-cream/10 py-5">
-        <p class="eyebrow text-cream/40">Tarifa por paquete · <span id="zone-plan">Standard</span></p>
-        <p id="zone-price" class="mt-2 font-display text-5xl text-accent"></p>
-        <p class="mt-1 text-xs text-cream/40">IVA no incluido</p>
-      </div>
+          {FEATURES.pricing && (
+            <div id="zone-price-wrap" class="mt-6 hidden border-y border-cream/10 py-5">
+              <p class="eyebrow text-cream/40">Tarifa por paquete · <span id="zone-plan">Standard</span></p>
+              <p id="zone-price" class="mt-2 font-display text-5xl text-accent"></p>
+              <p class="mt-1 text-xs text-cream/40">IVA no incluido</p>
+            </div>
+          )}
     </div>
 
     <details id="zone-localities-wrap" class="group hidden">
@@ -106,9 +111,13 @@ const localityOptions = [
                 <span class="h-3 w-3 shrink-0 rounded-full ring-1 ring-cream/30" style={`background:${zone.color}`} />
                 <span class="font-display uppercase">{zone.name}</span>
               </span>
-              <span class="zone-btn-price text-sm text-cream/50" data-standard={formatPrice(zone.prices.standard)} data-pro={formatPrice(zone.prices.pro)}>
-                {formatPrice(zone.prices.standard)}
-              </span>
+                  {FEATURES.pricing ? (
+                    <span class="zone-btn-price text-sm text-cream/50" data-standard={formatPrice(zone.prices.standard)} data-pro={formatPrice(zone.prices.pro)}>
+                      {formatPrice(zone.prices.standard)}
+                    </span>
+                  ) : (
+                    <span class="zone-btn-price text-sm text-cream/50">Consultar</span>
+                  )}
             </button>
           </li>
         ))
@@ -218,6 +227,7 @@ const localityOptions = [
   import type { FeatureCollection } from "geojson";
   import { ZONES, ZONE_LIST, PLANS, PARTIDO_EXCEPTIONS, formatPrice, type PlanId, type ZoneId } from "../data/zones";
   import { whatsappUrl } from "../data/site";
+  import { FEATURES } from "../data/features";
 
   // Leaflet writes colors as SVG attributes, which can't use var(): resolve theme tokens once.
   const rootStyle = getComputedStyle(document.documentElement);
@@ -289,11 +299,13 @@ const localityOptions = [
 
   function render() {
     planButtons.forEach((button) => button.setAttribute("aria-pressed", String(button.dataset["plan"] === plan)));
-    zoneButtons.forEach((button) => {
-      button.setAttribute("aria-pressed", String(button.dataset["zone"] === selected?.zone));
-      const label = button.querySelector<HTMLElement>(".zone-btn-price")!;
-      label.textContent = label.dataset[plan] ?? "";
-    });
+        zoneButtons.forEach((button) => {
+          button.setAttribute("aria-pressed", String(button.dataset["zone"] === selected?.zone));
+          if (FEATURES.pricing) {
+            const label = button.querySelector<HTMLElement>(".zone-btn-price")!;
+            label.textContent = label.dataset[plan] ?? "";
+          }
+        });
     paintMap();
 
     summary.classList.toggle("hidden", !selected);
@@ -318,13 +330,15 @@ const localityOptions = [
     title.textContent = isZoneOnly ? zone.name : selected.place;
     const area = selected.within ? `${selected.within} · ${zone.name}` : `${zone.name} · ${zone.description}`;
     description.textContent = isZoneOnly ? zone.description : area;
-    planLabel.textContent = PLANS[plan].name;
-    price.textContent = formatPrice(zone.prices[plan]);
-    priceWrap.classList.remove("hidden");
+        if (FEATURES.pricing) {
+          planLabel.textContent = PLANS[plan].name;
+          price.textContent = formatPrice(zone.prices[plan]);
+          priceWrap.classList.remove("hidden");
+        }
 
-    summaryPlace.textContent = title.textContent;
-    summaryZone.textContent = `${zone.name} · ${PLANS[plan].name}`;
-    summaryPrice.textContent = price.textContent;
+        summaryPlace.textContent = title.textContent;
+        summaryZone.textContent = FEATURES.pricing ? `${zone.name} · ${PLANS[plan].name}` : zone.name;
+        summaryPrice.textContent = FEATURES.pricing ? price.textContent : "Consultar";
 
     localitiesCount.textContent = String(zone.localities.length);
     localities.replaceChildren(
@@ -338,7 +352,11 @@ const localityOptions = [
     localitiesWrap.classList.remove("hidden");
 
     const place = isZoneOnly ? zone.name : `${selected.place} (${zone.name})`;
-    cta.href = whatsappUrl(`Hola FLEXAI, quiero información del plan ${PLANS[plan].name} para ${place}.`);
+        cta.href = whatsappUrl(
+          FEATURES.pricing
+            ? `Hola FLEXAI, quiero información del plan ${PLANS[plan].name} para ${place}.`
+            : `Hola FLEXAI, quiero consultar la tarifa para ${place}.`,
+        );
   }
 
   function focusSelection() {
@@ -468,7 +486,7 @@ const localityOptions = [
     selected = null;
     title.textContent = "AMBA";
     description.textContent = "Tocá el mapa, buscá tu localidad o elegí una zona para ver la tarifa.";
-    priceWrap.classList.add("hidden");
+    if (FEATURES.pricing) priceWrap.classList.add("hidden");
     localitiesWrap.classList.add("hidden");
     searchInput.value = "";
     render();

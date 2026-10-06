@@ -9,13 +9,19 @@ import ContactCta from "../components/sections/ContactCta.astro";
 import { PLANS, ZONE_LIST, formatPrice, type PlanId } from "../data/zones";
 import { DIFFERENTIATORS } from "../data/services";
 import { whatsappUrl } from "../data/site";
+import { FEATURES } from "../data/features";
+import SellerQuoteForm from "../components/sections/SellerQuoteForm.astro";
 
 const planIds: PlanId[] = ["standard", "pro"];
 ---
 
 <Layout title="Servicios y tarifas" description="Planes Standard y Pro para vendedores de Mercado Libre. Tarifas por zona para CABA y GBA, sin costos ocultos.">
   <PageHero eyebrow="Servicios · Tarifas" title={["Tarifas claras.", "Sin sorpresas."]} accent={1}>
-    <p>Elegí el plan según tu volumen diario. Todas las tarifas son por paquete y por zona de entrega.</p>
+        <p>
+          {FEATURES.pricing
+            ? "Elegí el plan según tu volumen diario. Todas las tarifas son por paquete y por zona de entrega."
+            : "Elegí el plan según tu volumen diario y consultá tu tarifa por WhatsApp."}
+        </p>
   </PageHero>
 
   <section class="section bg-cream" id="tarifas">
@@ -47,35 +53,45 @@ const planIds: PlanId[] = ["standard", "pro"];
                   {ZONE_LIST.map((zone) => (
                     <div class="flex items-baseline justify-between py-4">
                       <dt class="font-display text-lg uppercase">{zone.name}</dt>
-                      <dd class="font-display text-3xl">{formatPrice(zone.prices[planId])}</dd>
+                      <dd class="font-display text-3xl">{FEATURES.pricing ? formatPrice(zone.prices[planId]) : "Consultar"}</dd>
                     </div>
                   ))}
                 </dl>
 
-                <a
-                  href={whatsappUrl(`Hola FLEXAI, quiero contratar el plan ${plan.name}.`)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class:list={["mt-10 w-full", featured ? "btn-primary" : "btn-dark"]}
-                >
-                  Quiero el plan {plan.name.split(" ")[0]}
-                </a>
+                    {FEATURES.pricing ? (
+                      <a
+                        href={whatsappUrl(`Hola FLEXAI, quiero contratar el plan ${plan.name}.`)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class:list={["mt-10 w-full", featured ? "btn-primary" : "btn-dark"]}
+                      >
+                        Quiero el plan {plan.name.split(" ")[0]}
+                      </a>
+                    ) : (
+                      <button type="button" data-open-quote class:list={["mt-10 w-full", featured ? "btn-primary" : "btn-dark"]}>
+                        Consultar tarifa
+                      </button>
+                    )}
               </article>
             );
           })
         }
       </div>
-      <p class="mt-6 text-sm text-ink/50">* Precios por paquete. IVA no incluido.</p>
+          {FEATURES.pricing && <p class="mt-6 text-sm text-ink/50">* Precios por paquete. IVA no incluido.</p>}
 
-      <aside class="mt-16 flex flex-col gap-6 rounded-3xl bg-accent p-8 text-accent-contrast md:flex-row md:items-center md:p-12" data-reveal="up">
-        <Icon name="bx:group" class="h-12 w-12 shrink-0" />
-        <div>
-          <h2 class="font-display text-2xl uppercase">Sumá envíos con otros comercios</h2>
-          <p class="mt-2 max-w-3xl text-accent-contrast/75">
-            Si combinás tus envíos con los de comercios cercanos y juntos alcanzan un mayor volumen, pueden acceder a un plan superior con tarifas más bajas.
-          </p>
-        </div>
-      </aside>
+          {!FEATURES.pricing && <SellerQuoteForm />}
+
+          {FEATURES.collectiveShipping && (
+            <aside class="mt-16 flex flex-col gap-6 rounded-3xl bg-accent p-8 text-accent-contrast md:flex-row md:items-center md:p-12" data-reveal="up">
+              <Icon name="bx:group" class="h-12 w-12 shrink-0" />
+              <div>
+                <h2 class="font-display text-2xl uppercase">Sumá envíos con otros comercios</h2>
+                <p class="mt-2 max-w-3xl text-accent-contrast/75">
+                  Si combinás tus envíos con los de comercios cercanos y juntos alcanzan un mayor volumen, pueden acceder a un plan superior con tarifas más bajas.
+                </p>
+              </div>
+            </aside>
+          )}
     </Container>
   </section>
 
