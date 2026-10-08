@@ -1,13 +1,15 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { buildContactMessage, contactFieldError } from "../src/lib/contact-message.ts";
+import * as contactMessage from "../src/lib/contact-message.ts";
+import { SITE } from "../src/data/site.ts";
 
 function intake(extra = {}) {
   const data = new FormData();
   const fields = {
     name: "  Ana Pérez  ", phone: "  11 1234 5678  ", store: " Mi tienda ",
     locality: " Devoto ", volume: "30", deliveryZones: ["CABA", "GBA 1"], size: "Mediano",
-    driver: "yes", originZone: " Villa Luro ", interestZone: "CABA", vehicle: "Auto",
+    position: "STALE_POSITION", driver: "yes", originZone: " Villa Luro ", interestZone: "CABA", vehicle: "Auto",
     vehicleBrand: " Ford ", vehicleModel: " Falcon ", vehicleYear: "1975",
     availabilityDays: ["Lunes", "Viernes"], availabilityTime: "Tarde/noche",
     url: "REMOVED_URL", message: "REMOVED_MESSAGE", workMessage: "REMOVED_WORK", vehicleSize: "REMOVED_SIZE",
@@ -45,6 +47,34 @@ test("non-driver keeps minimum intake without stale driver or seller data", () =
   ].join("\n"));
 });
 
+test("CV email encodes subject and body and includes only applicant fields and attachment instruction", () => {
+  const url = contactMessage.buildCvEmailUrl(intake({
+    name: "  Inés & José\nPérez  ", position: "  Administración & logística\nAMBA  ",
+  }), SITE.email);
+  assert.ok(url.startsWith(`mailto:${SITE.email}?subject=`));
+  assert.ok(url.includes("%26"));
+  assert.ok(url.includes("%0A"));
+  const params = new URL(url).searchParams;
+  assert.deepEqual([...params.keys()], ["subject", "body"]);
+  assert.equal(params.get("subject"), "Postulación: Administración & logística\nAMBA");
+  assert.equal(params.get("body"), [
+    "Hola FLEXAI, quiero postularme para trabajar en el equipo.", "",
+    "Nombre: Inés & José\nPérez", "Puesto: Administración & logística\nAMBA",
+    "Teléfono: 11 1234 5678", "", "Recordá adjuntar tu CV antes de enviar este correo.",
+  ].join("\n"));
+});
+
+test("CV email omits an absent or whitespace-only phone", () => {
+  for (const phone of ["", "  \t\n ", undefined]) {
+    const data = intake({ position: "Depósito", phone: phone ?? "" });
+    if (phone === undefined) data.delete("phone");
+    const body = new URL(contactMessage.buildCvEmailUrl(data, SITE.email)).searchParams.get("body");
+    assert.ok(body.includes("Puesto: Depósito"));
+    assert.ok(!body.includes("Teléfono"));
+    assert.ok(!body.includes("WhatsApp"));
+  }
+});
+
 test("phone is optional and omitted from the message when blank", () => {
   const data = intake({ phone: "   " });
   assert.equal(buildContactMessage(data, "services"), [
@@ -74,7 +104,7 @@ test("messages reflect current input, preserve text literally and trim list item
 });
 
 test("required text rejects whitespace but optional text remains optional", () => {
-  for (const name of ["name", "phone", "store", "locality", "originZone", "vehicleBrand", "vehicleModel"]) {
+  for (const name of ["name", "phone", "store", "locality", "originZone", "vehicleBrand", "vehicleModel", "position"]) {
     assert.notEqual(contactFieldError({ name, required: true, value: " \t\n " }), "");
     assert.equal(contactFieldError({ name, required: true, value: " Devoto " }), "");
   }

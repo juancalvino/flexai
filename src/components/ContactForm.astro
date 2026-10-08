@@ -47,7 +47,7 @@ const choiceCardClass =
     <h2 id="contact-form-heading" tabindex="-1" class="scroll-mt-24 font-display text-2xl uppercase tracking-wide">Contanos un poco más</h2>
     <p class="mt-2 text-sm leading-relaxed text-ink/65">{quoteMode
       ? "Completá todos los campos con * para conocer el plan que corresponde a tu volumen. No abriremos WhatsApp hasta que lo elijas."
-      : "Completá los campos con * y prepararemos tu consulta para WhatsApp. Podés revisar el mensaje antes de enviarlo."}</p>
+      : "Completá los campos con * y prepararemos tu mensaje para WhatsApp o, si te postulás a otro puesto, por correo. Podés revisarlo antes de enviarlo."}</p>
   </div>
   {!hideIntent && !selectionMode && (
     <fieldset id="fieldset-intent" class="sm:col-span-2">
@@ -138,6 +138,14 @@ const choiceCardClass =
       </div>
     </fieldset>
 
+    <fieldset id="fieldset-non-driver" class="hidden sm:col-span-2" disabled>
+      <label class="block">
+        <span class={labelClass}>Puesto al que te postulás *</span>
+        <input name="position" type="text" required class={fieldClass} />
+      </label>
+      <p class="mt-3 text-sm leading-relaxed text-ink/60">Se abrirá tu aplicación de correo con tus datos. Adjuntá tu CV manualmente antes de enviarlo.</p>
+    </fieldset>
+
     <fieldset id="fieldset-driver-details" class="hidden grid gap-6 sm:col-span-2 sm:grid-cols-2" disabled>
       <legend class="mb-5 font-display text-lg uppercase tracking-wide">Vehículo y disponibilidad</legend>
       <LocalityAutocomplete name="originZone" label="Barrio / localidad de origen" inputClass={fieldClass} labelClass={labelClass} />
@@ -195,8 +203,14 @@ const choiceCardClass =
   </p>
 
   <button type="submit" disabled class="btn-dark min-h-12 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-secondary sm:col-span-2">
-    {!quoteMode && <Icon name="simple-icons:whatsapp" class="h-4 w-4" />}
-    {quoteMode ? "Ver mi plan" : "Enviar por WhatsApp"}
+    <span id="submit-whatsapp-icon" aria-hidden="true" class:list={[{ hidden: quoteMode }]}><Icon name="simple-icons:whatsapp" class="h-4 w-4" /></span>
+    <span id="submit-email-icon" aria-hidden="true" class="hidden">
+      <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" focusable="false">
+        <rect x="3" y="5" width="18" height="14" rx="2" />
+        <path d="m3 6 9 7 9-7" />
+      </svg>
+    </span>
+    <span id="submit-label">{quoteMode ? "Ver mi plan" : "Enviar por WhatsApp"}</span>
   </button>
   <noscript><p>Activá JavaScript para validar tus datos y preparar tu consulta sin incluirlos en la dirección de esta página.</p></noscript>
 </form>
@@ -205,18 +219,19 @@ const choiceCardClass =
   <p class="eyebrow text-accent">Listo</p>
   <h2 class="mt-4 font-display text-4xl uppercase">¡Gracias por escribirnos!</h2>
   <p class="mt-4 text-cream/70">
-    Tu mensaje está preparado. Revisalo y envialo desde WhatsApp. Si no se abrió, <a id="form-fallback" class="text-accent underline" target="_blank" rel="noopener noreferrer" href="#">tocá acá</a>.
+    <span id="form-success-message">Tu mensaje está preparado. Revisalo y envialo desde WhatsApp.</span> Si no se abrió, <a id="form-fallback" class="text-accent underline" target="_blank" rel="noopener noreferrer" href="#">tocá acá</a>.
   </p>
   <a href="/" class="btn-ghost mt-8">Volver al inicio</a>
 </div>
 
 <script>
-  import { whatsappUrl } from "../data/site";
-  import { buildContactMessage, contactFieldError } from "../lib/contact-message";
+  import { SITE, whatsappUrl } from "../data/site";
+  import { buildContactMessage, buildCvEmailUrl, contactFieldError } from "../lib/contact-message";
 
   const form = document.getElementById("contact-form") as HTMLFormElement;
   const error = document.getElementById("form-error")!;
   const success = document.getElementById("form-success")!;
+  const successMessage = document.getElementById("form-success-message")!;
   const fallback = document.getElementById("form-fallback") as HTMLAnchorElement;
   const quoteMode = form.dataset.quoteMode === "true";
   const result = document.getElementById("qualified-result");
@@ -226,6 +241,7 @@ const choiceCardClass =
   const servicesFieldset = document.getElementById("fieldset-services") as HTMLFieldSetElement;
   const workFieldset = document.getElementById("fieldset-work") as HTMLFieldSetElement;
   const driverDetailsFieldset = document.getElementById("fieldset-driver-details") as HTMLFieldSetElement;
+  const nonDriverFieldset = document.getElementById("fieldset-non-driver") as HTMLFieldSetElement;
 
   const parseIntent = (value: string | null | undefined) =>
     value === "services" || value === "work" ? value : undefined;
@@ -238,6 +254,9 @@ const choiceCardClass =
   const heading = document.getElementById("contact-form-heading")!;
   const choices = selectionMode ? Array.from(document.querySelectorAll<HTMLAnchorElement>("[data-contact-intent]")) : [];
   const submitButton = form.querySelector<HTMLButtonElement>('button[type="submit"]')!;
+  const submitLabel = document.getElementById("submit-label")!;
+  const whatsappIcon = document.getElementById("submit-whatsapp-icon")!;
+  const emailIcon = document.getElementById("submit-email-icon")!;
   const intentFieldset = document.getElementById("fieldset-intent") as HTMLFieldSetElement | null;
   if (intentFieldset) {
     intentFieldset.classList.toggle("hidden", locked);
@@ -283,6 +302,12 @@ const choiceCardClass =
     const showDriver = intent === "work" && driver === "yes";
     driverDetailsFieldset.disabled = !showDriver;
     driverDetailsFieldset.classList.toggle("hidden", !showDriver);
+    const showNonDriver = intent === "work" && driver === "no";
+    nonDriverFieldset.disabled = !showNonDriver;
+    nonDriverFieldset.classList.toggle("hidden", !showNonDriver);
+    submitLabel.textContent = quoteMode ? "Ver mi plan" : showNonDriver ? "Enviar CV" : "Enviar por WhatsApp";
+    whatsappIcon.classList.toggle("hidden", quoteMode || showNonDriver);
+    emailIcon.classList.toggle("hidden", quoteMode || !showNonDriver);
     submitted = false;
     validate(false);
   };
@@ -357,7 +382,11 @@ const choiceCardClass =
       if (qualified.defaultPrevented) form.classList.add("hidden");
       return;
     }
-    const url = whatsappUrl(buildContactMessage(data, intent));
+    const sendCv = intent === "work" && data.get("driver") === "no";
+    const url = sendCv ? buildCvEmailUrl(data, SITE.email) : whatsappUrl(buildContactMessage(data, intent));
+    successMessage.textContent = sendCv
+      ? "Tu correo está preparado. Adjuntá tu CV, revisá tus datos y envialo desde tu aplicación de correo."
+      : "Tu mensaje está preparado. Revisalo y envialo desde WhatsApp.";
     fallback.href = url;
     window.open(url, "_blank", "noopener");
 

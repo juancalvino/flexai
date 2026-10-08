@@ -3,6 +3,8 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 import { runInNewContext } from "node:vm";
 import ts from "typescript";
+import * as contactMessage from "../src/lib/contact-message.ts";
+import { SITE, whatsappUrl } from "../src/data/site.ts";
 
 const resultSource = await readFile(new URL("../src/components/QualifiedPlanResult.astro", import.meta.url), "utf8");
 const resultTemplate = (name) => resultSource.match(new RegExp(`<template data-result-template="${name}">([\\s\\S]*?)<\\/template>`))?.[1] ?? "";
@@ -194,8 +196,10 @@ function contactController({ search = "", selectionMode = true, presetIntent, qu
   };
   const elements = Object.fromEntries([
     "contact-form", "form-error", "form-success", "form-fallback", "fieldset-services",
-    "fieldset-work", "fieldset-driver-details", "formulario", "contact-form-heading",
+    "fieldset-work", "fieldset-driver-details", "fieldset-non-driver", "formulario", "contact-form-heading",
+    "submit-label", "submit-whatsapp-icon", "submit-email-icon", "form-success-message",
   ].map((id) => [id, node(id)]));
+  elements["fieldset-non-driver"].disabled = true;
   const form = elements["contact-form"];
   form.dataset = { selectionMode: String(selectionMode), presetIntent, quoteMode: String(quoteMode), hideIntent: String(Boolean(presetIntent)) };
   const section = elements.formulario;
@@ -208,11 +212,19 @@ function contactController({ search = "", selectionMode = true, presetIntent, qu
   driver.parent = elements["fieldset-work"];
   const origin = node("originZone");
   origin.parent = elements["fieldset-driver-details"];
-  const controls = [name, store, driver, origin];
+  const nonDriver = node("non-driver");
+  nonDriver.value = "no";
+  nonDriver.parent = elements["fieldset-work"];
+  const position = node("position");
+  position.required = true;
+  position.parent = elements["fieldset-non-driver"];
+  const phone = node("phone");
+  const controls = [name, store, driver, origin, nonDriver, position, phone];
+  controls.forEach((field) => { field.name = field === nonDriver ? "driver" : field.id; });
   const submit = node("submit");
   submit.disabled = true;
   form.querySelectorAll = (selector) => ({
-    'input[name="intent"]': [], 'input[name="driver"]': [driver],
+    'input[name="intent"]': [], 'input[name="driver"]': [driver, nonDriver],
     "input, select": controls, "[data-required-group]": [],
   })[selector] ?? [];
   form.querySelector = (selector) => selector.includes("submit") ? submit : name;
@@ -254,9 +266,20 @@ function contactController({ search = "", selectionMode = true, presetIntent, qu
       history: { replaceState: (_state, _title, url) => urls.push(String(url)) },
     },
     requestAnimationFrame: (callback) => frames.push(callback), URLSearchParams,
-    contactFieldError: (field) => field.value === "invalid" ? "Revisá este dato" : "",
-    FormData: class {}, buildContactMessage: (_data, intent) => intent,
-    whatsappUrl: (message) => `https://wa.me/test?text=${message}`,
+    ...contactMessage, SITE, whatsappUrl,
+    contactFieldError: (field) => field.value === "invalid" ? "Revisá este dato" : contactMessage.contactFieldError(field),
+    FormData: class {
+      constructor() {
+        this.data = new FormData();
+        for (const field of controls) {
+          if (!field.matches(":disabled") && (field.name !== "driver" || field.checked)) {
+            this.data.append(field.name, field.value);
+          }
+        }
+      }
+      get(key) { return this.data.get(key); }
+      getAll(key) { return this.data.getAll(key); }
+    },
   };
   for (const controller of [script, floatingSource.match(/<script>([\s\S]*?)<\/script>/)[1]]) {
     runInNewContext(ts.transpileModule(controller, {
@@ -265,9 +288,115 @@ function contactController({ search = "", selectionMode = true, presetIntent, qu
   }
   return {
     elements, form, section, choices, floatingChoices, button, popup, controls, submit, actions, urls, opens,
+    driver, nonDriver, position, phone,
     flush: () => { while (frames.length) frames.shift()(); },
   };
 }
+
+test("non-driver markup has a disabled required position and separate accessible CTA icons", () => {
+  assert.match(source, /<fieldset id="fieldset-non-driver"[^>]*class="hidden[^>]*disabled>/);
+  assert.match(input("position"), /type="text"/);
+  assert.match(input("position"), /\brequired\b/);
+  assert.match(source, /Puesto al que te postulás \*/);
+  for (const id of ["submit-whatsapp-icon", "submit-email-icon"]) {
+    assert.match(source, new RegExp(`<span id="${id}"[^>]*aria-hidden="true"`));
+  }
+  assert.match(source, /id="submit-whatsapp-icon"[\s\S]*?simple-icons:whatsapp/);
+  assert.match(source, /id="submit-email-icon"[^>]*>[\s\S]*?<svg/);
+  assert.doesNotMatch(source, /type="file"|fetch\(/);
+});
+
+function selectDriver(ui, isDriver) {
+  ui.driver.checked = isDriver;
+  ui.nonDriver.checked = !isDriver;
+  (isDriver ? ui.driver : ui.nonDriver).emit("change");
+}
+
+function assertCta(ui, label, email = false, quote = false) {
+  assert.equal(ui.elements["submit-label"].textContent, label);
+  assert.equal(ui.elements["submit-email-icon"].classList.contains("hidden"), !email || quote);
+  assert.equal(ui.elements["submit-whatsapp-icon"].classList.contains("hidden"), email || quote);
+}
+
+test("non-driver switches position and email CTA immediately, preserving typed values and quote CTA", () => {
+  const ui = contactController({ search: "?intent=work" });
+  assertCta(ui, "Enviar por WhatsApp");
+  assert.equal(ui.elements["fieldset-non-driver"].disabled, true);
+  selectDriver(ui, false);
+  assertCta(ui, "Enviar CV", true);
+  assert.equal(ui.elements["fieldset-non-driver"].disabled, false);
+  assert.equal(ui.elements["fieldset-non-driver"].classList.contains("hidden"), false);
+  ui.position.value = "Administración";
+  for (const switchTo of [() => selectDriver(ui, true), () => ui.choices[0].emit("click")]) {
+    switchTo();
+    assertCta(ui, "Enviar por WhatsApp");
+    assert.equal(ui.elements["fieldset-non-driver"].disabled, true);
+    assert.equal(ui.elements["fieldset-non-driver"].classList.contains("hidden"), true);
+    ui.choices[1].emit("click");
+    selectDriver(ui, false);
+    assert.equal(ui.position.value, "Administración");
+    assertCta(ui, "Enviar CV", true);
+  }
+  const plans = contactController({ presetIntent: "services", quoteMode: true });
+  assertCta(plans, "Ver mi plan", false, true);
+});
+
+test("non-driver rejects blank position, focuses it, and hands a valid email to the client and fallback", () => {
+  const ui = contactController({ search: "?intent=work" });
+  ui.controls[0].value = "Ana Pérez";
+  ui.controls[1].value = "HIDDEN_STORE";
+  ui.controls[3].value = "HIDDEN_ORIGIN";
+  selectDriver(ui, false);
+  for (const blank of ["", "  \t "]) {
+    ui.position.value = blank;
+    ui.form.emit("submit");
+    assert.equal(ui.opens.length, 0);
+    assert.equal(ui.position.getAttribute("aria-invalid"), "true");
+    assert.deepEqual(ui.actions.slice(-2), ["focus:position", "validity:position"]);
+  }
+  ui.position.value = "Depósito & logística";
+  ui.phone.value = "11 1234 5678";
+  ui.form.emit("input");
+  assert.equal(ui.position.getAttribute("aria-invalid"), "false");
+  assert.equal(ui.opens.length, 0);
+  ui.form.emit("submit");
+  assert.equal(ui.opens.length, 1);
+  const url = ui.opens[0];
+  assert.ok(url.startsWith(`mailto:${SITE.email}?`));
+  const body = new URL(url).searchParams.get("body");
+  assert.match(body, /Nombre: Ana Pérez/);
+  assert.match(body, /Puesto: Depósito & logística/);
+  assert.match(body, /Teléfono: 11 1234 5678/);
+  assert.doesNotMatch(body, /HIDDEN_|Vehículo|Empresa/);
+  assert.equal(ui.elements["form-fallback"].href, url);
+  assert.equal(ui.form.classList.contains("hidden"), true);
+  assert.equal(ui.elements["form-success"].classList.contains("hidden"), false);
+  assert.match(ui.elements["form-success-message"].textContent, /[Aa]djuntá tu CV/);
+  assert.match(ui.elements["form-success-message"].textContent, /correo/);
+  assert.doesNotMatch(ui.elements["form-success-message"].textContent, /WhatsApp|enviado/);
+  assert.equal(ui.actions.at(-1), "focus:form-success");
+});
+
+test("switching back to seller or driver keeps WhatsApp handoff and ignores stale position", () => {
+  for (const intent of ["services", "work"]) {
+    const ui = contactController({ search: "?intent=work" });
+    ui.controls[0].value = "Ana";
+    selectDriver(ui, false);
+    ui.position.value = "STALE_POSITION";
+    ui.form.emit("submit");
+    if (intent === "services") ui.choices[0].emit("click");
+    else { ui.choices[1].emit("click"); selectDriver(ui, true); }
+    ui.form.emit("submit");
+    const url = ui.opens.at(-1);
+    assert.ok(url.startsWith("https://wa.me/"));
+    const message = new URL(url).searchParams.get("text");
+    assert.doesNotMatch(message, /STALE_POSITION|Puesto:|adjunt/);
+    assert.match(message, intent === "services" ? /servicio de envíos/ : /conductor\/a/);
+    assert.equal(ui.elements["form-fallback"].href, url);
+    assert.match(ui.elements["form-success-message"].textContent, /WhatsApp/);
+    assert.doesNotMatch(ui.elements["form-success-message"].textContent, /CV/);
+  }
+});
 
 test("direct and malformed contact URLs keep both intents unselected and disabled", () => {
   for (const search of ["", "?intent=bogus", "?intent=", "?intent=Services"]) {
@@ -369,7 +498,7 @@ test("floating reselect and switches clear stale success, preserve data, and clo
     assert.equal(ui.popup.hidden, true);
     assert.equal(ui.button.getAttribute("aria-expanded"), "false");
     assert.equal(ui.urls.at(-1), choice.href);
-    assert.deepEqual(ui.controls.map((field) => field.value), ["Ana", "Mi tienda", "yes", "Devoto"]);
+    assert.deepEqual(ui.controls.slice(0, 4).map((field) => field.value), ["Ana", "Mi tienda", "yes", "Devoto"]);
     assert.equal(ui.controls[2].checked, true);
     for (const link of [...ui.choices, ...ui.floatingChoices]) {
       assert.equal(link.getAttribute("aria-expanded"), String(link.dataset.contactIntent === intent));

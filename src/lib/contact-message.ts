@@ -61,6 +61,23 @@ export function buildContactMessage(
   return lines.join("\n");
 }
 
+/** Prepare a draft only; mailto cannot attach a CV or send the email. */
+export function buildCvEmailUrl(data: FormData, recipient: string): string {
+  const value = (key: string) => String(data.get(key) ?? "").trim();
+  const position = value("position");
+  const subject = `Postulación: ${position}`;
+  const lines = [
+    "Hola FLEXAI, quiero postularme para trabajar en el equipo.",
+    "",
+    `Nombre: ${value("name")}`,
+    `Puesto: ${position}`,
+  ];
+  const phone = value("phone");
+  if (phone) lines.push(`Teléfono: ${phone}`);
+  lines.push("", "Recordá adjuntar tu CV antes de enviar este correo.");
+  return `mailto:${recipient}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(lines.join("\n"))}`;
+}
+
 /** Supplements native constraints; callers skip disabled controls. */
 export function contactFieldError(
   field: { name: string; required: boolean; value: string },
