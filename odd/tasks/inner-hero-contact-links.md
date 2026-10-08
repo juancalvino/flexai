@@ -13,7 +13,7 @@ Keep the initial /nosotros and /planes viewport blue without the next cream sect
 ## Tasks
 - [x] T1 — Finish viewport-height heroes and shared floating-contact intent behavior. Status: verified and committed. Work-unit commit: 69f23aeac87b8b329940ec738b262c82918b27db.
 - [x] T2 — Synchronize and audit desktop/mobile behavior in both variants; fix evidenced defects. Status: verified and committed. Work-unit commit: 69f23aeac87b8b329940ec738b262c82918b27db.
-- [ ] T3 — Commit no-plans work to dev and create feat/with-plans from final dev with plans enabled. Status: in_progress; verified shared work preserved on backup/verified-pricing-before-with-plans. Preserve main and original pricing branch, no push.
+- [x] T3 — Integrate shared work into dev without prices and create feat/with-plans from dev with plans enabled. Status: independently verified and committed. Dev configuration: 0f30301160642bf4fdf1e6d4605d44f051d59c67. Plans activation: 4867ec9a7d72bdb0a2491dae70c70c26696893a8.
 
 ## Checks
 - Deterministic RED/GREEN for opt-in/default hero contracts and shared contact-choice wiring.
@@ -56,4 +56,12 @@ Keep the initial /nosotros and /planes viewport blue without the next cream sect
 - NativeASSESS unavailable dueundeclareduntrackedfiles; independentverification performed underhighriskfallback. Nativepreflightstillpending; no nativeapprovalclaimed.
 
 ## Next step
-Native preflight completed: human declined this exact shared candidate; no lineage created or native approval claimed. Independent high-risk fallback verification passed. Shared work committed as69f23ae on backup/verified-pricing-before-with-plans, old pricing/main unchanged. Safely stash only known OFF source/test/task scopes (retain stash as recovery backup), fast-forward dev to the verified shared commit, and restore its already-verified pricing:false state in a separate commit. Create feat/with-plans from that dev and enable its single pricing flag. Finish ancestry/parity verification and record work-unit evidence; task bookkeeping may then be merged forward without changing application bytes.
+Local delivery is complete. Push, PR, merge to main and imagery completion remain human decisions; none were performed.
+
+## Delivery evidence
+- Shared implementation: 69f23aeac87b8b329940ec738b262c82918b27db. Recovery branch backup/verified-pricing-before-with-plans remains at ef9f2b63fcd618cc0d72dba6750359c2d0cf3433.
+- Dev was fast-forwarded to the verified shared work, then pricing disabled in 0f30301160642bf4fdf1e6d4605d44f051d59c67. Plans branch was created directly from that commit and enabled in 4867ec9a7d72bdb0a2491dae70c70c26696893a8. This passive completion record is merged forward afterward, without application changes.
+- Independent final verification reran 62/62 focused tests in each root, confirmed all 48 source/test files match the verified work unit (OFF differs only by the pricing boolean), and verified clean tracked worktrees/indexes. The entire branch-tree difference is that one boolean. Existing /servicios and /planes previews on4321/OFF and4322/ON return200 and expose the correct quote/form mode.
+- Main remains98eeac5b1d30afea9a1d941f8a44453e81d45538; old feat/precios-standar-pro remainsa36a75df4055410ec7bfeadf3cef5ebc15c16499. OFF's unrelated .codegraph stays untracked and untouched. Scoped pre-integration OFF recovery stash77b2353a509aad454bcf0d1aefeae82ed77ed269 retained; do not reapply blindly because its application changes are integrated.
+- Human declined native review separately for the shared candidate, OFF flag, ON flag and the explicit post-commit reminder targetsha256:bfbf618f8909bf1a9406e28f94a0ba8a5ae1d062669e7ea63d9a8a40edb2b45b. No lineage or native approval was created. Independent verification is the evidence; review decline did not authorize delivery (the user's explicit local-integration instruction did).
+- Final limitations: Chrome emulation, not Safari or physical devices; image placeholders intentional. One initial browser timeout passed on bounded retry. No outstanding confirmed defect in the audited scope.
