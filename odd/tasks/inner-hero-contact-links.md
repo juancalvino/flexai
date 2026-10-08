@@ -11,9 +11,9 @@ Keep the initial /nosotros and /planes viewport blue without the next cream sect
 - User explicitly authorized mobile audit/fixes and local integration: no-plans in dev, plans on new feat/with-plans based on final dev. Necessary local work-unit commits/branch operations are now authorized; preserve original pricing branch until verified. This supersedes earlier no-commit constraints for current delivery only.
 
 ## Tasks
-- [ ] T1 — Finish viewport-height heroes and shared floating-contact intent behavior. Status: verified; awaiting authorized work-unit commit. Commit: pending delivery.
-- [ ] T2 — Synchronize and audit desktop/mobile behavior in both variants; fix evidenced defects. Status: in_progress; implementation and independent verification passed. Commit: pending delivery.
-- [ ] T3 — Commit no-plans work to dev and create feat/with-plans from final dev with plans enabled. Status: pending. Preserve main and original pricing branch, no push.
+- [x] T1 — Finish viewport-height heroes and shared floating-contact intent behavior. Status: verified and committed. Work-unit commit: 69f23aeac87b8b329940ec738b262c82918b27db.
+- [x] T2 — Synchronize and audit desktop/mobile behavior in both variants; fix evidenced defects. Status: verified and committed. Work-unit commit: 69f23aeac87b8b329940ec738b262c82918b27db.
+- [ ] T3 — Commit no-plans work to dev and create feat/with-plans from final dev with plans enabled. Status: in_progress; verified shared work preserved on backup/verified-pricing-before-with-plans. Preserve main and original pricing branch, no push.
 
 ## Checks
 - Deterministic RED/GREEN for opt-in/default hero contracts and shared contact-choice wiring.
@@ -56,4 +56,4 @@ Keep the initial /nosotros and /planes viewport blue without the next cream sect
 - NativeASSESS unavailable dueundeclareduntrackedfiles; independentverification performed underhighriskfallback. Nativepreflightstillpending; no nativeapprovalclaimed.
 
 ## Next step
-Complete native preflight, then commit verified OFF work to dev, preserve ON snapshot on a backup branch without moving old pricing, and create feat/with-plans from dev with only pricing enabled. Recheck final ancestry/parity and record commit evidence. Main and unrelated files remain untouched; no push.
+Native preflight completed: human declined this exact shared candidate; no lineage created or native approval claimed. Independent high-risk fallback verification passed. Shared work committed as69f23ae on backup/verified-pricing-before-with-plans, old pricing/main unchanged. Safely stash only known OFF source/test/task scopes (retain stash as recovery backup), fast-forward dev to the verified shared commit, and restore its already-verified pricing:false state in a separate commit. Create feat/with-plans from that dev and enable its single pricing flag. Finish ancestry/parity verification and record work-unit evidence; task bookkeeping may then be merged forward without changing application bytes.
