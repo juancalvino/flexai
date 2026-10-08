@@ -10,8 +10,8 @@ Make the “Buscá tu localidad” dropdown on `/cobertura` visually consistent 
 - Apply shared source/tests to `dev` without prices and `feat/with-plans` with prices, preserving only `src/data/features.ts` as branch difference. Preserve `main`, old pricing branch, backup/stash and OFF `.codegraph/`; no push or real contact messages.
 
 ## Tasks
-- [ ] T1 — Implement accessible, styled coverage combobox with test-first map behavior guards. Status: in_progress. Work-unit commit: pending.
-- [ ] T2 — Change phone label and fix measured same-row form alignment, with tests and visual verification. Status: pending. Work-unit commit: pending.
+- [x] T1 — Implement accessible, styled coverage combobox with test-first map behavior guards. Status: verified and committed. Work-unit commit: `7e605a0201dd63e281e23b163d725e20a423b5b1`.
+- [ ] T2 — Change phone label and fix measured same-row form alignment, with tests and visual verification. Status: in_progress; baseline deltas measured. Work-unit commit: pending.
 - [ ] T3 — Independently verify both variants and integrate local branches with price-flag-only parity. Status: pending. Merge/work-unit commit: pending.
 
 ## Checks
