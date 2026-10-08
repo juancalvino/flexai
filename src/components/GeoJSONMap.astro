@@ -55,18 +55,30 @@ const localityOptions = [
     <form id="locality-search" class="relative" role="search">
       <label for="locality-input" class="eyebrow text-cream/40">Buscá tu localidad</label>
       <div class="relative mt-2">
-        <Icon name="bx:search" class="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-cream/40" />
-        <input
-          id="locality-input"
-          list="locality-options"
-          autocomplete="off"
-          placeholder="Ej: Quilmes, Pilar, Tigre…"
-          class="w-full rounded-full border-cream/15 bg-ink py-3 pl-12 pr-4 text-cream placeholder:text-cream/30 focus:border-accent focus:ring-0"
-        />
+        <div class="relative">
+          <Icon name="bx:search" class="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-cream/40" />
+          <input
+            id="locality-input"
+            role="combobox"
+            aria-controls="locality-options"
+            aria-expanded="false"
+            aria-autocomplete="list"
+            aria-describedby="search-feedback"
+            autocomplete="off"
+            placeholder="Ej: Quilmes, Pilar, Tigre…"
+            class="w-full rounded-full border-cream/15 bg-ink py-3 pl-12 pr-4 text-cream placeholder:text-cream/30 focus:border-accent focus:ring-0"
+          />
+        </div>
+        <ul
+          id="locality-options"
+          role="listbox"
+          aria-label="Localidades"
+          data-localities={JSON.stringify(localityOptions)}
+          data-lenis-prevent
+          hidden
+          class="static lg:absolute lg:inset-x-0 lg:top-full z-20 mt-2 max-h-64 touch-pan-y overflow-y-auto overflow-x-hidden overscroll-contain rounded-2xl border border-cream/15 bg-ink p-1.5 text-cream shadow-xl shadow-black/25"
+        ></ul>
       </div>
-      <datalist id="locality-options">
-        {localityOptions.map((name) => <option value={name} />)}
-      </datalist>
       <p id="search-feedback" class="mt-2 hidden text-sm text-cream/50" role="status"></p>
     </form>
 
@@ -224,6 +236,11 @@ const localityOptions = [
   const searchForm = $<HTMLFormElement>("locality-search");
   const searchInput = $<HTMLInputElement>("locality-input");
   const searchFeedback = $("search-feedback");
+  const searchOptions = $("locality-options");
+  const suggestionNames = JSON.parse(searchOptions.dataset["localities"]!) as string[];
+  let activeSuggestion = -1;
+  let visibleSuggestions: string[] = [];
+  let committedSearchValue: string | null = null;
   const note = $("zone-note");
   const summary = $("map-summary");
   const summaryPlace = $("map-summary-place");
@@ -334,7 +351,51 @@ const localityOptions = [
     }),
   );
 
-  function searchLocality() {
+  function clearSearchFeedback() {
+    searchFeedback.classList.add("hidden");
+    searchFeedback.textContent = "";
+  }
+
+  function closeSuggestions() {
+    searchOptions.hidden = true;
+    searchInput.setAttribute("aria-expanded", "false");
+    searchInput.removeAttribute("aria-activedescendant");
+    activeSuggestion = -1;
+    visibleSuggestions = [];
+    searchOptions.replaceChildren();
+  }
+
+  function chooseSuggestion(name: string) {
+    searchInput.value = name;
+    searchLocality();
+  }
+
+  function showSuggestions() {
+    closeSuggestions();
+    const query = normalize(searchInput.value);
+    if (!query) return;
+    // Only the popup is capped: the resolver below always searches the full map.
+    visibleSuggestions = suggestionNames.filter((name) => normalize(name).includes(query)).slice(0, 8);
+    searchOptions.replaceChildren(...visibleSuggestions.map((name, index) => {
+      const option = document.createElement("li");
+      option.id = `locality-option-${index}`;
+      option.setAttribute("role", "option");
+      option.setAttribute("aria-selected", "false");
+      option.className = "flex min-h-[44px] cursor-pointer items-center whitespace-normal break-words rounded-xl px-3 py-2 text-sm leading-snug transition-colors hover:bg-accent/10 hover:text-accent aria-selected:bg-accent/15 aria-selected:text-accent";
+      option.textContent = name;
+      // Keep input focus until click; scrolling/cancelled touch gestures must not select.
+      option.addEventListener("pointerdown", (event) => event.preventDefault());
+      option.addEventListener("click", () => chooseSuggestion(name));
+      return option;
+    }));
+    searchOptions.hidden = visibleSuggestions.length === 0;
+    searchInput.setAttribute("aria-expanded", String(!searchOptions.hidden));
+  }
+
+  function searchLocality(event?: Event) {
+    closeSuggestions();
+    // A later native change must not repeat a selection already committed by click/Enter.
+    if (event?.type === "change" && searchInput.value === committedSearchValue) return;
     const query = normalize(searchInput.value);
     if (!query) return;
     const partial = [...localityZone.entries()].filter(([name]) => name.includes(query)).map(([, value]) => value);
@@ -356,9 +417,9 @@ const localityOptions = [
       return;
     }
 
-    searchFeedback.classList.add("hidden");
-    searchFeedback.textContent = "";
+    clearSearchFeedback();
     searchInput.value = match.place;
+    committedSearchValue = match.place;
     select(match);
   }
 
@@ -367,8 +428,46 @@ const localityOptions = [
     searchLocality();
   });
 
-  // Choosing an option from the datalist fires "change" without submitting.
+  // Preserve free-text search when the browser commits an edit on blur.
   searchInput.addEventListener("change", searchLocality);
+  searchInput.addEventListener("input", () => {
+    committedSearchValue = null;
+    clearSearchFeedback();
+    showSuggestions();
+  });
+  searchInput.addEventListener("focus", showSuggestions);
+  searchInput.addEventListener("blur", closeSuggestions);
+  document.addEventListener("pointerdown", (event) => {
+    if (!searchForm.contains(event.target as Node)) closeSuggestions();
+  });
+  searchInput.addEventListener("keydown", (event) => {
+    if (event.isComposing) return;
+    if (event.key === "Escape" || event.key === "Tab") {
+      if (event.key === "Escape" && !searchOptions.hidden) event.preventDefault();
+      closeSuggestions();
+      return;
+    }
+    if (event.key === "Enter" && activeSuggestion >= 0) {
+      event.preventDefault();
+      chooseSuggestion(visibleSuggestions[activeSuggestion]!);
+      return;
+    }
+    if (event.key !== "ArrowDown" && event.key !== "ArrowUp") return;
+    if (searchOptions.hidden) showSuggestions();
+    const count = visibleSuggestions.length;
+    if (!count) return;
+    event.preventDefault();
+    activeSuggestion = activeSuggestion < 0
+      ? (event.key === "ArrowDown" ? 0 : count - 1)
+      : (activeSuggestion + (event.key === "ArrowDown" ? 1 : -1) + count) % count;
+    Array.from(searchOptions.children).forEach((option, index) => {
+      option.setAttribute("aria-selected", String(index === activeSuggestion));
+      if (index === activeSuggestion) {
+        searchInput.setAttribute("aria-activedescendant", option.id);
+        option.scrollIntoView({ block: "nearest" });
+      }
+    });
+  });
 
   const isTouch = window.matchMedia("(pointer: coarse)").matches;
 
@@ -434,6 +533,9 @@ const localityOptions = [
     description.textContent = "Tocá el mapa, buscá tu localidad o elegí una zona para conocer la cobertura.";
     localitiesWrap.classList.add("hidden");
     searchInput.value = "";
+    committedSearchValue = null;
+    closeSuggestions();
+    clearSearchFeedback();
     render();
     if (overview) map.flyTo(overview.center, overview.zoom, { duration: 0.8 });
   });
