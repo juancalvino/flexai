@@ -22,7 +22,30 @@ test("phone is explicitly optional while retaining native validation for nonblan
   assert.ok(phone.includes(String.raw`pattern="[0-9 +\\-\\(\\)]{8,}"`));
   const label = [...source.matchAll(/<label\b[^>]*>[\s\S]*?<\/label>/g)]
     .find(([markup]) => markup.includes('name="phone"'))?.[0] ?? "";
-  assert.match(label, /Teléfono adicional \/ de contacto \(opcional\)/);
+  assert.equal(label.match(/<span\b[^>]*>([^<]*)<\/span>/)?.[1], "Telefono (Opcional)");
+});
+
+test("ordinary field captions are block-level like autocomplete labels, without changing legends", async () => {
+  assert.match(source, /const captionClass = `\$\{labelClass\} block[^`]*`;/);
+  const labels = [...source.matchAll(/<label\b[^>]*>[\s\S]*?<\/label>/g)];
+  for (const name of ["name", "phone", "store", "volume", "position", "interestZone", "vehicle", "vehicleBrand", "vehicleModel", "vehicleYear", "availabilityTime"]) {
+    const label = labels.find(([markup]) => markup.includes(`name="${name}"`))?.[0] ?? "";
+    assert.match(label, /<span class=\{captionClass\}>[^<]+<\/span>\s*<(?:input|select)\b/, name);
+  }
+  assert.match(source, /const labelClass = "eyebrow text-ink\/75";/);
+  assert.doesNotMatch(source, /<legend\b[^>]*captionClass/);
+  const autocomplete = await readFile(new URL("../src/components/LocalityAutocomplete.astro", import.meta.url), "utf8");
+  assert.match(autocomplete, /<label for=\{id\} class=\{`\$\{labelClass\} block`\}/);
+});
+
+test("ordinary and locality captions reserve two lines only between sm and md, excluding legends", () => {
+  assert.equal(source.match(/const captionClass = `([^`]+)`;/)?.[1], "${labelClass} block sm:min-h-8 md:min-h-0");
+  for (const name of ["locality", "originZone"]) {
+    const autocomplete = source.match(new RegExp(`<LocalityAutocomplete\\b[^>]*name="${name}"[^>]*>`))?.[0] ?? "";
+    assert.match(autocomplete, /labelClass=\{captionClass\}/, name);
+  }
+  assert.match(source, /const labelClass = "eyebrow text-ink\/75";/);
+  assert.doesNotMatch(source, /<legend\b[^>]*(?:captionClass|min-h-)/);
 });
 
 test("intake removes retired controls and their payload keys and hints", () => {

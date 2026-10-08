@@ -25,6 +25,7 @@ const timeBands = ["Mañana", "Tarde/noche"];
 const fieldClass =
   "mt-2 w-full rounded-xl border border-ink/15 bg-cream px-4 py-3 text-ink shadow-sm placeholder:text-ink/35 transition-colors focus:outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/30";
 const labelClass = "eyebrow text-ink/75";
+const captionClass = `${labelClass} block sm:min-h-8 md:min-h-0`;
 
 const checkboxClass =
   "flex min-h-11 cursor-pointer items-center gap-2 rounded-xl border border-ink/15 bg-cream px-3 py-2 transition-colors hover:border-secondary has-[:checked]:border-secondary has-[:checked]:bg-secondary/10 has-[:checked]:ring-1 has-[:checked]:ring-secondary has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-secondary has-[:focus-visible]:ring-offset-2";
@@ -72,23 +73,23 @@ const choiceCardClass =
   )}
 
   <label class="block">
-    <span class={labelClass}>Nombre y apellido *</span>
+    <span class={captionClass}>Nombre y apellido *</span>
     <input name="name" type="text" required autocomplete="name" class={fieldClass} />
   </label>
   <label class="block">
-    <span class={labelClass}>Teléfono adicional / de contacto (opcional)</span>
+    <span class={captionClass}>Telefono (Opcional)</span>
     <input name="phone" type="tel" autocomplete="tel" inputmode="tel" pattern="[0-9 +\\-\\(\\)]{8,}" class={fieldClass} />
   </label>
 
   <fieldset id="fieldset-services" class="grid gap-6 sm:col-span-2 sm:grid-cols-2">
     <legend class="mb-5 w-full border-t border-ink/10 pt-6 font-display text-xl uppercase tracking-wide">Datos de tus envíos</legend>
     <label class="block">
-      <span class={labelClass}>Nombre de la empresa *</span>
+      <span class={captionClass}>Nombre de la empresa *</span>
       <input name="store" type="text" required autocomplete="organization" class={fieldClass} />
     </label>
-    <LocalityAutocomplete name="locality" label="Barrio / localidad de colecta" inputClass={fieldClass} labelClass={labelClass} />
+    <LocalityAutocomplete name="locality" label="Barrio / localidad de colecta" inputClass={fieldClass} labelClass={captionClass} />
     <label class="block">
-      <span class={labelClass}>Paquetes por día *</span>
+      <span class={captionClass}>Paquetes por día *</span>
       <input name="volume" type="number" min="1" step="1" required placeholder="Ej: 30" class={fieldClass} />
     </label>
     <fieldset class="sm:col-span-2" data-required-group="deliveryZones" aria-describedby="delivery-zones-error">
@@ -140,7 +141,7 @@ const choiceCardClass =
 
     <fieldset id="fieldset-non-driver" class="hidden sm:col-span-2" disabled>
       <label class="block">
-        <span class={labelClass}>Puesto al que te postulás *</span>
+        <span class={captionClass}>Puesto al que te postulás *</span>
         <input name="position" type="text" required class={fieldClass} />
       </label>
       <p class="mt-3 text-sm leading-relaxed text-ink/60">Se abrirá tu aplicación de correo con tus datos. Adjuntá tu CV manualmente antes de enviarlo.</p>
@@ -148,31 +149,31 @@ const choiceCardClass =
 
     <fieldset id="fieldset-driver-details" class="hidden grid gap-6 sm:col-span-2 sm:grid-cols-2" disabled>
       <legend class="mb-5 font-display text-lg uppercase tracking-wide">Vehículo y disponibilidad</legend>
-      <LocalityAutocomplete name="originZone" label="Barrio / localidad de origen" inputClass={fieldClass} labelClass={labelClass} />
+      <LocalityAutocomplete name="originZone" label="Barrio / localidad de origen" inputClass={fieldClass} labelClass={captionClass} />
       <label class="block">
-        <span class={labelClass}>Zona de interés *</span>
+        <span class={captionClass}>Zona de interés *</span>
         <select name="interestZone" required class={fieldClass}>
           <option value="">Seleccioná una zona</option>
           {zoneNames.map((zone) => <option value={zone}>{zone}</option>)}
         </select>
       </label>
       <label class="block">
-        <span class={labelClass}>Vehículo *</span>
+        <span class={captionClass}>Vehículo *</span>
         <select name="vehicle" required class={fieldClass}>
           <option value="">Seleccioná tu vehículo</option>
           {vehicleTypes.map((item) => <option value={item}>{item}</option>)}
         </select>
       </label>
       <label class="block">
-        <span class={labelClass}>Marca del vehículo *</span>
+        <span class={captionClass}>Marca del vehículo *</span>
         <input name="vehicleBrand" type="text" required placeholder="Ej: Ford" class={fieldClass} />
       </label>
       <label class="block">
-        <span class={labelClass}>Modelo del vehículo *</span>
+        <span class={captionClass}>Modelo del vehículo *</span>
         <input name="vehicleModel" type="text" required placeholder="Ej: Transit" class={fieldClass} />
       </label>
       <label class="block">
-        <span class={labelClass}>Año del vehículo *</span>
+        <span class={captionClass}>Año del vehículo *</span>
         <input name="vehicleYear" type="number" min="1886" step="1" required placeholder="Ej: 2015" class={fieldClass} />
       </label>
       <fieldset class="sm:col-span-2" data-required-group="availabilityDays" aria-describedby="availability-days-error">
@@ -188,7 +189,7 @@ const choiceCardClass =
         <p id="availability-days-error" class="hidden mt-3 text-sm text-red-700">Elegí al menos un día de disponibilidad.</p>
       </fieldset>
       <label class="block sm:col-span-2">
-        <span class={labelClass}>Horario *</span>
+        <span class={captionClass}>Horario *</span>
         <select name="availabilityTime" required class={fieldClass}>
           <option value="">Seleccioná un horario</option>
           {timeBands.map((item) => <option value={item}>{item}</option>)}
