@@ -10,8 +10,8 @@ For Contact > Trabajá con nosotros > No, otro puesto, offer a truthful “Envia
 - Apply the exact same source/tests to dev without pricing and feat/with-plans with pricing. Preserve main, the old pricing branch, the existing backup/stash and unrelated `.codegraph/`; no push or real email/WhatsApp sends.
 
 ## Tasks
-- [ ] T1 — Add test-first non-driver mailto handoff and accessible branch-specific button/confirmation. Status: in_progress. Work-unit commit: pending.
-- [ ] T2 — Independently verify mailto/WhatsApp flows, then integrate shared work into dev and feat/with-plans with only the pricing flag different. Status: pending. Work-unit/merge commit: pending.
+- [x] T1 — Add test-first non-driver mailto handoff and accessible branch-specific button/confirmation. Status: verified and committed. Work-unit commit: `0bb992f685f9cb6ec19b15654066af292fa07456`.
+- [ ] T2 — Independently verify mailto/WhatsApp flows, then integrate shared work into dev and feat/with-plans with only the pricing flag different. Status: in_progress; OFF verified, isolated ON preview pending after merge. Work-unit/merge commit: pending.
 
 ## Checks
 - RED before implementation for email body/URL/branch state where runnable; GREEN with focused tests.
