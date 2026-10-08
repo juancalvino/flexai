@@ -8,12 +8,21 @@ import ContactForm from "../components/ContactForm.astro";
 <Layout title="Contacto" description="Elegí entre contratar el servicio de envíos o trabajar con FLEXAI y te contactamos por WhatsApp.">
   <PageHero eyebrow="Contacto" title={["¿Cómo podemos", "ayudarte?"]} accent={1}>
     <p>Contanos qué necesitás. Ya sea para tus envíos o para sumarte al equipo, seguimos la conversación por WhatsApp.</p>
+    <div class="mt-8 flex flex-col gap-4 sm:flex-row">
+      <a href="/contacto?intent=services#formulario" data-contact-intent="services" aria-controls="formulario" aria-expanded="false" class="btn-primary min-h-12 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent">
+        Adquirir servicio
+      </a>
+      <a href="/contacto?intent=work#formulario" data-contact-intent="work" aria-controls="formulario" aria-expanded="false" class="btn-primary min-h-12 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent">
+        Trabajá con nosotros
+      </a>
+    </div>
+    <noscript><p class="mt-6">Activá JavaScript y elegí una opción para completar el formulario y preparar tu consulta por WhatsApp. No enviamos datos desde esta página sin JavaScript.</p></noscript>
   </PageHero>
 
-  <section class="section bg-cream">
+  <section id="formulario" hidden tabindex="-1" aria-labelledby="contact-form-heading" class="section scroll-mt-24 bg-cream">
     <Container>
-      <div data-reveal="up" data-delay="0.1" class="mx-auto max-w-3xl">
-        <ContactForm />
+      <div class="mx-auto max-w-3xl">
+        <ContactForm selectionMode />
       </div>
     </Container>
   </section>

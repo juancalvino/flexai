@@ -3,105 +3,16 @@ import { Icon } from "astro-icon/components";
 import Layout from "../layouts/Layout.astro";
 import Container from "../components/container.astro";
 import Sectionhead from "../components/sectionhead.astro";
-import PageHero from "../components/sections/PageHero.astro";
 import ServicesSection from "../components/sections/ServicesSection.astro";
 import ContactCta from "../components/sections/ContactCta.astro";
-import { PLANS, ZONE_LIST, formatPrice, type PlanId } from "../data/zones";
 import { DIFFERENTIATORS } from "../data/services";
-import { whatsappUrl } from "../data/site";
-import { FEATURES } from "../data/features";
-
-const planIds: PlanId[] = ["standard", "pro"];
 ---
 
 <Layout
-  title={FEATURES.pricing ? "Servicios y tarifas" : "Servicios"}
-  description={FEATURES.pricing
-    ? "Planes Standard y Pro para vendedores de Mercado Libre. Tarifas por zona para CABA y GBA, sin costos ocultos."
-    : "Logística Flex para vendedores de Mercado Libre en CABA y GBA. Dos recorridos diarios y seguimiento en tiempo real."}
+  title="Servicios"
+  description="Logística Flex para vendedores de Mercado Libre en CABA y GBA. Dos recorridos diarios y seguimiento en tiempo real."
 >
-  <PageHero
-    eyebrow={FEATURES.pricing ? "Servicios · Tarifas" : "Servicios"}
-    title={FEATURES.pricing ? ["Tarifas claras."] : ["Tu logística,", "resuelta."]}
-    accent={1}
-  >
-    <p>
-      {FEATURES.pricing
-        ? "Elegí el plan según tu volumen diario. Todas las tarifas son por paquete y por zona de entrega."
-        : "Retiramos tus ventas de Mercado Envíos Flex y las entregamos en el día, con dos recorridos diarios y seguimiento en tiempo real."}
-    </p>
-  </PageHero>
-
-  {FEATURES.pricing && (
-    <section class="section bg-cream" id="tarifas">
-      <Container>
-        <div class="grid gap-6 lg:grid-cols-2">
-          {planIds.map((planId, index) => {
-            const plan = PLANS[planId];
-            const featured = planId === "pro";
-            return (
-              <article
-                class:list={[
-                  "flex flex-col rounded-3xl p-8 md:p-12",
-                  featured ? "bg-ink text-cream" : "bg-cream-light ring-1 ring-ink/10",
-                ]}
-                data-reveal="up"
-                data-delay={index * 0.12}
-              >
-                <div class="flex items-start justify-between gap-4">
-                  <div>
-                    <p class:list={["eyebrow", featured ? "text-accent" : "text-ink/50"]}>{plan.volume}</p>
-                    <h2 class="mt-4 font-display text-5xl uppercase leading-none">{plan.name}</h2>
-                  </div>
-                  {featured && <span class="eyebrow rounded-full bg-accent px-3 py-1.5 text-accent-contrast">Mejor tarifa</span>}
-                </div>
-                <p class:list={["mt-4", featured ? "text-cream/60" : "text-ink/60"]}>{plan.highlight}</p>
-
-                <dl class:list={["mt-10 flex-1 divide-y", featured ? "divide-cream/10" : "divide-ink/10"]}>
-                  {ZONE_LIST.map((zone) => (
-                    <div class="flex items-baseline justify-between py-4">
-                      <dt class="font-display text-lg uppercase">{zone.name}</dt>
-                      <dd class="font-display text-3xl">{formatPrice(zone.prices[planId])}</dd>
-                    </div>
-                  ))}
-                </dl>
-
-                <a
-                  href={whatsappUrl(`Hola FLEXAI, quiero contratar el plan ${plan.name}.`)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class:list={["mt-10 w-full", featured ? "btn-primary" : "btn-dark"]}
-                >
-                  Quiero el plan {plan.name.split(" ")[0]}
-                </a>
-              </article>
-            );
-          })}
-        </div>
-        <p class="mt-6 text-sm text-ink/50">* Precios por paquete. IVA no incluido.</p>
-      </Container>
-    </section>
-  )}
-
-  {FEATURES.collectiveShipping && (
-    <section class="section bg-cream" aria-labelledby="collective-title">
-      <Container>
-        <aside class="flex flex-col gap-6 rounded-3xl bg-accent p-8 text-accent-contrast md:flex-row md:items-center md:p-12" data-reveal="up">
-          <Icon name="bx:group" class="h-12 w-12 shrink-0" />
-          <div>
-            <h2 id="collective-title" class="font-display text-2xl uppercase">Sumá envíos con otros comercios</h2>
-            <p class="mt-2 max-w-3xl text-accent-contrast/75">
-              {FEATURES.pricing
-                ? "Si combinás tus envíos con los de comercios cercanos y juntos alcanzan un mayor volumen, pueden acceder a un plan superior con tarifas más bajas."
-                : "Combiná tus envíos con los de comercios cercanos. Contanos cómo se organizan y te ayudamos a coordinar los retiros y cotizar la operación conjunta."}
-            </p>
-          </div>
-        </aside>
-      </Container>
-    </section>
-  )}
-
-  <ServicesSection />
+  <ServicesSection headingTag="h1" />
 
   <section class="section bg-cream">
     <Container>
@@ -118,30 +29,5 @@ const planIds: PlanId[] = ["standard", "pro"];
     </Container>
   </section>
 
-  {!FEATURES.pricing && (
-    <section class="section bg-cream" id="cotizacion">
-      <Container>
-        <article class="flex flex-col rounded-3xl bg-cream-light p-8 ring-1 ring-ink/10 md:p-12" data-reveal="up">
-          <p class="eyebrow text-ink/50">Cotización</p>
-          <h2 class="mt-4 font-display text-5xl uppercase leading-none">Consultá tu tarifa</h2>
-          <p class="mt-4 max-w-2xl text-ink/60">
-            Contanos sobre tu operación y te respondemos por WhatsApp con la tarifa según tu zona y volumen diario.
-          </p>
-
-          <ul class="mt-10 grid gap-3 sm:grid-cols-2">
-            {ZONE_LIST.map((zone) => (
-              <li class="flex items-center gap-3 rounded-xl bg-cream px-4 py-3 ring-1 ring-ink/10">
-                <span class="h-3 w-3 shrink-0 rounded-full ring-1 ring-ink/20" style={`background:${zone.color}`} />
-                <span class="font-display text-lg uppercase">{zone.name}</span>
-              </li>
-            ))}
-          </ul>
-
-          <a href="/contacto?intent=services" class="btn-dark mt-10 w-full">Consultar tarifa</a>
-        </article>
-      </Container>
-    </section>
-  )}
-
-  {FEATURES.pricing && <ContactCta />}
+  <ContactCta />
 </Layout>

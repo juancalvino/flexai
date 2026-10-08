@@ -1,0 +1,234 @@
+---
+import { COVERAGE_PLACES } from "../lib/coverage-places";
+
+interface Props {
+  /** Form field name; also used to derive unique ids (must be unique per page). */
+  name: string;
+  /** Visible field label, rendered with the required asterisk. */
+  label: string;
+  placeholder?: string;
+  inputClass?: string;
+  labelClass?: string;
+}
+
+const {
+  name,
+  label,
+  placeholder = "Ej: Villa Devoto, Villa Luro o Quilmes",
+  inputClass = "mt-2 w-full rounded-xl border border-ink/15 bg-cream px-4 py-3 text-ink shadow-sm placeholder:text-ink/35 transition-colors focus:outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/30",
+  labelClass = "eyebrow text-ink/75",
+} = Astro.props;
+
+const id = `${name}-input`;
+const listboxId = `${name}-listbox`;
+// Coverage names only: no commercial prices reach the client bundle.
+const placesJson = JSON.stringify(COVERAGE_PLACES);
+---
+
+<div class="relative" data-locality-autocomplete data-places={placesJson}>
+  <label for={id} class={`${labelClass} block`}>{label} *</label>
+  <input
+    id={id}
+    type="text"
+    name={name}
+    required
+    role="combobox"
+    aria-expanded="false"
+    aria-controls={listboxId}
+    aria-autocomplete="list"
+    autocomplete="off"
+    autocapitalize="off"
+    spellcheck="false"
+    placeholder={placeholder}
+    class={inputClass}
+  />
+  <ul
+    id={listboxId}
+    role="listbox"
+    aria-label={`Sugerencias de ${label}`}
+    class="absolute z-20 mt-1 hidden max-h-72 w-full overflow-auto rounded-xl border border-ink/15 bg-cream py-1 shadow-lg"
+  ></ul>
+</div>
+
+<script>
+  const normalize = (value) =>
+    String(value)
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^\p{L}\p{N}\s]/gu, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+
+  for (const root of document.querySelectorAll("[data-locality-autocomplete]")) {
+    if (root.dataset.wired === "true") continue;
+    root.dataset.wired = "true";
+
+    const input = root.querySelector('input[role="combobox"]');
+    const listbox = root.querySelector('[role="listbox"]');
+    const places = JSON.parse(root.dataset.places);
+    const byKey = new Map(places.map((place) => [normalize(place.name), place]));
+
+    let committed = "";
+    let activeIndex = -1;
+    let matches = [];
+    let optionEls = [];
+
+    const close = () => {
+      listbox.classList.add("hidden");
+      listbox.replaceChildren();
+      input.setAttribute("aria-expanded", "false");
+      input.removeAttribute("aria-activedescendant");
+      activeIndex = -1;
+      matches = [];
+      optionEls = [];
+    };
+
+    const commit = (place) => {
+      committed = place.name;
+      input.value = place.name;
+      close();
+      // Settled value: let the shared form controller pick up the change.
+      input.dispatchEvent(new Event("change", { bubbles: true }));
+    };
+
+    const buildOption = (place, index) => {
+      const item = document.createElement("li");
+      item.id = `${listbox.id}-option-${index}`;
+      item.setAttribute("role", "option");
+      item.setAttribute("aria-selected", "false");
+      item.className = "flex cursor-pointer items-center justify-between gap-3 px-4 py-3 text-ink";
+
+      const name = document.createElement("span");
+      name.className = "text-sm font-medium";
+      name.textContent = place.name;
+
+      const zone = document.createElement("span");
+      zone.className = "shrink-0 rounded-full bg-ink/5 px-2 py-1 text-xs text-ink/60";
+      zone.textContent = place.zone;
+
+      item.append(name, zone);
+      item.addEventListener("mousedown", (event) => event.preventDefault());
+      item.addEventListener("click", () => commit(place));
+      return item;
+    };
+
+    const setActive = (index) => {
+      optionEls.forEach((item, i) => {
+        const active = i === index;
+        item.setAttribute("aria-selected", String(active));
+        item.classList.toggle("bg-secondary/10", active);
+      });
+      activeIndex = index;
+      if (index >= 0) {
+        input.setAttribute("aria-activedescendant", optionEls[index].id);
+        input.value = matches[index].name;
+      } else {
+        input.removeAttribute("aria-activedescendant");
+      }
+    };
+
+    const renderOptions = (query) => {
+      const ranked = places
+        .map((place) => {
+          const key = normalize(place.name);
+          return { place, key, prefix: key.startsWith(query) };
+        })
+        .filter(({ key }) => key.includes(query))
+        .sort((a, b) => Number(b.prefix) - Number(a.prefix) || a.place.name.localeCompare(b.place.name, "es"));
+
+      listbox.replaceChildren();
+      matches = ranked.map(({ place }) => place);
+      optionEls = [];
+      activeIndex = -1;
+      input.removeAttribute("aria-activedescendant");
+
+      if (matches.length === 0) {
+        const empty = document.createElement("li");
+        empty.setAttribute("role", "presentation");
+        empty.className = "px-4 py-3 text-sm text-ink/50";
+        empty.textContent = "No encontramos esa localidad en nuestra cobertura.";
+        listbox.appendChild(empty);
+      } else {
+        const shown = matches.slice(0, 10);
+        shown.forEach((place, index) => {
+          const item = buildOption(place, index);
+          listbox.appendChild(item);
+          optionEls.push(item);
+        });
+        if (matches.length > shown.length) {
+          const more = document.createElement("li");
+          more.setAttribute("role", "presentation");
+          more.className = "px-4 py-2 text-xs text-ink/45";
+          more.textContent = `Mostrando 10 de ${matches.length}. Seguí escribiendo para afinar.`;
+          listbox.appendChild(more);
+        }
+      }
+
+      listbox.classList.remove("hidden");
+      input.setAttribute("aria-expanded", "true");
+    };
+
+    const finalize = () => {
+      const match = byKey.get(normalize(input.value));
+      if (match) commit(match);
+      else {
+        input.value = committed;
+        close();
+      }
+    };
+
+    input.addEventListener("input", () => {
+      const query = normalize(input.value);
+      if (query.length < 3) {
+        close();
+        return;
+      }
+      renderOptions(query);
+    });
+
+    input.addEventListener("keydown", (event) => {
+      if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+        if (optionEls.length === 0) return;
+        event.preventDefault();
+        const delta = event.key === "ArrowDown" ? 1 : -1;
+        const next = activeIndex < 0
+          ? (delta > 0 ? 0 : optionEls.length - 1)
+          : (activeIndex + delta + optionEls.length) % optionEls.length;
+        setActive(next);
+      } else if (event.key === "Enter") {
+        const highlighted = activeIndex >= 0 ? matches[activeIndex] : (matches.length ? matches[0] : null);
+        const exact = byKey.get(normalize(input.value));
+        if (highlighted) {
+          event.preventDefault();
+          commit(highlighted);
+        } else if (exact) {
+          if (input.value !== committed) {
+            event.preventDefault();
+            commit(exact);
+          }
+          // Already settled and valid: allow the native form submit.
+        } else {
+          // Non-empty but outside coverage: block implicit submit.
+          event.preventDefault();
+        }
+      } else if (event.key === "Escape") {
+        if (!listbox.classList.contains("hidden")) {
+          event.preventDefault();
+          input.value = committed;
+          close();
+        }
+      }
+    });
+
+    root.addEventListener("focusout", (event) => {
+      if (root.contains(event.relatedTarget)) return;
+      finalize();
+    });
+
+    // Safety net for touch/keyboard submit paths that can skip focusout.
+    input.form?.addEventListener("submit", () => {
+      if (input.value !== committed) finalize();
+    }, true);
+  }
+</script>

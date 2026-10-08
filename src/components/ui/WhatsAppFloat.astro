@@ -13,17 +13,19 @@ import { Icon } from "astro-icon/components";
     <p class="eyebrow mb-2 px-1 text-ink/50">¿Cómo podemos ayudarte?</p>
     <div class="grid gap-2">
       <a
-        href="/contacto?intent=services"
+        href="/contacto?intent=services#formulario"
+        data-contact-intent="services"
         class="group flex items-start gap-3 rounded-xl border border-ink/15 bg-cream-light px-4 py-3 transition-colors hover:border-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
       >
         <Icon name="simple-icons:whatsapp" class="mt-0.5 h-5 w-5 shrink-0 text-[#25D366]" />
         <span>
           <span class="block font-display text-sm font-medium uppercase tracking-wider text-ink group-hover:text-secondary">Contratar el servicio</span>
-          <span class="block text-sm text-ink/60">Quiero enviar con FLEXAI</span>
+          <span class="block text-sm text-ink/60">Quiero realizar envíos con FLEXAI</span>
         </span>
       </a>
       <a
-        href="/contacto?intent=work"
+        href="/contacto?intent=work#formulario"
+        data-contact-intent="work"
         class="group flex items-start gap-3 rounded-xl border border-ink/15 bg-cream-light px-4 py-3 transition-colors hover:border-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
       >
         <Icon name="simple-icons:whatsapp" class="mt-0.5 h-5 w-5 shrink-0 text-[#25D366]" />

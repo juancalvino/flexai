@@ -2,7 +2,7 @@
 import { Icon } from "astro-icon/components";
 import Container from "../container.astro";
 import Logo from "../ui/Logo.astro";
-import { NAVIGATION, SITE, SOCIAL_LINKS, whatsappUrl, DEFAULT_WHATSAPP_MESSAGE } from "../../data/site";
+import { NAVIGATION, SITE, SOCIAL_LINKS } from "../../data/site";
 
 const currentPath = Astro.url.pathname.replace(/\/$/, "") || "/";
 const isActive = (path: string) => (path === "/" ? currentPath === "/" : currentPath.startsWith(path));
@@ -36,11 +36,8 @@ const isActive = (path: string) => (path === "/" ? currentPath === "/" : current
     </nav>
 
     <div class="hidden items-center gap-3 lg:flex">
-      <a href={SITE.lightDataUrl} target="_blank" rel="noopener noreferrer" class="btn-ghost !px-5 !py-2.5 text-cream">
-        LightData
-      </a>
-      <a href={whatsappUrl(DEFAULT_WHATSAPP_MESSAGE)} target="_blank" rel="noopener noreferrer" class="btn-primary !px-5 !py-2.5">
-        Hablanos
+      <a href={SITE.trackingUrl} target="_blank" rel="noopener noreferrer" class="btn-ghost !px-5 !py-2.5 text-cream">
+        Login
       </a>
     </div>
 
@@ -99,13 +96,9 @@ const isActive = (path: string) => (path === "/" ? currentPath === "/" : current
       </nav>
 
       <div class="menu-footer mt-auto flex flex-col gap-8">
-        <div class="grid gap-3 sm:grid-cols-2">
-          <a href={whatsappUrl(DEFAULT_WHATSAPP_MESSAGE)} target="_blank" rel="noopener noreferrer" class="btn-primary w-full">
-            <Icon name="simple-icons:whatsapp" class="h-4 w-4" />
-            Hablanos por WhatsApp
-          </a>
-          <a href={SITE.lightDataUrl} target="_blank" rel="noopener noreferrer" class="btn-ghost w-full text-cream">
-            Ingresar a LightData
+        <div>
+          <a href={SITE.trackingUrl} target="_blank" rel="noopener noreferrer" class="btn-ghost w-full text-cream">
+            Login
           </a>
         </div>
 
@@ -129,8 +122,8 @@ const isActive = (path: string) => (path === "/" ? currentPath === "/" : current
               SOCIAL_LINKS.map((social) => (
                 <a
                   href={social.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  target={social.href.startsWith("/") ? undefined : "_blank"}
+                  rel={social.href.startsWith("/") ? undefined : "noopener noreferrer"}
                   aria-label={social.name}
                   class="flex h-11 w-11 items-center justify-center rounded-full border border-cream/20 text-cream transition-colors hover:border-accent hover:bg-accent hover:text-accent-contrast"
                 >

@@ -1,4 +1,4 @@
-// Zones, localities and prices. Used by the map, /servicios and /cobertura.
+// Shared zone metadata; commercial prices are serialized only by qualified /planes.
 
 export type ZoneId = "CABA" | "GBA1" | "GBA2" | "GBA3";
 export type PlanId = "standard" | "pro";
@@ -111,12 +111,12 @@ export const ZONE_LIST: Zone[] = Object.values(ZONES);
 export const PLANS: Record<PlanId, { name: string; volume: string; highlight: string }> = {
   standard: {
     name: "Standard Seller",
-    volume: "10 a 50 paquetes por día",
+    volume: "1–50 paquetes por día",
     highlight: "Ideal para tiendas en crecimiento",
   },
   pro: {
     name: "Pro Seller",
-    volume: "Más de 50 paquetes por día",
+    volume: "51–99 paquetes por día",
     highlight: "Tarifa preferencial por volumen",
   },
 };

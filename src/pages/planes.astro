@@ -1,0 +1,33 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Container from "../components/container.astro";
+import PageHero from "../components/sections/PageHero.astro";
+import ContactForm from "../components/ContactForm.astro";
+import QualifiedPlanResult from "../components/QualifiedPlanResult.astro";
+import { FEATURES } from "../data/features";
+---
+
+<Layout
+  title={FEATURES.pricing ? "Planes y tarifas" : "Consultá por tus envíos"}
+  description="Contanos sobre tu operación y encontrá una propuesta de logística Flex para tu tienda."
+>
+  <PageHero
+    fullHeight
+    eyebrow={FEATURES.pricing ? "Planes · Tarifas" : "Contacto · Envíos"}
+    title={FEATURES.pricing ? ["Tarifas claras.", "Sin sorpresas."] : ["Hablemos de", "tus envíos."]}
+    accent={1}
+  >
+    <p>{FEATURES.pricing
+      ? "Completá tus datos para conocer el plan que corresponde a tu volumen diario. Después, elegís si querés continuar por WhatsApp."
+      : "Contanos sobre tu tienda y prepararemos una consulta personalizada para nuestro equipo."}</p>
+  </PageHero>
+
+  <section class="section bg-cream">
+    <Container>
+      <div class="mx-auto max-w-4xl">
+        <ContactForm presetIntent="services" hideIntent quoteMode={FEATURES.pricing} />
+        {FEATURES.pricing && <QualifiedPlanResult />}
+      </div>
+    </Container>
+  </section>
+</Layout>

@@ -28,10 +28,10 @@ export const SERVICES: Service[] = [
       "furgoneta de reparto estacionada en un depósito con paquetes apilados, luz de la mañana, estilo documental",
   },
   {
-    id: "lightdata",
-    title: "Seguimiento con LightData",
+    id: "tracking",
+    title: "Seguimiento de envíos",
     description:
-      "Gestioná tus envíos y consultá el estado de cada entrega en tiempo real desde nuestra plataforma LightData.",
+      "Gestioná tus envíos y consultá el estado de cada entrega en tiempo real desde nuestra plataforma de seguimiento.",
     icon: "bx:line-chart",
     imagePrompt:
       "manos sosteniendo un celular con un panel de seguimiento de envíos en pantalla, fondo desenfocado de depósito, tonos oscuros con acentos amarillos",
@@ -68,5 +68,5 @@ export const DIFFERENTIATORS = [
 export const STEPS = [
   { title: "Retiramos", description: "Pasamos por tu depósito o local a buscar las ventas del día." },
   { title: "Entregamos", description: "Nuestros repartidores llevan cada paquete a destino en el día." },
-  { title: "Seguís todo", description: "Consultás cada entrega en LightData y recibís el cierre del recorrido." },
+  { title: "Seguís todo", description: "Consultás cada entrega en la plataforma de seguimiento y recibís el cierre del recorrido." },
 ] as const;

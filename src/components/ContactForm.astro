@@ -1,13 +1,16 @@
 ---
 import { Icon } from "astro-icon/components";
 import { ZONE_LIST } from "../data/zones";
+import LocalityAutocomplete from "./LocalityAutocomplete.astro";
 
 interface Props {
   presetIntent?: "services" | "work";
   hideIntent?: boolean;
+  quoteMode?: boolean;
+  selectionMode?: boolean;
 }
 
-const { presetIntent, hideIntent = false } = Astro.props;
+const { presetIntent, hideIntent = false, quoteMode = false, selectionMode = false } = Astro.props;
 
 const zoneNames = ZONE_LIST.map((zone) => zone.name);
 const packageSizes = [
@@ -16,9 +19,8 @@ const packageSizes = [
   { value: "Grande", hint: "hasta 80 cm · ~30 kg" },
 ];
 const vehicleTypes = ["Moto", "Auto", "Camioneta / Utilitario", "Camión"];
-const vehicleSizes = ["Chico", "Mediano", "Grande"];
 const weekdays = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
-const timeBands = ["Mañana", "Tarde", "Noche", "Horario completo"];
+const timeBands = ["Mañana", "Tarde/noche"];
 
 const fieldClass =
   "mt-2 w-full rounded-xl border border-ink/15 bg-cream px-4 py-3 text-ink shadow-sm placeholder:text-ink/35 transition-colors focus:outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/30";
@@ -36,13 +38,18 @@ const choiceCardClass =
   class="grid gap-6 rounded-3xl bg-cream-light p-5 ring-1 ring-ink/10 sm:grid-cols-2 sm:gap-x-6 sm:gap-y-8 sm:p-8 md:p-10"
   data-preset-intent={presetIntent}
   data-hide-intent={hideIntent}
+  data-quote-mode={quoteMode}
+  data-selection-mode={selectionMode}
+  method="post"
   novalidate
 >
   <div class="border-b border-ink/10 pb-5 sm:col-span-2">
-    <h2 class="font-display text-2xl uppercase tracking-wide">Contanos un poco más</h2>
-    <p class="mt-2 text-sm leading-relaxed text-ink/65">Completá los campos con * y prepararemos tu consulta para WhatsApp. Podés revisar el mensaje antes de enviarlo.</p>
+    <h2 id="contact-form-heading" tabindex="-1" class="scroll-mt-24 font-display text-2xl uppercase tracking-wide">Contanos un poco más</h2>
+    <p class="mt-2 text-sm leading-relaxed text-ink/65">{quoteMode
+      ? "Completá todos los campos con * para conocer el plan que corresponde a tu volumen. No abriremos WhatsApp hasta que lo elijas."
+      : "Completá los campos con * y prepararemos tu consulta para WhatsApp. Podés revisar el mensaje antes de enviarlo."}</p>
   </div>
-  {!hideIntent && (
+  {!hideIntent && !selectionMode && (
     <fieldset id="fieldset-intent" class="sm:col-span-2">
       <legend class={labelClass}>¿Qué te gustaría hacer? *</legend>
       <div class="mt-2 grid gap-3 sm:grid-cols-2">
@@ -50,7 +57,7 @@ const choiceCardClass =
           <input type="radio" name="intent" value="services" checked required class="size-4 shrink-0 accent-secondary" />
           <span>
             <span class="block font-display text-sm font-medium uppercase tracking-wider">Contratar el servicio</span>
-            <span class="block text-sm text-ink/60">Quiero enviar con FLEXAI</span>
+            <span class="block text-sm text-ink/60">Quiero realizar envíos con FLEXAI</span>
           </span>
         </label>
         <label class={choiceCardClass}>
@@ -69,8 +76,8 @@ const choiceCardClass =
     <input name="name" type="text" required autocomplete="name" class={fieldClass} />
   </label>
   <label class="block">
-    <span class={labelClass}>Teléfono *</span>
-    <input name="phone" type="tel" required autocomplete="tel" inputmode="tel" pattern="[0-9 +\\-\\(\\)]{8,}" class={fieldClass} />
+    <span class={labelClass}>Teléfono adicional / de contacto (opcional)</span>
+    <input name="phone" type="tel" autocomplete="tel" inputmode="tel" pattern="[0-9 +\\-\\(\\)]{8,}" class={fieldClass} />
   </label>
 
   <fieldset id="fieldset-services" class="grid gap-6 sm:col-span-2 sm:grid-cols-2">
@@ -79,13 +86,7 @@ const choiceCardClass =
       <span class={labelClass}>Nombre de la empresa *</span>
       <input name="store" type="text" required autocomplete="organization" class={fieldClass} />
     </label>
-    <label class="block">
-      <span class={labelClass}>Zona de colecta *</span>
-      <select name="locality" required class={fieldClass}>
-        <option value="">Seleccioná una zona</option>
-        {zoneNames.map((zone) => <option value={zone}>{zone}</option>)}
-      </select>
-    </label>
+    <LocalityAutocomplete name="locality" label="Barrio / localidad de colecta" inputClass={fieldClass} labelClass={labelClass} />
     <label class="block">
       <span class={labelClass}>Paquetes por día *</span>
       <input name="volume" type="number" min="1" step="1" required placeholder="Ej: 30" class={fieldClass} />
@@ -93,11 +94,11 @@ const choiceCardClass =
     <fieldset class="sm:col-span-2" data-required-group="deliveryZones" aria-describedby="delivery-zones-error">
       <legend class={labelClass}>Zonas de entrega *</legend>
       <p class="mt-1 text-sm text-ink/60">Podés elegir más de una zona.</p>
-      <div class="mt-2 flex flex-wrap gap-2">
+      <div class="mt-2 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {zoneNames.map((zone) => (
-          <label class={checkboxClass}>
+          <label class:list={[choiceCardClass, "justify-center text-center"]}>
             <input type="checkbox" name="deliveryZones" value={zone} aria-describedby="delivery-zones-error" class="size-4 shrink-0 accent-secondary" />
-            <span class="text-sm">{zone}</span>
+            <span class="font-display text-sm font-medium uppercase tracking-wider">{zone}</span>
           </label>
         ))}
       </div>
@@ -116,16 +117,8 @@ const choiceCardClass =
           </label>
         ))}
       </div>
-      <p class="mt-3 text-sm leading-relaxed text-ink/60">Referencias aproximadas de FLEXAI (lado mayor y peso), no categorías oficiales de Mercado Libre. Si tus paquetes son más grandes, contanos en el mensaje para evaluar el envío.</p>
+      <p class="mt-3 text-sm leading-relaxed text-ink/60">Referencias aproximadas de FLEXAI (lado mayor y peso), no categorías oficiales de Mercado Libre.</p>
     </fieldset>
-    <label class="block sm:col-span-2">
-      <span class={labelClass}>Link de tu tienda en Mercado Libre</span>
-      <input name="url" type="url" placeholder="https://" class={fieldClass} />
-    </label>
-    <label class="block sm:col-span-2">
-      <span class={labelClass}>Mensaje</span>
-      <textarea name="message" rows="4" class={fieldClass}></textarea>
-    </label>
   </fieldset>
 
   <fieldset id="fieldset-work" class="hidden grid gap-6 sm:col-span-2 sm:grid-cols-2" disabled>
@@ -147,13 +140,7 @@ const choiceCardClass =
 
     <fieldset id="fieldset-driver-details" class="hidden grid gap-6 sm:col-span-2 sm:grid-cols-2" disabled>
       <legend class="mb-5 font-display text-lg uppercase tracking-wide">Vehículo y disponibilidad</legend>
-      <label class="block">
-        <span class={labelClass}>Zona de origen *</span>
-        <select name="originZone" required class={fieldClass}>
-          <option value="">Seleccioná una zona</option>
-          {zoneNames.map((zone) => <option value={zone}>{zone}</option>)}
-        </select>
-      </label>
+      <LocalityAutocomplete name="originZone" label="Barrio / localidad de origen" inputClass={fieldClass} labelClass={labelClass} />
       <label class="block">
         <span class={labelClass}>Zona de interés *</span>
         <select name="interestZone" required class={fieldClass}>
@@ -169,11 +156,16 @@ const choiceCardClass =
         </select>
       </label>
       <label class="block">
-        <span class={labelClass}>Tamaño del vehículo *</span>
-        <select name="vehicleSize" required class={fieldClass}>
-          <option value="">Seleccioná el tamaño</option>
-          {vehicleSizes.map((item) => <option value={item}>{item}</option>)}
-        </select>
+        <span class={labelClass}>Marca del vehículo *</span>
+        <input name="vehicleBrand" type="text" required placeholder="Ej: Ford" class={fieldClass} />
+      </label>
+      <label class="block">
+        <span class={labelClass}>Modelo del vehículo *</span>
+        <input name="vehicleModel" type="text" required placeholder="Ej: Transit" class={fieldClass} />
+      </label>
+      <label class="block">
+        <span class={labelClass}>Año del vehículo *</span>
+        <input name="vehicleYear" type="number" min="1886" step="1" required placeholder="Ej: 2015" class={fieldClass} />
       </label>
       <fieldset class="sm:col-span-2" data-required-group="availabilityDays" aria-describedby="availability-days-error">
         <legend class={labelClass}>Disponibilidad semanal *</legend>
@@ -196,20 +188,17 @@ const choiceCardClass =
       </label>
     </fieldset>
 
-    <label class="block sm:col-span-2">
-      <span class={labelClass}>Mensaje</span>
-      <textarea name="workMessage" rows="4" class={fieldClass}></textarea>
-    </label>
   </fieldset>
 
   <p id="form-error" class="hidden text-sm text-red-700 sm:col-span-2" role="alert">
     Revisá los campos marcados con * antes de enviar.
   </p>
 
-  <button type="submit" class="btn-dark min-h-12 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-secondary sm:col-span-2">
-    <Icon name="simple-icons:whatsapp" class="h-4 w-4" />
-    Enviar por WhatsApp
+  <button type="submit" disabled class="btn-dark min-h-12 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-secondary sm:col-span-2">
+    {!quoteMode && <Icon name="simple-icons:whatsapp" class="h-4 w-4" />}
+    {quoteMode ? "Ver mi plan" : "Enviar por WhatsApp"}
   </button>
+  <noscript><p>Activá JavaScript para validar tus datos y preparar tu consulta sin incluirlos en la dirección de esta página.</p></noscript>
 </form>
 
 <div id="form-success" class="hidden rounded-3xl bg-ink p-10 text-cream" role="status" tabindex="-1">
@@ -223,11 +212,14 @@ const choiceCardClass =
 
 <script>
   import { whatsappUrl } from "../data/site";
+  import { buildContactMessage, contactFieldError } from "../lib/contact-message";
 
   const form = document.getElementById("contact-form") as HTMLFormElement;
   const error = document.getElementById("form-error")!;
   const success = document.getElementById("form-success")!;
   const fallback = document.getElementById("form-fallback") as HTMLAnchorElement;
+  const quoteMode = form.dataset.quoteMode === "true";
+  const result = document.getElementById("qualified-result");
 
   const intentInputs = Array.from(form.querySelectorAll<HTMLInputElement>('input[name="intent"]'));
   const driverInputs = Array.from(form.querySelectorAll<HTMLInputElement>('input[name="driver"]'));
@@ -239,8 +231,13 @@ const choiceCardClass =
     value === "services" || value === "work" ? value : undefined;
   const preset = parseIntent(form.dataset.presetIntent);
   const requested = parseIntent(new URLSearchParams(window.location.search).get("intent"));
-  let intent = preset ?? requested ?? "services";
-  const locked = Boolean(preset) || requested === "services" || form.dataset.hideIntent === "true";
+  const selectionMode = form.dataset.selectionMode === "true" && !preset;
+  let intent = preset ?? requested ?? (selectionMode ? undefined : "services");
+  const locked = Boolean(preset) || selectionMode || requested === "services" || form.dataset.hideIntent === "true";
+  const section = selectionMode ? document.getElementById("formulario") : null;
+  const heading = document.getElementById("contact-form-heading")!;
+  const choices = selectionMode ? Array.from(document.querySelectorAll<HTMLAnchorElement>("[data-contact-intent]")) : [];
+  const submitButton = form.querySelector<HTMLButtonElement>('button[type="submit"]')!;
   const intentFieldset = document.getElementById("fieldset-intent") as HTMLFieldSetElement | null;
   if (intentFieldset) {
     intentFieldset.classList.toggle("hidden", locked);
@@ -248,13 +245,14 @@ const choiceCardClass =
   }
   intentInputs.forEach((input) => { input.checked = input.value === intent; });
 
-  const controls = Array.from(form.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>("input, select, textarea"));
+  const controls = Array.from(form.querySelectorAll<HTMLInputElement | HTMLSelectElement>("input, select"));
   const requiredGroups = Array.from(form.querySelectorAll<HTMLFieldSetElement>("[data-required-group]"));
   let submitted = false;
 
   const validate = (showErrors: boolean) => {
     let valid = true;
     controls.forEach((field) => {
+      field.setCustomValidity(field.matches(":disabled") ? "" : contactFieldError(field));
       const invalid = !field.matches(":disabled") && !field.checkValidity();
       valid = valid && !invalid;
       field.setAttribute("aria-invalid", String(showErrors && invalid));
@@ -274,7 +272,8 @@ const choiceCardClass =
 
   const applyState = () => {
     if (!locked) intent = parseIntent(intentInputs.find((input) => input.checked)?.value) ?? intent;
-    form.dataset.intent = intent;
+    form.dataset.intent = intent ?? "";
+    submitButton.disabled = !intent;
     servicesFieldset.disabled = intent !== "services";
     servicesFieldset.classList.toggle("hidden", intent !== "services");
     workFieldset.disabled = intent !== "work";
@@ -289,13 +288,58 @@ const choiceCardClass =
   };
   applyState();
 
+  // The landing owns the choice gate; explicit presets (including /planes) bypass it.
+  const revealSelection = () => {
+    if (!section || !intent) return;
+    section.hidden = false;
+    form.classList.remove("hidden");
+    success.classList.add("hidden");
+    fallback.href = "#";
+    choices.forEach((choice) => {
+      choice.setAttribute("aria-expanded", String(choice.dataset.contactIntent === intent));
+    });
+    // Reveal first: native fragment navigation may have run while the section was hidden.
+    requestAnimationFrame(() => {
+      heading.focus({ preventScroll: true });
+      heading.scrollIntoView({ block: "start", behavior: "instant" });
+    });
+  };
+  revealSelection();
+  choices.forEach((choice) => choice.addEventListener("click", (event) => {
+    if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    const selected = parseIntent(choice.dataset.contactIntent);
+    if (!selected) return;
+    event.preventDefault();
+    intent = selected;
+    // Only the public intent/anchor is retained; entered data stays in the form.
+    window.history.replaceState(null, "", choice.href);
+    applyState();
+    revealSelection();
+  }));
+
   intentInputs.forEach((input) => input.addEventListener("change", applyState));
   driverInputs.forEach((input) => input.addEventListener("change", applyState));
-  form.addEventListener("input", () => { if (submitted) validate(true); });
-  form.addEventListener("change", () => { if (submitted) validate(true); });
+  const clearQualification = () => {
+    if (!quoteMode) return;
+    result?.dispatchEvent(new Event("contact:clear"));
+    form.classList.remove("hidden");
+  };
+  const onEdit = () => {
+    clearQualification();
+    if (submitted) validate(true);
+  };
+  form.addEventListener("input", onEdit);
+  form.addEventListener("change", onEdit);
+  result?.addEventListener("contact:edit", () => {
+    clearQualification();
+    submitted = false;
+    validate(false);
+    form.querySelector<HTMLInputElement>('[name="name"]')?.focus();
+  });
 
   form.addEventListener("submit", (event) => {
     event.preventDefault();
+    if (!intent) return;
 
     submitted = true;
     if (!validate(true)) {
@@ -306,42 +350,14 @@ const choiceCardClass =
     }
 
     const data = new FormData(form);
-    const value = (key: string) => String(data.get(key) ?? "").trim();
-    const shared = [
-      `Nombre: ${value("name")}`,
-      `Teléfono: ${value("phone")}`,
-    ];
-
-    const lines =
-      intent === "work"
-        ? [
-            "Hola FLEXAI, quiero trabajar con FLEXAI.",
-            ...shared,
-            `Conductor: ${value("driver") === "yes" ? "Sí" : "No"}`,
-            ...(value("driver") === "yes"
-              ? [
-                  `Zona de origen: ${value("originZone")}`,
-                  `Zona de interés: ${value("interestZone")}`,
-                  `Vehículo: ${value("vehicle")}`,
-                  `Tamaño del vehículo: ${value("vehicleSize")}`,
-                  `Disponibilidad: ${data.getAll("availabilityDays").join(", ")} · ${value("availabilityTime")}`,
-                ]
-              : []),
-            ...(value("workMessage") ? [`Mensaje: ${value("workMessage")}`] : []),
-          ]
-        : [
-            "Hola FLEXAI, quiero información sobre el servicio de envíos.",
-            ...shared,
-            `Empresa: ${value("store")}`,
-            `Zona de colecta: ${value("locality")}`,
-            `Paquetes por día: ${value("volume")}`,
-            `Zonas de entrega: ${data.getAll("deliveryZones").join(", ")}`,
-            `Tamaño de paquetes: ${value("size")}`,
-            ...(value("url") ? [`Link: ${value("url")}`] : []),
-            ...(value("message") ? [`Mensaje: ${value("message")}`] : []),
-          ];
-
-    const url = whatsappUrl(lines.join("\n"));
+    if (quoteMode) {
+      if (intent !== "services" || !result) return;
+      const qualified = new CustomEvent("contact:qualified", { detail: data, cancelable: true });
+      result.dispatchEvent(qualified);
+      if (qualified.defaultPrevented) form.classList.add("hidden");
+      return;
+    }
+    const url = whatsappUrl(buildContactMessage(data, intent));
     fallback.href = url;
     window.open(url, "_blank", "noopener");
 

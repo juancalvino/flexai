@@ -1,7 +1,6 @@
 ---
 import Container from "../container.astro";
 import Lines from "../ui/Lines.astro";
-import { whatsappUrl, DEFAULT_WHATSAPP_MESSAGE } from "../../data/site";
 ---
 
 <section class="relative overflow-hidden bg-accent py-24 text-accent-contrast md:py-36">
@@ -11,10 +10,10 @@ import { whatsappUrl, DEFAULT_WHATSAPP_MESSAGE } from "../../data/site";
       <Lines lines={["Tus ventas,", "nuestra ruta."]} class="text-display-md uppercase" />
     </div>
     <div class="flex flex-col gap-3 sm:flex-row" data-reveal="up" data-delay="0.2">
-      <a href={whatsappUrl(DEFAULT_WHATSAPP_MESSAGE)} target="_blank" rel="noopener noreferrer" class="btn-dark md:px-8 md:py-4 md:text-base">
+      <a href="/contacto?intent=services#formulario" class="btn-dark md:px-8 md:py-4 md:text-base">
         Hablanos por WhatsApp
       </a>
-      <a href="/contacto" class="btn border border-accent-contrast hover:bg-accent-contrast hover:text-accent md:px-8 md:py-4 md:text-base">Dejanos tus datos</a>
+      <a href="/contacto?intent=services#formulario" class="btn border border-accent-contrast hover:bg-accent-contrast hover:text-accent md:px-8 md:py-4 md:text-base">Dejanos tus datos</a>
     </div>
   </Container>
 </section>

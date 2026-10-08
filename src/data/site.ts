@@ -13,7 +13,7 @@ export const SITE = {
   phoneHref: `tel:+${WHATSAPP_NUMBER}`,
   whatsappNumber: WHATSAPP_NUMBER,
   email: "flexai.logistica@gmail.com",
-  lightDataUrl: "https://lightdata.flexai.com.ar",
+  trackingUrl: "https://lightdata.flexai.com.ar",
   instagram: "https://instagram.com/flexai.logistica",
   ogImage: "/assets/og-image.jpg",
   // Browser UI color (mobile address bar). Meta tags can't read CSS variables: keep in sync with --color-ink.
@@ -38,5 +38,5 @@ export const NAVIGATION = [
 
 export const SOCIAL_LINKS = [
   { name: "Instagram", href: SITE.instagram, icon: "simple-icons:instagram" },
-  { name: "WhatsApp", href: whatsappUrl(), icon: "simple-icons:whatsapp" },
+  { name: "WhatsApp", href: "/contacto", icon: "simple-icons:whatsapp" },
 ] as const;
