@@ -4,5 +4,5 @@
 
 export const FEATURES: { pricing: boolean } = {
   /** Show qualified plan results and rates on /planes after valid intake. */
-  pricing: true,
+  pricing: false,
 };
