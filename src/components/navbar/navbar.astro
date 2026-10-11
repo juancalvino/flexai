@@ -144,6 +144,11 @@ const isActive = (path: string) => (path === "/" ? currentPath === "/" : current
     backdrop-filter: blur(12px);
   }
 
+  /* A backdrop filter makes the header the containing block of the fixed menu, clipping it to the header height. */
+  #site-header[data-menu-open] {
+    backdrop-filter: none;
+  }
+
   .menu-icon,
   .menu-icon::before {
     display: block;
@@ -213,6 +218,7 @@ const isActive = (path: string) => (path === "/" ? currentPath === "/" : current
 
   function setOpen(open: boolean) {
     menu.toggleAttribute("data-open", open);
+    header.toggleAttribute("data-menu-open", open);
     toggle.setAttribute("aria-expanded", String(open));
     toggle.setAttribute("aria-label", open ? "Cerrar menú" : "Abrir menú");
     document.documentElement.style.overflow = open ? "hidden" : "";
