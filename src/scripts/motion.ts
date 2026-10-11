@@ -40,7 +40,9 @@ function initReveals() {
   gsap.utils.toArray<HTMLElement>("[data-reveal]").forEach((el) => {
     const type = el.dataset["reveal"] ?? "up";
     const delay = Number(el.dataset["delay"] ?? 0);
-    const scrollTrigger = { trigger: el, start: "top 88%", once: true };
+    // Elements already visible on load (e.g. hero CTAs near the fold) must not wait for a scroll.
+    const inInitialViewport = el.getBoundingClientRect().top < window.innerHeight;
+    const scrollTrigger = { trigger: el, start: inInitialViewport ? "top bottom" : "top 88%", once: true };
 
     if (type === "clip") {
       gsap.fromTo(
