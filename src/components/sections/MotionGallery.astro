@@ -3,30 +3,40 @@ import { Icon } from "astro-icon/components";
 import Container from "../container.astro";
 import Sectionhead from "../sectionhead.astro";
 import ImageSlot from "../ui/ImageSlot.astro";
+import operationsImage from "../../images/gallery-operations.png";
+import teamImage from "../../images/gallery-team.png";
+import technologyImage from "../../images/gallery-technology.png";
+import lastMileImage from "../../images/gallery-last-mile.png";
+import storePickupImage from "../../images/gallery-store-pickup.png";
 
 const slides = [
   {
     title: "Operación",
+    image: operationsImage,
     description: "Una red preparada para mover cada paquete del día.",
     prompt: "depósito logístico con estanterías y paquetes de Mercado Libre clasificados por zona, luz natural, fotografía vertical 4:5",
   },
   {
     title: "Equipo",
-    description: "Personas reales detrás de cada entrega.",
-    prompt: "retrato grupal de repartidores sonrientes con remeras negras y detalles amarillos frente a sus motos, fotografía vertical 4:5",
+    image: teamImage,
+    description: "Un equipo propio y una flota de vehículos lista para salir todos los días.",
+    prompt: "equipo de repartidores con remeras negras y detalles amarillos frente a una flota de motos y utilitarios FLEXAI estacionados, fotografía vertical 4:5",
   },
   {
     title: "Tecnología",
+    image: technologyImage,
     description: "Datos en tiempo real para decidir mejor.",
     prompt: "primer plano de una pantalla con mapa de rutas de entrega y puntos amarillos sobre fondo oscuro, fotografía vertical 4:5",
   },
   {
     title: "Última milla",
+    image: lastMileImage,
     description: "El momento donde cada minuto cuenta.",
     prompt: "repartidor entregando un paquete en la puerta de una casa del conurbano bonaerense, luz de tarde, fotografía vertical 4:5",
   },
   {
     title: "Retiro en tienda",
+    image: storePickupImage,
     description: "Pasamos a buscar tus ventas por tu depósito o local.",
     prompt: "vendedor entregando cajas embaladas a un repartidor en la puerta de un local comercial, fotografía vertical 4:5",
   },
@@ -56,7 +66,7 @@ const slides = [
     {
       slides.map((slide, index) => (
         <li class="group w-[78vw] shrink-0 snap-start sm:w-[46vw] lg:w-[28vw]" data-reveal="up" data-delay={index * 0.08}>
-          <ImageSlot prompt={slide.prompt} alt={slide.title} class="aspect-[4/5] rounded-3xl transition-transform duration-700 ease-out-expo group-hover:scale-[0.98]" />
+          <ImageSlot src={slide.image} prompt={slide.prompt} alt={slide.title} sizes="(min-width: 1024px) 28vw, (min-width: 640px) 46vw, 78vw" class="aspect-[4/5] rounded-3xl transition-transform duration-700 ease-out-expo group-hover:scale-[0.98]" />
           <div class="mt-5 flex items-baseline justify-between gap-4">
             <h3 class="font-display text-2xl uppercase">{slide.title}</h3>
             <span class="font-display text-sm text-ink/40">0{index + 1}</span>

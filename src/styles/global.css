@@ -54,6 +54,10 @@
     @apply btn border border-current hover:bg-cream hover:text-ink;
   }
 
+  .img-frame {
+    @apply relative overflow-hidden bg-ink-muted;
+  }
+
   /* Image placeholder: to be replaced with generated images. */
   .img-slot {
     @apply relative flex flex-col overflow-hidden bg-ink-muted text-cream/70;

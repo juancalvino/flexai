@@ -1,17 +1,40 @@
 ---
-// Placeholder for an image that will be generated later.
-// `prompt` describes the image to create and is shown as a visible label.
+import type { ImageMetadata } from "astro";
+import { Image } from "astro:assets";
+
+// Image frame. Renders `src` when provided; otherwise shows a placeholder
+// whose `prompt` describes the image still to be created.
 interface Props {
   prompt: string;
+  src?: ImageMetadata | undefined;
   alt?: string;
+  sizes?: string;
+  loading?: "eager" | "lazy";
   class?: string;
   [key: string]: unknown;
 }
 
-const { prompt, alt = "", class: className, ...rest } = Astro.props;
+const { prompt, src, alt = "", sizes = "100vw", loading = "lazy", class: className, ...rest } = Astro.props;
 ---
 
-<figure class:list={["img-slot", className]} role="img" aria-label={alt || prompt} {...rest}>
-  <figcaption class="img-slot__label">&lt;colocar imagen: {prompt}&gt;</figcaption>
-  <slot />
-</figure>
+{
+  src ? (
+    <figure class:list={["img-frame", className]} {...rest}>
+      <Image
+        src={src}
+        alt={alt}
+        sizes={sizes}
+        widths={[480, 800, 1200, src.width]}
+        loading={loading}
+        fetchpriority={loading === "eager" ? "high" : undefined}
+        class="absolute inset-0 h-full w-full object-cover"
+      />
+      <slot />
+    </figure>
+  ) : (
+    <figure class:list={["img-slot", className]} role="img" aria-label={alt || prompt} {...rest}>
+      <figcaption class="img-slot__label">&lt;colocar imagen: {prompt}&gt;</figcaption>
+      <slot />
+    </figure>
+  )
+}

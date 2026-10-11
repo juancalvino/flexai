@@ -32,7 +32,7 @@ import { SERVICES } from "../../data/services";
                 <p class="mt-6 max-w-md text-lg leading-relaxed text-cream/70">{service.description}</p>
               </div>
             </div>
-            <ImageSlot prompt={service.imagePrompt} alt={service.title} class="aspect-[16/10] md:aspect-auto md:min-h-full" />
+            <ImageSlot src={service.image} prompt={service.imagePrompt} alt={service.title} sizes="(min-width: 768px) 50vw, 100vw" class="aspect-[16/10] md:aspect-auto md:min-h-full" />
           </li>
         ))
       }
