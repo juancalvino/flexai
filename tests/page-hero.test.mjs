@@ -18,9 +18,9 @@ test("Servicios shares its service-first H1, differentiators and final contact C
   assert.ok(services.indexOf("DIFFERENTIATORS.map") < services.indexOf("<ContactCta"));
 });
 
-test("home foreground reserves mobile clearance for the visible image instructions", () => {
+test("home foreground centers on mobile below the header and anchors to the bottom from sm", () => {
   const foreground = homeHero.match(/<Container\b[^>]*>/)?.[0] ?? "";
-  assert.match(foreground, /\bpt-64 sm:pt-32\b/);
+  assert.match(foreground, /\bjustify-center\b.*\bpt-28\b.*\bsm:justify-end\b/);
   assert.match(homeHero, /min-h-\[100svh\]/);
   const placeholder = homeHero.match(/<ImageSlot\b[\s\S]*?\/>/)?.[0] ?? "";
   assert.match(placeholder, /prompt="fotografía cinematográfica/);
