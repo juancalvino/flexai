@@ -1,6 +1,13 @@
 ---
 import { Icon } from "astro-icon/components";
-import { ZONE_LIST, formatPrice } from "../data/zones";
+import { ZONE_LIST, PARTIDO_EXCEPTIONS } from "../data/zones";
+import { FEATURES } from "../data/features";
+
+// Coverage is public in every variant; commercial data stays out of the map payload.
+const mapData = {
+  zones: ZONE_LIST.map(({ prices, ...zone }) => zone),
+  exceptions: PARTIDO_EXCEPTIONS,
+};
 
 const localityOptions = [
   ...new Set(
@@ -14,7 +21,7 @@ const localityOptions = [
 
 <div class="grid gap-6 lg:grid-cols-[1fr_400px]">
   <div class="relative isolate min-h-[440px] overflow-hidden rounded-3xl ring-1 ring-cream/10 md:min-h-[640px]">
-    <div id="coverage-map" class="absolute inset-0 bg-ink-soft" aria-label="Mapa de cobertura AMBA"></div>
+    <div id="coverage-map" data-map={JSON.stringify(mapData)} class="absolute inset-0 bg-ink-soft" aria-label="Mapa de cobertura AMBA"></div>
     <p id="map-status" class="pointer-events-none absolute inset-0 z-[500] flex items-center justify-center text-cream/50">Cargando mapa…</p>
 
     <button
@@ -40,10 +47,7 @@ const localityOptions = [
         <span id="map-summary-place" class="block font-display text-lg uppercase leading-tight"></span>
         <span id="map-summary-zone" class="block text-xs text-cream/50"></span>
       </span>
-      <span class="flex items-center gap-2">
-        <span id="map-summary-price" class="font-display text-2xl text-accent"></span>
-        <Icon name="bx:chevron-down" class="h-5 w-5 text-cream/60" />
-      </span>
+      <Icon name="bx:chevron-down" class="h-5 w-5 text-cream/60" />
     </a>
   </div>
 
@@ -51,40 +55,43 @@ const localityOptions = [
     <form id="locality-search" class="relative" role="search">
       <label for="locality-input" class="eyebrow text-cream/40">Buscá tu localidad</label>
       <div class="relative mt-2">
-        <Icon name="bx:search" class="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-cream/40" />
-        <input
-          id="locality-input"
-          list="locality-options"
-          autocomplete="off"
-          placeholder="Ej: Quilmes, Pilar, Tigre…"
-          class="w-full rounded-full border-cream/15 bg-ink py-3 pl-12 pr-4 text-cream placeholder:text-cream/30 focus:border-accent focus:ring-0"
-        />
+        <div class="relative">
+          <Icon name="bx:search" class="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-cream/40" />
+          <input
+            id="locality-input"
+            role="combobox"
+            aria-controls="locality-options"
+            aria-expanded="false"
+            aria-autocomplete="list"
+            aria-describedby="search-feedback"
+            autocomplete="off"
+            placeholder="Ej: Quilmes, Pilar, Tigre…"
+            class="w-full rounded-full border-cream/15 bg-ink py-3 pl-12 pr-4 text-cream placeholder:text-cream/30 focus:border-accent focus:ring-0"
+          />
+        </div>
+        <ul
+          id="locality-options"
+          role="listbox"
+          aria-label="Localidades"
+          data-localities={JSON.stringify(localityOptions)}
+          data-lenis-prevent
+          hidden
+          class="static lg:absolute lg:inset-x-0 lg:top-full z-20 mt-2 max-h-64 touch-pan-y overflow-y-auto overflow-x-hidden overscroll-contain rounded-2xl border border-cream/15 bg-ink p-1.5 text-cream shadow-xl shadow-black/25"
+        ></ul>
       </div>
-      <datalist id="locality-options">
-        {localityOptions.map((name) => <option value={name} />)}
-      </datalist>
       <p id="search-feedback" class="mt-2 hidden text-sm text-cream/50" role="status"></p>
     </form>
-
-    <div class="grid grid-cols-2 rounded-full bg-ink p-1" role="group" aria-label="Plan">
-      <button type="button" class="plan-btn rounded-full py-2.5 font-display text-sm uppercase tracking-wider" data-plan="standard" aria-pressed="true">Standard</button>
-      <button type="button" class="plan-btn rounded-full py-2.5 font-display text-sm uppercase tracking-wider" data-plan="pro" aria-pressed="false">Pro</button>
-    </div>
 
     <div aria-live="polite">
       <p class="eyebrow text-cream/40">Zona</p>
       <h2 id="zone-title" class="mt-2 font-display text-4xl uppercase">AMBA</h2>
-      <p id="zone-description" class="mt-1 text-cream/60">Tocá el mapa, buscá tu localidad o elegí una zona para ver la tarifa.</p>
+      <p id="zone-description" class="mt-1 text-cream/60">
+        Tocá el mapa, buscá tu localidad o elegí una zona para conocer la cobertura.
+      </p>
       <p id="zone-note" class="mt-3 hidden rounded-xl bg-accent/10 px-4 py-3 text-sm text-accent"></p>
-
-      <div id="zone-price-wrap" class="mt-6 hidden border-y border-cream/10 py-5">
-        <p class="eyebrow text-cream/40">Tarifa por paquete · <span id="zone-plan">Standard</span></p>
-        <p id="zone-price" class="mt-2 font-display text-5xl text-accent"></p>
-        <p class="mt-1 text-xs text-cream/40">IVA no incluido</p>
-      </div>
     </div>
 
-    <details id="zone-localities-wrap" class="group hidden">
+    <details id="zone-localities-wrap" class="group hidden" open>
       <summary class="flex cursor-pointer list-none items-center justify-between text-sm text-cream/70 hover:text-cream">
         <span>Localidades incluidas (<span id="zone-localities-count"></span>)</span>
         <Icon name="bx:chevron-down" class="h-5 w-5 transition-transform group-open:rotate-180" />
@@ -106,16 +113,13 @@ const localityOptions = [
                 <span class="h-3 w-3 shrink-0 rounded-full ring-1 ring-cream/30" style={`background:${zone.color}`} />
                 <span class="font-display uppercase">{zone.name}</span>
               </span>
-              <span class="zone-btn-price text-sm text-cream/50" data-standard={formatPrice(zone.prices.standard)} data-pro={formatPrice(zone.prices.pro)}>
-                {formatPrice(zone.prices.standard)}
-              </span>
             </button>
           </li>
         ))
       }
     </ul>
 
-    <a id="zone-cta" href="#" target="_blank" rel="noopener noreferrer" class="btn-primary w-full">Consultar por WhatsApp</a>
+    <a id="zone-cta" href={FEATURES.pricing ? "/planes" : "/contacto?intent=services#formulario"} class="btn-primary w-full">Cotizar mis envíos</a>
   </aside>
 </div>
 
@@ -201,23 +205,13 @@ const localityOptions = [
   #coverage-map .leaflet-control-attribution a {
     color: rgb(var(--color-cream) / 0.7);
   }
-
-  .plan-btn[aria-pressed="true"] {
-    background: rgb(var(--color-accent));
-    color: rgb(var(--color-on-accent));
-  }
-
-  .plan-btn[aria-pressed="false"] {
-    color: rgb(var(--color-cream) / 0.6);
-  }
 </style>
 
 <script>
   import L from "leaflet";
   import "leaflet/dist/leaflet.css";
   import type { FeatureCollection } from "geojson";
-  import { ZONES, ZONE_LIST, PLANS, PARTIDO_EXCEPTIONS, formatPrice, type PlanId, type ZoneId } from "../data/zones";
-  import { whatsappUrl } from "../data/site";
+  import type { Zone, ZoneId } from "../data/zones";
 
   // Leaflet writes colors as SVG attributes, which can't use var(): resolve theme tokens once.
   const rootStyle = getComputedStyle(document.documentElement);
@@ -226,31 +220,36 @@ const localityOptions = [
 
   const $ = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T;
 
+  type MapZone = Omit<Zone, "prices">;
+  const { zones: ZONE_LIST, exceptions: PARTIDO_EXCEPTIONS } = JSON.parse($("coverage-map").dataset["map"]!) as {
+    zones: MapZone[];
+    exceptions: Record<string, string[]>;
+  };
+  const ZONES = Object.fromEntries(ZONE_LIST.map((zone) => [zone.id, zone])) as Record<ZoneId, MapZone>;
+
   const status = $("map-status");
   const title = $("zone-title");
   const description = $("zone-description");
-  const priceWrap = $("zone-price-wrap");
-  const price = $("zone-price");
-  const planLabel = $("zone-plan");
   const localitiesWrap = $("zone-localities-wrap");
   const localities = $("zone-localities");
   const localitiesCount = $("zone-localities-count");
-  const cta = $<HTMLAnchorElement>("zone-cta");
   const searchForm = $<HTMLFormElement>("locality-search");
   const searchInput = $<HTMLInputElement>("locality-input");
   const searchFeedback = $("search-feedback");
+  const searchOptions = $("locality-options");
+  const suggestionNames = JSON.parse(searchOptions.dataset["localities"]!) as string[];
+  let activeSuggestion = -1;
+  let visibleSuggestions: string[] = [];
+  let committedSearchValue: string | null = null;
   const note = $("zone-note");
   const summary = $("map-summary");
   const summaryPlace = $("map-summary-place");
   const summaryZone = $("map-summary-zone");
-  const summaryPrice = $("map-summary-price");
   const hint = $("map-hint");
-  const planButtons = document.querySelectorAll<HTMLButtonElement>(".plan-btn");
   const zoneButtons = document.querySelectorAll<HTMLButtonElement>(".zone-btn");
 
   type Selection = { zone: ZoneId; place: string; within?: string };
 
-  let plan: PlanId = "standard";
   let selected: Selection | null = null;
   let hovered: ZoneId | null = null;
   let overview: { center: L.LatLng; zoom: number } | null = null;
@@ -288,11 +287,8 @@ const localityOptions = [
   }
 
   function render() {
-    planButtons.forEach((button) => button.setAttribute("aria-pressed", String(button.dataset["plan"] === plan)));
     zoneButtons.forEach((button) => {
       button.setAttribute("aria-pressed", String(button.dataset["zone"] === selected?.zone));
-      const label = button.querySelector<HTMLElement>(".zone-btn-price")!;
-      label.textContent = label.dataset[plan] ?? "";
     });
     paintMap();
 
@@ -303,28 +299,23 @@ const localityOptions = [
     const exceptions = selected && !selected.within ? (PARTIDO_EXCEPTIONS[selected.place] ?? []) : [];
     const notes = exceptions.flatMap((name) => {
       const exception = localityZone.get(normalize(name));
-      return exception && exception.zone !== selected?.zone ? [`${name} tiene tarifa ${ZONES[exception.zone].name}.`] : [];
+      return exception && exception.zone !== selected?.zone
+        ? [`${name} pertenece a la zona ${ZONES[exception.zone].name}.`]
+        : [];
     });
     note.textContent = notes.join(" ");
     note.classList.toggle("hidden", notes.length === 0);
 
-    if (!selected) {
-      cta.href = whatsappUrl("Hola FLEXAI, quiero información sobre la cobertura de envíos.");
-      return;
-    }
+    if (!selected) return;
 
     const zone = ZONES[selected.zone];
     const isZoneOnly = selected.place === zone.name;
     title.textContent = isZoneOnly ? zone.name : selected.place;
     const area = selected.within ? `${selected.within} · ${zone.name}` : `${zone.name} · ${zone.description}`;
     description.textContent = isZoneOnly ? zone.description : area;
-    planLabel.textContent = PLANS[plan].name;
-    price.textContent = formatPrice(zone.prices[plan]);
-    priceWrap.classList.remove("hidden");
 
     summaryPlace.textContent = title.textContent;
-    summaryZone.textContent = `${zone.name} · ${PLANS[plan].name}`;
-    summaryPrice.textContent = price.textContent;
+    summaryZone.textContent = zone.name;
 
     localitiesCount.textContent = String(zone.localities.length);
     localities.replaceChildren(
@@ -336,9 +327,6 @@ const localityOptions = [
       }),
     );
     localitiesWrap.classList.remove("hidden");
-
-    const place = isZoneOnly ? zone.name : `${selected.place} (${zone.name})`;
-    cta.href = whatsappUrl(`Hola FLEXAI, quiero información del plan ${PLANS[plan].name} para ${place}.`);
   }
 
   function focusSelection() {
@@ -356,13 +344,6 @@ const localityOptions = [
     if (fly) focusSelection();
   }
 
-  planButtons.forEach((button) =>
-    button.addEventListener("click", () => {
-      plan = button.dataset["plan"] as PlanId;
-      render();
-    }),
-  );
-
   zoneButtons.forEach((button) =>
     button.addEventListener("click", () => {
       const zone = button.dataset["zone"] as ZoneId;
@@ -370,7 +351,51 @@ const localityOptions = [
     }),
   );
 
-  function searchLocality() {
+  function clearSearchFeedback() {
+    searchFeedback.classList.add("hidden");
+    searchFeedback.textContent = "";
+  }
+
+  function closeSuggestions() {
+    searchOptions.hidden = true;
+    searchInput.setAttribute("aria-expanded", "false");
+    searchInput.removeAttribute("aria-activedescendant");
+    activeSuggestion = -1;
+    visibleSuggestions = [];
+    searchOptions.replaceChildren();
+  }
+
+  function chooseSuggestion(name: string) {
+    searchInput.value = name;
+    searchLocality();
+  }
+
+  function showSuggestions() {
+    closeSuggestions();
+    const query = normalize(searchInput.value);
+    if (!query) return;
+    // Only the popup is capped: the resolver below always searches the full map.
+    visibleSuggestions = suggestionNames.filter((name) => normalize(name).includes(query)).slice(0, 8);
+    searchOptions.replaceChildren(...visibleSuggestions.map((name, index) => {
+      const option = document.createElement("li");
+      option.id = `locality-option-${index}`;
+      option.setAttribute("role", "option");
+      option.setAttribute("aria-selected", "false");
+      option.className = "flex min-h-[44px] cursor-pointer items-center whitespace-normal break-words rounded-xl px-3 py-2 text-sm leading-snug transition-colors hover:bg-accent/10 hover:text-accent aria-selected:bg-accent/15 aria-selected:text-accent";
+      option.textContent = name;
+      // Keep input focus until click; scrolling/cancelled touch gestures must not select.
+      option.addEventListener("pointerdown", (event) => event.preventDefault());
+      option.addEventListener("click", () => chooseSuggestion(name));
+      return option;
+    }));
+    searchOptions.hidden = visibleSuggestions.length === 0;
+    searchInput.setAttribute("aria-expanded", String(!searchOptions.hidden));
+  }
+
+  function searchLocality(event?: Event) {
+    closeSuggestions();
+    // A later native change must not repeat a selection already committed by click/Enter.
+    if (event?.type === "change" && searchInput.value === committedSearchValue) return;
     const query = normalize(searchInput.value);
     if (!query) return;
     const partial = [...localityZone.entries()].filter(([name]) => name.includes(query)).map(([, value]) => value);
@@ -392,9 +417,9 @@ const localityOptions = [
       return;
     }
 
-    searchFeedback.classList.add("hidden");
-    searchFeedback.textContent = "";
+    clearSearchFeedback();
     searchInput.value = match.place;
+    committedSearchValue = match.place;
     select(match);
   }
 
@@ -403,8 +428,46 @@ const localityOptions = [
     searchLocality();
   });
 
-  // Choosing an option from the datalist fires "change" without submitting.
+  // Preserve free-text search when the browser commits an edit on blur.
   searchInput.addEventListener("change", searchLocality);
+  searchInput.addEventListener("input", () => {
+    committedSearchValue = null;
+    clearSearchFeedback();
+    showSuggestions();
+  });
+  searchInput.addEventListener("focus", showSuggestions);
+  searchInput.addEventListener("blur", closeSuggestions);
+  document.addEventListener("pointerdown", (event) => {
+    if (!searchForm.contains(event.target as Node)) closeSuggestions();
+  });
+  searchInput.addEventListener("keydown", (event) => {
+    if (event.isComposing) return;
+    if (event.key === "Escape" || event.key === "Tab") {
+      if (event.key === "Escape" && !searchOptions.hidden) event.preventDefault();
+      closeSuggestions();
+      return;
+    }
+    if (event.key === "Enter" && activeSuggestion >= 0) {
+      event.preventDefault();
+      chooseSuggestion(visibleSuggestions[activeSuggestion]!);
+      return;
+    }
+    if (event.key !== "ArrowDown" && event.key !== "ArrowUp") return;
+    if (searchOptions.hidden) showSuggestions();
+    const count = visibleSuggestions.length;
+    if (!count) return;
+    event.preventDefault();
+    activeSuggestion = activeSuggestion < 0
+      ? (event.key === "ArrowDown" ? 0 : count - 1)
+      : (activeSuggestion + (event.key === "ArrowDown" ? 1 : -1) + count) % count;
+    Array.from(searchOptions.children).forEach((option, index) => {
+      option.setAttribute("aria-selected", String(index === activeSuggestion));
+      if (index === activeSuggestion) {
+        searchInput.setAttribute("aria-activedescendant", option.id);
+        option.scrollIntoView({ block: "nearest" });
+      }
+    });
+  });
 
   const isTouch = window.matchMedia("(pointer: coarse)").matches;
 
@@ -467,10 +530,12 @@ const localityOptions = [
   $("map-reset").addEventListener("click", () => {
     selected = null;
     title.textContent = "AMBA";
-    description.textContent = "Tocá el mapa, buscá tu localidad o elegí una zona para ver la tarifa.";
-    priceWrap.classList.add("hidden");
+    description.textContent = "Tocá el mapa, buscá tu localidad o elegí una zona para conocer la cobertura.";
     localitiesWrap.classList.add("hidden");
     searchInput.value = "";
+    committedSearchValue = null;
+    closeSuggestions();
+    clearSearchFeedback();
     render();
     if (overview) map.flyTo(overview.center, overview.zoom, { duration: 0.8 });
   });

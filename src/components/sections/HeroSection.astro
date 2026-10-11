@@ -3,7 +3,7 @@ import Container from "../container.astro";
 import Lines from "../ui/Lines.astro";
 import ImageSlot from "../ui/ImageSlot.astro";
 import heroImage from "../../images/hero-night-ride.png";
-import { whatsappUrl, DEFAULT_WHATSAPP_MESSAGE } from "../../data/site";
+import { FEATURES } from "../../data/features";
 ---
 
 <section class="relative flex min-h-[100svh] flex-col overflow-hidden bg-ink text-cream">
@@ -20,7 +20,7 @@ import { whatsappUrl, DEFAULT_WHATSAPP_MESSAGE } from "../../data/site";
     <div class="absolute inset-0 bg-gradient-to-r from-ink/70 via-ink/30 to-transparent"></div>
   </div>
 
-  <Container class="relative flex flex-1 flex-col justify-end pb-16 pt-32 md:pb-20">
+  <Container class="relative flex flex-1 flex-col justify-end pb-16 pt-64 sm:pt-32 md:pb-20">
     <div class="mb-10 flex flex-wrap gap-3" data-reveal="fade" data-delay="0.4">
       <span class="eyebrow rounded-full border border-cream/25 px-4 py-2">FLEXAI · Logística</span>
       <span class="eyebrow rounded-full border border-cream/25 px-4 py-2">AMBA · Argentina</span>
@@ -33,10 +33,10 @@ import { whatsappUrl, DEFAULT_WHATSAPP_MESSAGE } from "../../data/site";
         Logística de última milla para vendedores de Mercado Libre. Dos recorridos diarios en CABA y GBA, con seguimiento en tiempo real.
       </p>
       <div class="flex flex-wrap gap-3" data-reveal="up" data-delay="0.75">
-        <a href={whatsappUrl(DEFAULT_WHATSAPP_MESSAGE)} target="_blank" rel="noopener noreferrer" class="btn-primary">
+        <a href="/contacto?intent=services#formulario" class="btn-primary">
           Hablanos
         </a>
-        <a href="/servicios" class="btn-ghost">Ver tarifas</a>
+        <a href={FEATURES.pricing ? "/planes" : "/servicios"} class="btn-ghost">{FEATURES.pricing ? "Ver tarifas" : "Ver servicios"}</a>
       </div>
     </div>
   </Container>

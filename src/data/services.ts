@@ -1,24 +1,16 @@
 // Service and differentiator copy shared by the home page and /servicios.
 
-import type { ImageMetadata } from "astro";
-import flexImage from "../images/service-flex.png";
-import routesImage from "../images/service-routes.png";
-import trackingImage from "../images/service-tracking.png";
-import reschedulingImage from "../images/service-rescheduling.png";
-
 export interface Service {
   id: string;
   title: string;
   description: string;
   icon: string;
   imagePrompt: string;
-  image?: ImageMetadata;
 }
 
 export const SERVICES: Service[] = [
   {
     id: "flex",
-    image: flexImage,
     title: "Envíos Flex",
     description:
       "Retiramos tus ventas de Mercado Envíos Flex y las entregamos en el día, cuidando tu reputación en cada paquete.",
@@ -28,7 +20,6 @@ export const SERVICES: Service[] = [
   },
   {
     id: "recorridos",
-    image: routesImage,
     title: "Dos recorridos diarios",
     description:
       "Salimos dos veces por día, de lunes a sábado, para que ningún pedido quede esperando al día siguiente.",
@@ -37,18 +28,16 @@ export const SERVICES: Service[] = [
       "furgoneta de reparto estacionada en un depósito con paquetes apilados, luz de la mañana, estilo documental",
   },
   {
-    id: "lightdata",
-    image: trackingImage,
-    title: "Seguimiento con LightData",
+    id: "tracking",
+    title: "Seguimiento de envíos",
     description:
-      "Gestioná tus envíos y consultá el estado de cada entrega en tiempo real desde nuestra plataforma LightData.",
+      "Gestioná tus envíos y consultá el estado de cada entrega en tiempo real desde nuestra plataforma de seguimiento.",
     icon: "bx:line-chart",
     imagePrompt:
       "manos sosteniendo un celular con un panel de seguimiento de envíos en pantalla, fondo desenfocado de depósito, tonos oscuros con acentos amarillos",
   },
   {
     id: "reprogramaciones",
-    image: reschedulingImage,
     title: "Reprogramaciones sin estrés",
     description:
       "Coordinamos con el comprador cuando no está en su domicilio y reprogramamos la entrega en tiempo y forma.",
@@ -79,5 +68,5 @@ export const DIFFERENTIATORS = [
 export const STEPS = [
   { title: "Retiramos", description: "Pasamos por tu depósito o local a buscar las ventas del día." },
   { title: "Entregamos", description: "Nuestros repartidores llevan cada paquete a destino en el día." },
-  { title: "Seguís todo", description: "Consultás cada entrega en LightData y recibís el cierre del recorrido." },
+  { title: "Seguís todo", description: "Consultás cada entrega en la plataforma de seguimiento y recibís el cierre del recorrido." },
 ] as const;

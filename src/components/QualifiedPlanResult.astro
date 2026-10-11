@@ -1,0 +1,111 @@
+---
+import { PLANS, ZONE_LIST, type PlanId } from "../data/zones";
+
+// Only /planes with pricing enabled renders this payload. Never import zones in client code.
+const planIds: PlanId[] = ["standard", "pro"];
+const plans = Object.fromEntries(planIds.map((id) => [id, {
+  name: PLANS[id].name,
+  highlight: PLANS[id].highlight,
+  rates: ZONE_LIST.map((zone) => ({ name: zone.name, amount: zone.prices[id] })),
+}]));
+---
+
+<section id="qualified-result" class="hidden scroll-mt-28" data-plans={JSON.stringify(plans)} aria-label="Tu plan recomendado" tabindex="-1">
+  <div data-result-content></div>
+  <template data-result-template="priced">
+    <article class="rounded-3xl bg-ink p-6 text-cream sm:p-10">
+      <h2 data-title class="font-display text-4xl uppercase sm:text-5xl"></h2>
+      <p data-highlight class="mt-4 text-cream/70"></p>
+      <dl data-rates class="mt-8 divide-y divide-cream/15"></dl>
+      <p class="mt-4 text-sm text-cream/60">* Precios por paquete. IVA no incluido.</p>
+    </article>
+  </template>
+  <template data-result-template="premium">
+    <article class="rounded-3xl bg-ink p-6 text-cream sm:p-10">
+      <p class="eyebrow text-accent">Atención personalizada</p>
+      <h2 class="mt-4 font-display text-4xl uppercase sm:text-5xl">Servicio Premium</h2>
+      <p class="mt-4 text-cream/70">Un asesor te acompañará para armar una propuesta a la medida de tus necesidades. Coordinamos los detalles con vos para que tus envíos tengan la atención que necesitan.</p>
+    </article>
+  </template>
+  <template data-result-template="actions">
+    <div class="mt-8 flex flex-wrap items-center gap-4">
+      <a data-whatsapp target="_blank" rel="noopener noreferrer" class="btn-primary"></a>
+      <button data-edit type="button" class="px-2 py-3 text-sm text-cream/80 underline underline-offset-4 transition-colors hover:text-cream">Editar datos</button>
+    </div>
+  </template>
+</section>
+
+<script>
+  import { whatsappUrl } from "../data/site";
+  import { buildContactMessage } from "../lib/contact-message";
+  import { eligiblePlan, qualificationHeading } from "../lib/pricing-qualification";
+
+  interface PricedPlan {
+    name: string;
+    highlight: string;
+    rates: { name: string; amount: number }[];
+  }
+
+  const result = document.getElementById("qualified-result");
+  if (result) {
+    const content = result.querySelector<HTMLElement>("[data-result-content]")!;
+    const plans = JSON.parse(result.dataset.plans!) as Record<"standard" | "pro", PricedPlan>;
+    const formatter = new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", maximumFractionDigits: 0 });
+    const clone = (name: string) => (result.querySelector<HTMLTemplateElement>(`[data-result-template="${name}"]`)!.content.cloneNode(true) as DocumentFragment);
+    const edit = () => result.dispatchEvent(new Event("contact:edit"));
+    const clear = () => {
+      content.replaceChildren(); // Removes the previous card and its WhatsApp destination.
+      result.classList.add("hidden");
+    };
+    result.addEventListener("contact:clear", clear);
+    result.addEventListener("contact:qualified", (event) => {
+      clear();
+      const data = (event as CustomEvent<FormData>).detail;
+      const plan = eligiblePlan(data.get("volume"));
+      const heading = qualificationHeading(data.get("volume"));
+      if (!plan || !heading) return;
+
+      const card = clone(plan === "premium" ? "premium" : "priced");
+      if (plan !== "premium") {
+        const selected = plans[plan];
+        card.querySelector("[data-title]")!.textContent = selected.name;
+        card.querySelector("[data-highlight]")!.textContent = selected.highlight;
+        const rates = card.querySelector("[data-rates]")!;
+        for (const rate of selected.rates) {
+          const row = document.createElement("div");
+          row.className = "flex items-baseline justify-between gap-4 py-4";
+          const zone = document.createElement("dt");
+          zone.className = "font-display text-lg uppercase";
+          zone.textContent = rate.name;
+          const price = document.createElement("dd");
+          price.className = "font-display text-3xl";
+          price.textContent = formatter.format(rate.amount);
+          row.append(zone, price);
+          rates.append(row);
+        }
+      }
+
+      const message = buildContactMessage(data, "services", { heading });
+      const actions = clone("actions");
+      const link = actions.querySelector<HTMLAnchorElement>("[data-whatsapp]")!;
+      link.textContent = "Adquirir el servicio";
+      link.href = whatsappUrl(message);
+      actions.querySelector("[data-edit]")!.addEventListener("click", edit);
+      link.addEventListener("click", (click) => {
+        // Also fail closed if autofill/programmatic changes did not emit input/change.
+        const form = document.getElementById("contact-form") as HTMLFormElement;
+        const current = new FormData(form);
+        const currentHeading = qualificationHeading(current.get("volume"));
+        if (!currentHeading || buildContactMessage(current, "services", { heading: currentHeading }) !== message) {
+          click.preventDefault();
+          edit();
+        }
+      });
+      card.querySelector("article")!.append(actions);
+      content.append(card);
+      result.classList.remove("hidden");
+      event.preventDefault(); // Acknowledge rendering before ContactForm hides the intake.
+      result.focus();
+    });
+  }
+</script>

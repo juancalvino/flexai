@@ -2,7 +2,7 @@
 import { Icon } from "astro-icon/components";
 import Container from "./container.astro";
 import Logo from "./ui/Logo.astro";
-import { NAVIGATION, SITE, SOCIAL_LINKS, whatsappUrl, DEFAULT_WHATSAPP_MESSAGE } from "../data/site";
+import { NAVIGATION, SITE, SOCIAL_LINKS } from "../data/site";
 
 const year = new Date().getFullYear();
 ---
@@ -13,9 +13,7 @@ const year = new Date().getFullYear();
       <div>
         <p class="eyebrow mb-6 text-accent">¿Arrancamos?</p>
         <a
-          href={whatsappUrl(DEFAULT_WHATSAPP_MESSAGE)}
-          target="_blank"
-          rel="noopener noreferrer"
+          href="/contacto"
           class="group inline-flex items-center gap-4 font-display text-4xl uppercase leading-none md:text-6xl"
         >
           Hablanos
@@ -38,8 +36,8 @@ const year = new Date().getFullYear();
             ))
           }
           <li>
-            <a href={SITE.lightDataUrl} target="_blank" rel="noopener noreferrer" class="inline-block py-2 text-cream/80 transition-colors hover:text-accent">
-              Sistema LightData
+            <a href={SITE.trackingUrl} target="_blank" rel="noopener noreferrer" class="inline-block py-2 text-cream/80 transition-colors hover:text-accent">
+              Login
             </a>
           </li>
         </ul>
@@ -61,8 +59,8 @@ const year = new Date().getFullYear();
             SOCIAL_LINKS.map((social) => (
               <a
                 href={social.href}
-                target="_blank"
-                rel="noopener noreferrer"
+                target={social.href.startsWith("/") ? undefined : "_blank"}
+                rel={social.href.startsWith("/") ? undefined : "noopener noreferrer"}
                 aria-label={social.name}
                 class="flex h-11 w-11 items-center justify-center rounded-full border border-cream/20 transition-colors hover:border-accent hover:bg-accent hover:text-accent-contrast"
               >

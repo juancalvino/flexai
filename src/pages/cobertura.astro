@@ -6,11 +6,21 @@ import PageHero from "../components/sections/PageHero.astro";
 import GeoJSONMap from "../components/GeoJSONMap.astro";
 import ContactCta from "../components/sections/ContactCta.astro";
 import { ZONE_LIST } from "../data/zones";
+import { FEATURES } from "../data/features";
 ---
 
-<Layout title="Cobertura" description="Zonas de entrega de FLEXAI en CABA y GBA. Consultá el mapa interactivo y la tarifa de cada zona.">
+<Layout
+  title="Cobertura"
+  description={FEATURES.pricing
+    ? "Zonas de entrega de FLEXAI en CABA y GBA. Consultá el mapa interactivo y la tarifa de cada zona."
+    : "Zonas de entrega de FLEXAI en CABA y GBA. Consultá el mapa interactivo y tu zona de cobertura."}
+>
   <PageHero eyebrow="Cobertura · AMBA" title={["Llegamos a", "donde vende", "tu tienda."]} accent={2}>
-    <p>Todas las zonas habilitadas por Mercado Libre en CABA y el conurbano, organizadas en cuatro zonas de tarifa.</p>
+    <p>
+      {FEATURES.pricing
+        ? "Todas las zonas habilitadas por Mercado Libre en CABA y el conurbano, organizadas en cuatro zonas de tarifa."
+        : "Todas las zonas habilitadas por Mercado Libre en CABA y el conurbano, organizadas en cuatro zonas de cobertura."}
+    </p>
   </PageHero>
 
   <section class="bg-ink pb-24 text-cream md:pb-36">

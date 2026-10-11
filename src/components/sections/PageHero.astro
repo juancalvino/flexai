@@ -7,12 +7,13 @@ interface Props {
   eyebrow: string;
   title: string[];
   accent?: number | undefined;
+  fullHeight?: boolean;
 }
 
-const { eyebrow, title, accent } = Astro.props;
+const { eyebrow, title, accent, fullHeight = false } = Astro.props;
 ---
 
-<section class="relative overflow-hidden bg-ink pb-20 pt-40 text-cream md:pb-28 md:pt-52">
+<section class:list={["relative overflow-hidden bg-ink pb-20 pt-40 text-cream md:pb-28 md:pt-52", { "min-h-[100svh]": fullHeight }]}>
   <Container>
     <p class="eyebrow mb-8 text-accent" data-reveal="fade">{eyebrow}</p>
     <Lines tag="h1" lines={title} accent={accent} class="text-display-md uppercase" />
