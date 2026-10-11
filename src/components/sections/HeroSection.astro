@@ -2,18 +2,22 @@
 import Container from "../container.astro";
 import Lines from "../ui/Lines.astro";
 import ImageSlot from "../ui/ImageSlot.astro";
+import heroImage from "../../images/hero-night-ride.png";
 import { FEATURES } from "../../data/features";
 ---
 
 <section class="relative flex min-h-[100svh] flex-col overflow-hidden bg-ink text-cream">
   <div class="absolute inset-0" data-reveal="clip">
     <ImageSlot
+      src={heroImage}
+      loading="eager"
       prompt="fotografía cinematográfica nocturna de una avenida de Buenos Aires con estelas de luces de tránsito y un repartidor en moto en primer plano, desenfoque de movimiento, tonos oscuros con acentos amarillos, formato 16:9 horizontal"
       alt="Repartidor de FLEXAI en moto por una avenida de Buenos Aires"
       class="h-[115%] w-full pt-20"
       data-parallax="0.12"
     />
-    <div class="absolute inset-0 bg-gradient-to-t from-ink via-ink/60 to-ink/30"></div>
+    <div class="absolute inset-0 bg-gradient-to-t from-ink via-ink/75 to-ink/55"></div>
+    <div class="absolute inset-0 bg-gradient-to-r from-ink/70 via-ink/30 to-transparent"></div>
   </div>
 
   <Container class="relative flex flex-1 flex-col justify-end pb-16 pt-64 sm:pt-32 md:pb-20">
