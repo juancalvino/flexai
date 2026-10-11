@@ -45,14 +45,14 @@ module.exports = {
           from: { transform: "translateX(0)" },
           to: { transform: "translateX(-50%)" },
         },
-        "scroll-cue": {
-          "0%": { transform: "translateY(-100%)" },
-          "100%": { transform: "translateY(200%)" },
+        "scroll-nudge": {
+          "0%, 100%": { transform: "translateY(0)", opacity: "0.6" },
+          "50%": { transform: "translateY(4px)", opacity: "1" },
         },
       },
       animation: {
         marquee: "marquee 30s linear infinite",
-        "scroll-cue": "scroll-cue 1.8s cubic-bezier(0.65, 0, 0.35, 1) infinite",
+        "scroll-nudge": "scroll-nudge 2s ease-in-out infinite",
       },
     },
   },

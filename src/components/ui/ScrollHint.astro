@@ -1,0 +1,56 @@
+---
+/**
+ * Floating scroll-down hint shown on any page whose content extends below
+ * the fold. It fades out as soon as the visitor starts scrolling and comes
+ * back only when they return to the top. Decorative — hidden from assistive
+ * technology because scrolling is already discoverable there.
+ */
+---
+
+<div
+  id="scroll-hint"
+  class="pointer-events-none fixed bottom-[calc(1.25rem+env(safe-area-inset-bottom))] left-1/2 z-40 -translate-x-1/2 opacity-0 transition-opacity duration-500 data-[visible]:opacity-100 md:bottom-8"
+  aria-hidden="true"
+>
+  <span class="flex h-9 w-9 items-center justify-center rounded-full bg-ink/50 text-cream/80 backdrop-blur-sm">
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.5"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      class="h-5 w-5 motion-safe:animate-scroll-nudge motion-reduce:animate-none"
+      focusable="false"
+    >
+      <path d="M6 9l6 6 6-6" />
+    </svg>
+  </span>
+</div>
+
+<script>
+  /** Pixels of scroll that dismiss the hint. */
+  const DISMISS_OFFSET = 40;
+  /** Minimum hidden content below the fold before the hint is worth showing. */
+  const MIN_OVERFLOW = 120;
+
+  const hint = document.getElementById("scroll-hint");
+
+  if (hint) {
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      const root = document.documentElement;
+      const overflow = root.scrollHeight - window.innerHeight;
+      hint.toggleAttribute("data-visible", overflow > MIN_OVERFLOW && window.scrollY < DISMISS_OFFSET);
+    };
+    const schedule = () => {
+      if (!frame) frame = requestAnimationFrame(update);
+    };
+
+    update();
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule);
+    window.addEventListener("load", schedule);
+  }
+</script>
