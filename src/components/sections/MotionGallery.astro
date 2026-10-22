@@ -59,14 +59,14 @@ const slides = [
   </Container>
 
   <ul
-    class="gallery-track flex snap-x snap-mandatory gap-5 overflow-x-auto scroll-smooth px-5 pb-6 [scrollbar-width:none] md:px-10 [&::-webkit-scrollbar]:hidden"
+    class="gallery-track flex snap-x snap-mandatory gap-5 overflow-x-auto scroll-smooth px-5 pb-6 scrollbar-none md:px-10 [&::-webkit-scrollbar]:hidden"
     tabindex="0"
     aria-label="Galería FLEXAI en movimiento"
   >
     {
       slides.map((slide, index) => (
         <li class="group w-[78vw] shrink-0 snap-start sm:w-[46vw] lg:w-[28vw]" data-reveal="up" data-delay={index * 0.08}>
-          <ImageSlot src={slide.image} prompt={slide.prompt} alt={slide.title} sizes="(min-width: 1024px) 28vw, (min-width: 640px) 46vw, 78vw" class="aspect-[4/5] rounded-3xl transition-transform duration-700 ease-out-expo group-hover:scale-[0.98]" />
+          <ImageSlot src={slide.image} prompt={slide.prompt} alt={slide.title} sizes="(min-width: 1024px) 28vw, (min-width: 640px) 46vw, 78vw" class="aspect-4/5 rounded-3xl transition-transform duration-700 ease-out-expo group-hover:scale-[0.98]" />
           <div class="mt-5 flex items-baseline justify-between gap-4">
             <h3 class="font-display text-2xl uppercase">{slide.title}</h3>
             <span class="font-display text-sm text-ink/40">0{index + 1}</span>

@@ -11,13 +11,13 @@ export interface Zone {
   /** Extra places (neighborhoods, towns) the map search resolves to this zone; `within` is the map polygon to focus. */
   searchAliases?: { within?: string; names: string[] }[];
   prices: Record<PlanId, number>;
-  /** Theme token in src/styles/theme.css (--color-<token>). */
+  /** Theme token in src/styles/theme.css (--rgb-<token>). */
   colorToken: string;
   /** CSS color for inline styles. */
   color: string;
 }
 
-const themeColor = (token: string) => `rgb(var(--color-${token}))`;
+const themeColor = (token: string) => `rgb(var(--rgb-${token}))`;
 
 export const ZONES: Record<ZoneId, Zone> = {
   CABA: {

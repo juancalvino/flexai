@@ -23,15 +23,15 @@ const weekdays = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado
 const timeBands = ["Mañana", "Tarde/noche"];
 
 const fieldClass =
-  "mt-2 w-full rounded-xl border border-ink/15 bg-cream px-4 py-3 text-ink shadow-sm placeholder:text-ink/35 transition-colors focus:outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/30";
+  "mt-2 w-full rounded-xl border border-ink/15 bg-cream px-4 py-3 text-ink shadow-xs placeholder:text-ink/35 transition-colors focus:outline-hidden focus:border-secondary focus:ring-2 focus:ring-secondary/30";
 const labelClass = "eyebrow text-ink/75";
 const captionClass = `${labelClass} block sm:min-h-8 md:min-h-0`;
 
 const checkboxClass =
-  "flex min-h-11 cursor-pointer items-center gap-2 rounded-xl border border-ink/15 bg-cream px-3 py-2 transition-colors hover:border-secondary has-[:checked]:border-secondary has-[:checked]:bg-secondary/10 has-[:checked]:ring-1 has-[:checked]:ring-secondary has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-secondary has-[:focus-visible]:ring-offset-2";
+  "flex min-h-11 cursor-pointer items-center gap-2 rounded-xl border border-ink/15 bg-cream px-3 py-2 transition-colors hover:border-secondary has-checked:border-secondary has-checked:bg-secondary/10 has-checked:ring-1 has-checked:ring-secondary has-focus-visible:ring-2 has-focus-visible:ring-secondary has-focus-visible:ring-offset-2";
 
 const choiceCardClass =
-  "flex cursor-pointer items-center gap-3 rounded-xl border border-ink/15 bg-cream px-4 py-3 transition-colors hover:border-ink/40 has-[:checked]:border-secondary has-[:checked]:bg-secondary/10 has-[:checked]:ring-1 has-[:checked]:ring-secondary has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-secondary has-[:focus-visible]:ring-offset-2";
+  "flex cursor-pointer items-center gap-3 rounded-xl border border-ink/15 bg-cream px-4 py-3 transition-colors hover:border-ink/40 has-checked:border-secondary has-checked:bg-secondary/10 has-checked:ring-1 has-checked:ring-secondary has-focus-visible:ring-2 has-focus-visible:ring-secondary has-focus-visible:ring-offset-2";
 ---
 
 <form
@@ -203,7 +203,7 @@ const choiceCardClass =
     Revisá los campos marcados con * antes de enviar.
   </p>
 
-  <button type="submit" disabled class="btn-dark min-h-12 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-secondary sm:col-span-2">
+  <button type="submit" disabled class="btn-dark min-h-12 focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-secondary sm:col-span-2">
     <span id="submit-whatsapp-icon" aria-hidden="true" class:list={[{ hidden: quoteMode }]}><Icon name="simple-icons:whatsapp" class="h-4 w-4" /></span>
     <span id="submit-email-icon" aria-hidden="true" class="hidden">
       <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" focusable="false">
@@ -276,7 +276,7 @@ const choiceCardClass =
       const invalid = !field.matches(":disabled") && !field.checkValidity();
       valid = valid && !invalid;
       field.setAttribute("aria-invalid", String(showErrors && invalid));
-      field.classList.toggle("!border-red-600", showErrors && invalid);
+      field.classList.toggle("border-red-600!", showErrors && invalid);
     });
     requiredGroups.forEach((group) => {
       const checkboxes = Array.from(group.querySelectorAll<HTMLInputElement>('input[type="checkbox"]'));

@@ -10,8 +10,8 @@ const isActive = (path: string) => (path === "/" ? currentPath === "/" : current
 
 <header id="site-header" class="fixed inset-x-0 top-0 z-50 text-cream transition-[background-color,backdrop-filter] duration-500">
   <Container class="flex h-20 items-center justify-between gap-6">
-    <a href="/" class="relative z-[60] block w-28 py-3 md:w-32" aria-label="FLEXAI, ir al inicio">
-      <Logo class="h-auto w-full text-cream" accent="rgb(var(--color-accent))" />
+    <a href="/" class="relative z-60 block w-28 py-3 md:w-32" aria-label="FLEXAI, ir al inicio">
+      <Logo class="h-auto w-full text-cream" accent="rgb(var(--rgb-accent))" />
     </a>
 
     <nav aria-label="Principal" class="hidden lg:block">
@@ -36,7 +36,7 @@ const isActive = (path: string) => (path === "/" ? currentPath === "/" : current
     </nav>
 
     <div class="hidden items-center gap-3 lg:flex">
-      <a href={SITE.trackingUrl} target="_blank" rel="noopener noreferrer" class="btn-ghost !px-5 !py-2.5 text-cream">
+      <a href={SITE.trackingUrl} target="_blank" rel="noopener noreferrer" class="btn-ghost px-5! py-2.5! text-cream">
         Login
       </a>
     </div>
@@ -44,7 +44,7 @@ const isActive = (path: string) => (path === "/" ? currentPath === "/" : current
     <button
       id="menu-toggle"
       type="button"
-      class="relative z-[60] flex h-11 w-11 items-center justify-center rounded-full border border-cream/20 lg:hidden"
+      class="relative z-60 flex h-11 w-11 items-center justify-center rounded-full border border-cream/20 lg:hidden"
       aria-controls="mobile-menu"
       aria-expanded="false"
       aria-label="Abrir menú"
@@ -55,7 +55,7 @@ const isActive = (path: string) => (path === "/" ? currentPath === "/" : current
 
   <div
     id="mobile-menu"
-    class="fixed inset-0 z-50 overflow-y-auto overscroll-contain bg-ink opacity-0 transition-opacity duration-500 [visibility:hidden] data-[open]:opacity-100 data-[open]:[visibility:visible] lg:hidden"
+    class="fixed inset-0 z-50 overflow-y-auto overscroll-contain bg-ink opacity-0 transition-opacity duration-500 invisible data-open:opacity-100 data-open:visible lg:hidden"
     role="dialog"
     aria-modal="true"
     aria-label="Menú"
@@ -140,7 +140,7 @@ const isActive = (path: string) => (path === "/" ? currentPath === "/" : current
 
 <style>
   #site-header[data-scrolled] {
-    background-color: rgb(var(--color-ink) / 0.85);
+    background-color: rgb(var(--rgb-ink) / 0.85);
     backdrop-filter: blur(12px);
   }
 
@@ -178,7 +178,7 @@ const isActive = (path: string) => (path === "/" ? currentPath === "/" : current
   }
 
   .menu-glow {
-    background: radial-gradient(60% 40% at 100% 100%, rgb(var(--color-accent) / 0.12), transparent 70%);
+    background: radial-gradient(60% 40% at 100% 100%, rgb(var(--rgb-accent) / 0.12), transparent 70%);
   }
 
   .menu-item > a {

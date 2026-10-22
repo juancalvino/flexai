@@ -51,7 +51,7 @@ const { headingTag = "h2" } = Astro.props;
                 <p class="mt-6 max-w-md text-lg leading-relaxed text-cream/70">{service.description}</p>
               </div>
             </div>
-            <ImageSlot src={serviceImages[service.id]} prompt={service.imagePrompt} alt={service.title} sizes="(min-width: 768px) 50vw, 100vw" class="aspect-[16/10] md:aspect-auto md:min-h-full" />
+            <ImageSlot src={serviceImages[service.id]} prompt={service.imagePrompt} alt={service.title} sizes="(min-width: 768px) 50vw, 100vw" class="aspect-16/10 md:aspect-auto md:min-h-full" />
           </li>
         ))
       }
