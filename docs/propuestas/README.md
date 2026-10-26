@@ -4,8 +4,9 @@ Client-facing proposals. Not part of the site build (kept outside `public/` on p
 
 | File | Description |
 | --- | --- |
-| `flexai-propuesta-comercial.html` | Source. Self-contained A4 document (4 pages): cover, services, coverage, rates. |
+| `flexai-propuesta-comercial.html` | Source. A4 document (4 pages): cover, services, coverage, rates. |
 | `flexai-propuesta-comercial.pdf` | Generated from the HTML. Do not edit by hand. |
+| `cover-night-ride.jpg` | Cover background, compressed copy of `src/images/hero-night-ride.png`. Must sit next to the HTML. |
 
 ## Data sources
 

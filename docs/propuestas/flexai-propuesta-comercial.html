@@ -92,9 +92,14 @@
 
   /* Cover */
   .cover { background: var(--ink); color: var(--cream); padding: 22mm 20mm 18mm; }
-  .cover-glow {
-    position: absolute; right: -60mm; top: -50mm; width: 170mm; height: 170mm; border-radius: 50%;
-    background: radial-gradient(circle, rgba(255, 207, 21, .35), rgba(255, 207, 21, 0) 65%);
+  /* Same photo and overlays as the site hero (src/components/sections/HeroSection.astro). */
+  .cover-bg { position: absolute; inset: 0; }
+  .cover-bg img { width: 100%; height: 100%; object-fit: cover; object-position: 30% center; display: block; }
+  .cover-bg::after {
+    content: ""; position: absolute; inset: 0;
+    background:
+      linear-gradient(to top, var(--ink) 0%, rgba(8, 20, 33, .92) 38%, rgba(8, 20, 33, .35) 70%, rgba(8, 20, 33, .7) 100%),
+      linear-gradient(to right, rgba(8, 20, 33, .55), rgba(8, 20, 33, 0) 70%);
   }
   .cover-top {
     position: relative; display: flex; justify-content: space-between; align-items: center;
@@ -219,7 +224,7 @@
 
 <!-- 1 · Cover -->
 <section class="page cover">
-  <div class="cover-glow"></div>
+  <div class="cover-bg"><img src="cover-night-ride.jpg" alt=""></div>
   <div class="cover-top">
     <svg class="cover-logo" viewBox="0 0 305 67" role="img" aria-label="FLEXAI"><use href="#wordmark"/></svg>
     <p class="eyebrow">Propuesta comercial · Octubre 2026</p>
