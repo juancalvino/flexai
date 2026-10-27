@@ -16,7 +16,9 @@
   .bg img { width: 100%; height: 640px; object-fit: cover; object-position: 22% center; display: block; }
   .bg::after { content: ""; position: absolute; inset: 0;
     background: linear-gradient(to bottom, rgba(0,0,0,.82) 0%, rgba(0,0,0,.4) 16%, rgba(0,0,0,.55) 25%, var(--ink) 39%, var(--ink) 100%); }
-  .top { position: relative; display: flex; justify-content: space-between; align-items: center; min-height: 120px; }
+  /* Logo top-right: the rider's box carries the brand logo top-left of the photo. Fixed height so the badge below it does not push the layout. */
+  .top { position: relative; display: flex; flex-direction: column; align-items: flex-end; gap: 14px; height: 120px; }
+  .top > * { flex: none; }
   .logo-wide { height: 84px; width: auto; display: block; }
   .logo-round { height: 130px; width: 130px; display: block; }
   .logo-wordmark { width: 250px; height: auto; display: block; color: var(--cream); --logo-accent: var(--accent); }
