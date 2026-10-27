@@ -1,5 +1,5 @@
 import { defineConfig } from "astro/config";
-import tailwind from "@astrojs/tailwind";
+import tailwindcss from "@tailwindcss/vite";
 import sitemap from "@astrojs/sitemap";
 import icon from "astro-icon";
 import { securityConfig } from "./astro.config.security.mjs";
@@ -9,7 +9,6 @@ const isDev = process.env.NODE_ENV === "development";
 export default defineConfig({
   site: "https://flexai.com.ar",
   integrations: [
-    tailwind({ applyBaseStyles: true }),
     sitemap({
       i18n: {
         defaultLocale: "es",
@@ -33,6 +32,7 @@ export default defineConfig({
     defaultStrategy: "hover",
   },
   vite: {
+    plugins: [tailwindcss()],
     build: {
       cssCodeSplit: true,
       minify: "esbuild",

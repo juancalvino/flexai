@@ -16,7 +16,7 @@ export const SITE = {
   trackingUrl: "https://lightdata.flexai.com.ar",
   instagram: "https://instagram.com/flexai.logistica",
   ogImage: "/assets/og-image.jpg",
-  // Browser UI color (mobile address bar). Meta tags can't read CSS variables: keep in sync with --color-ink.
+  // Browser UI color (mobile address bar). Meta tags can't read CSS variables: keep in sync with --rgb-ink.
   browserThemeColor: "#081421",
 } as const;
 

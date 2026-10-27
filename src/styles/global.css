@@ -1,8 +1,127 @@
-@import "./theme.css";
+@import './theme.css' layer(base);
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+
+@plugin '@tailwindcss/forms';
+
+@theme {
+  --color-ink: rgb(var(--rgb-ink));
+  --color-ink-soft: rgb(var(--rgb-ink-soft));
+  --color-ink-muted: rgb(var(--rgb-ink-muted));
+
+  --color-cream: rgb(var(--rgb-cream));
+  --color-cream-light: rgb(var(--rgb-cream-light));
+  --color-cream-dark: rgb(var(--rgb-cream-dark));
+
+  --color-accent: rgb(var(--rgb-accent));
+  --color-accent-contrast: rgb(var(--rgb-on-accent));
+
+  --color-secondary: rgb(var(--rgb-secondary));
+
+  --font-sans:
+    Inter Variable, ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
+    'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  --font-display:
+    Kanit, ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
+    'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+
+  --text-display-sm: clamp(2.5rem, 6vw, 4.5rem);
+  --text-display-sm--line-height: 0.95;
+  --text-display-sm--letter-spacing: -0.02em;
+  --text-display-md: clamp(3rem, 8vw, 6.5rem);
+  --text-display-md--line-height: 0.92;
+  --text-display-md--letter-spacing: -0.03em;
+  --text-display-lg: clamp(3.25rem, 11vw, 9.5rem);
+  --text-display-lg--line-height: 0.88;
+  --text-display-lg--letter-spacing: -0.035em;
+
+  --tracking-eyebrow: 0.22em;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+
+  --animate-marquee: marquee 30s linear infinite;
+  --animate-scroll-nudge: scroll-nudge 2s ease-in-out infinite;
+
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+  @keyframes scroll-nudge {
+    0%,
+    100% {
+      transform: translateY(0);
+      opacity: 0.6;
+    }
+    50% {
+      transform: translateY(4px);
+      opacity: 1;
+    }
+  }
+}
+
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
+}
+
+@utility eyebrow {
+  @apply font-display text-xs font-medium uppercase tracking-eyebrow;
+}
+
+@utility section {
+  @apply relative py-20 md:py-36;
+}
+
+@utility btn {
+  @apply inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 font-display text-sm font-medium uppercase tracking-wider transition-[background-color,color,transform] duration-300 ease-out-expo active:scale-[0.97];
+}
+
+@utility btn-primary {
+  @apply btn bg-accent text-accent-contrast hover:bg-ink hover:text-accent;
+}
+
+@utility btn-dark {
+  @apply btn bg-ink text-cream hover:bg-accent hover:text-accent-contrast;
+}
+
+@utility btn-ghost {
+  @apply btn border border-current hover:bg-cream hover:text-ink;
+}
+
+@utility img-frame {
+  @apply relative overflow-hidden bg-ink-muted;
+}
+
+@utility img-slot {
+  /* Image placeholder: to be replaced with generated images. */
+  @apply relative flex flex-col overflow-hidden bg-ink-muted text-cream/70;
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent 0 14px,
+    rgb(var(--rgb-cream) / 0.04) 14px 28px
+  );
+}
+
+@utility img-slot__label {
+  @apply m-3 self-start rounded-sm bg-ink/80 px-2 py-1 font-mono text-[11px] leading-snug text-accent;
+}
 
 @layer base {
   html {
@@ -24,49 +143,8 @@
   }
 
   :focus-visible {
-    outline: 2px solid rgb(var(--color-accent));
+    outline: 2px solid rgb(var(--rgb-accent));
     outline-offset: 3px;
-  }
-}
-
-@layer components {
-  .eyebrow {
-    @apply font-display text-xs font-medium uppercase tracking-eyebrow;
-  }
-
-  .section {
-    @apply relative py-20 md:py-36;
-  }
-
-  .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 font-display text-sm font-medium uppercase tracking-wider transition-[background-color,color,transform] duration-300 ease-out-expo active:scale-[0.97];
-  }
-
-  .btn-primary {
-    @apply btn bg-accent text-accent-contrast hover:bg-ink hover:text-accent;
-  }
-
-  .btn-dark {
-    @apply btn bg-ink text-cream hover:bg-accent hover:text-accent-contrast;
-  }
-
-  .btn-ghost {
-    @apply btn border border-current hover:bg-cream hover:text-ink;
-  }
-
-  .img-frame {
-    @apply relative overflow-hidden bg-ink-muted;
-  }
-
-  /* Image placeholder: to be replaced with generated images. */
-  .img-slot {
-    @apply relative flex flex-col overflow-hidden bg-ink-muted text-cream/70;
-    background-image:
-      repeating-linear-gradient(45deg, transparent 0 14px, rgb(var(--color-cream) / 0.04) 14px 28px);
-  }
-
-  .img-slot__label {
-    @apply m-3 self-start rounded bg-ink/80 px-2 py-1 font-mono text-[11px] leading-snug text-accent;
   }
 }
 
