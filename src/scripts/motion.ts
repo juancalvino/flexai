@@ -3,7 +3,6 @@
 //   data-reveal="up" | "fade" | "clip"   reveal when entering the viewport
 //   data-delay="0.2"                      optional delay in seconds
 //   data-lines                            stagger children `.line > span` upward
-//   data-parallax="0.15"                  move vertically while scrolling (fraction of height)
 //   data-count="1500"                     count up to the value (data-suffix optional);
 //                                         keep the final value as text so it works without JS
 
@@ -76,21 +75,6 @@ function initLines() {
   });
 }
 
-function initParallax() {
-  gsap.utils.toArray<HTMLElement>("[data-parallax]").forEach((el) => {
-    const amount = Number(el.dataset["parallax"] ?? 0.15) * 100;
-    gsap.fromTo(
-      el,
-      { yPercent: -amount / 2 },
-      {
-        yPercent: amount / 2,
-        ease: "none",
-        scrollTrigger: { trigger: el.parentElement ?? el, start: "top bottom", end: "bottom top", scrub: true },
-      },
-    );
-  });
-}
-
 function initCounters() {
   gsap.utils.toArray<HTMLElement>("[data-count]").forEach((el) => {
     const target = Number(el.dataset["count"]);
@@ -132,7 +116,6 @@ if (!prefersReducedMotion) {
   initSmoothScroll();
   initReveals();
   initLines();
-  initParallax();
   initCounters();
   if (window.matchMedia("(min-width: 768px)").matches) initStackedCards();
 }

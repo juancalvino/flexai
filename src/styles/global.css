@@ -173,6 +173,34 @@
   }
 }
 
+/*
+ * Scroll-driven parallax. The parent of a [data-parallax] element is the view
+ * timeline subject; --parallax-amount is the travel as a fraction of the
+ * element's height. Browsers without support keep the static image.
+ * Longhands on purpose: the minifier would fold a shorthand plus
+ * animation-timeline into a single shorthand that browsers reject.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    :has(> [data-parallax]) {
+      view-timeline: --parallax block;
+    }
+
+    [data-parallax] {
+      animation-name: parallax;
+      animation-duration: 1ms;
+      animation-timing-function: linear;
+      animation-fill-mode: both;
+      animation-timeline: --parallax;
+    }
+  }
+}
+
+@keyframes parallax {
+  from { translate: 0 calc(var(--parallax-amount, 15%) / -2); }
+  to { translate: 0 calc(var(--parallax-amount, 15%) / 2); }
+}
+
 /* Lenis smooth scroll */
 html.lenis, html.lenis body {
   height: auto;

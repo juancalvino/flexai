@@ -7,7 +7,7 @@ import heroImage from "../../images/hero-night-ride.png";
 import { FEATURES } from "../../data/features";
 ---
 
-<section class="relative flex min-h-svh flex-col overflow-hidden bg-ink text-cream">
+<section class="relative flex min-h-svh flex-col overflow-clip bg-ink text-cream">
   <div class="absolute inset-0" data-reveal="clip">
     <ImageSlot
       src={heroImage}
@@ -15,7 +15,8 @@ import { FEATURES } from "../../data/features";
       prompt="fotografía cinematográfica nocturna de una avenida de Buenos Aires con estelas de luces de tránsito y un repartidor en moto en primer plano, desenfoque de movimiento, tonos oscuros con acentos amarillos, formato 16:9 horizontal"
       alt="Repartidor de FLEXAI en moto por una avenida de Buenos Aires"
       class="h-[115%] w-full pt-20"
-      data-parallax="0.12"
+      data-parallax
+      style="--parallax-amount: 12%"
     />
     <div class="absolute inset-0 bg-linear-to-t from-ink via-ink/75 to-ink/55"></div>
     <div class="absolute inset-0 bg-linear-to-r from-ink/70 via-ink/30 to-transparent"></div>
