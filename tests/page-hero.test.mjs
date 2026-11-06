@@ -21,7 +21,7 @@ test("Servicios shares its service-first H1, differentiators and final contact C
 test("home foreground centers on mobile below the header and anchors to the bottom from sm", () => {
   const foreground = homeHero.match(/<Container\b[^>]*>/)?.[0] ?? "";
   assert.match(foreground, /\bjustify-center\b.*\bpt-28\b.*\bsm:justify-end\b/);
-  assert.match(homeHero, /min-h-\[100svh\]/);
+  assert.match(homeHero, /\bmin-h-svh\b/);
   const placeholder = homeHero.match(/<ImageSlot\b[\s\S]*?\/>/)?.[0] ?? "";
   assert.match(placeholder, /prompt="fotografía cinematográfica/);
   assert.match(placeholder, /class="h-\[115%\] w-full pt-20"/);
@@ -46,8 +46,8 @@ test("PageHero full height is optional and defaults to false", () => {
 test("PageHero conditionally adds a growable full-viewport minimum without changing base styles", () => {
   const section = hero.match(/<section\b[^>]*>/)?.[0];
   assert.ok(section);
-  assert.match(section, /class:list=\{\[\s*"relative overflow-hidden bg-ink pb-20 pt-40 text-cream md:pb-28 md:pt-52",\s*\{\s*"min-h-\[100svh\]":\s*fullHeight\s*\}\s*\]\}/);
-  assert.equal((hero.match(/min-h-\[100svh\]/g) ?? []).length, 1);
+  assert.match(section, /class:list=\{\[\s*"relative overflow-hidden bg-ink pb-20 pt-40 text-cream md:pb-28 md:pt-52",\s*\{\s*"min-h-svh":\s*fullHeight\s*\}\s*\]\}/);
+  assert.equal((hero.match(/\bmin-h-svh\b/g) ?? []).length, 1);
   assert.doesNotMatch(section, /(?<![\w-])(?:h-|max-h-)|\bstyle=/);
 });
 

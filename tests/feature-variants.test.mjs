@@ -25,7 +25,7 @@ async function buildVariant(t, pricing) {
     t.after(() => rm(fixture, { recursive: true, force: true }));
   }
   // Explicit inputs only: never copy environment files, Git state or local caches.
-  for (const path of ["src", "public", "package.json", "astro.config.mjs", "astro.config.security.mjs", "tailwind.config.cjs", "tsconfig.json"]) {
+  for (const path of ["src", "public", "package.json", "astro.config.mjs", "astro.config.security.mjs", "tsconfig.json"]) {
     await cp(join(root, path), join(fixture, path), {
       recursive: true,
       filter: (source) => !basename(source).startsWith(".env"),
@@ -40,7 +40,7 @@ async function buildVariant(t, pricing) {
     resolve: { preserveSymlinks: true },`));
   await writeFile(join(fixture, "src/data/features.ts"), originalFlags
     .replace(/pricing: (true|false)/, `pricing: ${pricing}`));
-  execFileSync(process.execPath, [join(root, "node_modules/astro/astro.js"), "build"], {
+  execFileSync(process.execPath, [join(root, "node_modules/astro/bin/astro.mjs"), "build"], {
     cwd: fixture, encoding: "utf8", timeout: 120_000, stdio: "pipe",
   });
   return fixture;
