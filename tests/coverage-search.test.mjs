@@ -93,7 +93,7 @@ test("map-specific combobox exposes labelled ARIA and a bounded dark touch-frien
   assert.match(source, /data-lenis-prevent/);
   assert.match(source, /overscroll-contain/);
   assert.match(source, /min-h-\[44px\]/);
-  assert.match(source, /break-words/);
+  assert.match(source, /\bwrap-break-word\b/);
   assert.match(source, /role="status"/);
 });
 
